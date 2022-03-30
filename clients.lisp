@@ -19,8 +19,8 @@
                    :accessor first-name)
    (last-name      :initarg :last-name
 	           :accessor last-name)
-   (client-id      :initarg :id
-	           :accessor id)
+   (client-id      :initarg :client-id
+	           :accessor client-id)
    (phone          :initarg :phone
 		   :accessor phone) ;default to nil
    (email          :initarg :email
@@ -37,7 +37,7 @@
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((first-name first-name)
 		     (last-name last-name)
-		     (id id)
+		     (client-id client-id)
 		     (phone phone)
 		     (email email)
 		     (makeups makeups)
@@ -45,12 +45,12 @@
 	obj
       (format stream
 	      "~%Name: ~a ~a~% ID: ~a~% Phone: ~a~%Email: ~a~%Makeup Minutes: ~a~%Notes: ~a~%"
-	      first-name last-name id phone email makeups notes))))
+	      first-name last-name client-id phone email makeups notes))))
 
-(defun make-client (first-name last-name id makeups phone email notes)
+(defun make-client (first-name last-name client-id makeups phone email notes)
   (make-instance 'client :first-name first-name
 		         :last-name  last-name
-			 :id         id
+			 :client-id         client-id
 			 :phone      phone
 			 :email      email
 			 :makeups    makeups
@@ -60,17 +60,17 @@
   "generates a client with a new id and default makeups"
   (make-instance 'client :first-name first-name
 		         :last-name  last-name
-			 :id         (new-id)
+			 :client-id         (new-id)
 			 :phone      phone
 			 :email      email
 			 :makeups    0
 			 :notes      notes))
 
-(add-client (make-client "joe" "jonas" "1001" "45" "4043872185" "joejoe@joe.joe" "not the best jonas"))
+(add-client-to-list (make-client "joe" "jonas" 1001 "45" "4043872185" "joejoe@joe.joe" "not the best jonas"))
 ;;;;------------------------------------------------------------------------
 ;;;;ID generation
 ;;;;------------------------------------------------------------------------
-(defvar last-id (parse-integer (id (first *clients*))))
+(defvar last-id (client-id (first *clients*)))
 
 (defun new-id ()
   (setq last-id (+ last-id 1))
@@ -92,11 +92,11 @@
 
 
 ;;;;search
-(add-client (new-client "nick" "jonas" "423251324" "nicknick@joe.joe" "i guess"))
+(add-client-to-list (new-client "nick" "jonas" "423251324" "nicknick@joe.joe" "i guess"))
 
-(add-client (new-client "kevin" "jonas" "405321235" "kevinisbest@joe.joe" "the best"))
+(add-client-to-list (new-client "kevin" "jonas" "405321235" "kevinisbest@joe.joe" "the best"))
 
-(add-client (new-client "jeff" "jonass" "4032458590" "jeff@jonass.com" "ghmm?:"))
+(add-client-to-list (new-client "jeff" "jonass" "4032458590" "jeff@jonass.com" "ghmm?:"))
 ;;;;------------------------------------------------------------------------
 ;;;;search and organization
 ;;;;------------------------------------------------------------------------
@@ -108,5 +108,15 @@
 
 (defun id-search (id)
   (loop for client in *clients*
-	if (equal id (id client))
+	if (equal (write-to-string id) (write-to-string (client-id client)))
+	  do (return client)))
+
+(defun last-name-search (last-name)
+  (loop for client in *clients*
+	if (equal last-name (last-name client))
+	  do (return client)))
+
+(defun first-name-search (first-name)
+  (loop for client in *clients*
+	if (equal first-name (first-name client))
 	  do (return client)))

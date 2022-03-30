@@ -7,6 +7,5 @@
   :description "Scheduling System"
   :serial t
   :components ((:file "package")
-	       (:file "students")))
-;;;appointments
-;;;
+	       (:file "clients") ;;;change to "clients"
+	       (:file "appointments")))
