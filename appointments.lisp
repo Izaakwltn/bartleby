@@ -6,7 +6,9 @@
 ;;;;Appointment list
 ;;;;------------------------------------------------------------------------
 
-(defvar *appointments* nil)
+(defvar *appointments* nil) ;;;;should this be in virtual memory or saved to hard drive?
+;I guess ideally clients and appointments should both be saved as database files
+;that can be accessed and searched- maybe sql or postgre?
 
 ;;;;------------------------------------------------------------------------
 ;;;;Appointment Class
@@ -54,3 +56,13 @@
 ;;;;test
 (defvar test-appointment (make-appointment 1001 3 26 2022 3 45 "cabbage"))
 
+;(defun reccurring (client-id time first-date start-time duration notes) ;optional last-day, default 1 year
+ ; (loop for 
+
+;;;;calendar system (calendar.lisp)
+;;;;;function to calculate day of week given m/d/y
+;;;;
+
+
+
+				     

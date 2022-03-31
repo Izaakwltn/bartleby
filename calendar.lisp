@@ -1,0 +1,95 @@
+;;;;calendar.lisp
+
+(in-package :schedulizer)
+
+;;;;------------------------------------------------------------------------
+;;;;Date/Time Classes
+;;;;------------------------------------------------------------------------
+
+(defclass date ()
+  ((month       :initarg :month
+	        :accessor month)
+   (day         :initarg :day
+	        :accessor day)
+   (year        :initarg :year
+	        :accessor year)))
+   ;(day-of-week :initarg :day-of-week
+;		:accessor day-of-week))
+
+;print object will print like "March 1st, 2022" with a simple cond statement deciding on st, th, or rd
+
+(defmethod print-object ((obj date) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((month month)
+		     (day day)
+		     (year year))
+	obj
+      (format stream "~%~a/~a/~a" month day year))))
+
+(defun date (m d y)
+  (make-instance 'date :month m
+		       :day   d
+		       :year  y))
+
+;;;;------------------------------------------------------------------------
+;;;;Date Calculations
+;;;;------------------------------------------------------------------------
+
+(defvar common-year-numbers '((1 31) (2 28) (3 31) (4 30) (5 31) (6 30) (7 31) (8 30) (9 30) (10 31) (11 30) (12 31)))
+
+(defvar leap-year-numbers '((1 31) (2 29) (3 31) (4 30) (5 31) (6 30) (7 31) (8 30) (9 30) (10 31) (11 30) (12 31)))
+
+(defvar days-of-week '((0 "Sunday")
+		       (1 "Monday")
+		       (2 "Tuesday")
+		       (3 "Wednesday")
+		       (4 "Thursday")
+		       (5 "Friday")
+		       (6 "Saturday")))
+
+(defun leap-year-p (year)
+  "Determines whether a given year is a leap year"
+  (cond ((not (zerop (mod year 4))) nil)
+	((not (zerop (mod year 100))) t)
+	((not (zerop (mod year 400))) nil)
+	(t t)))
+
+(defun each-first-of-january (start-year start-day-of-week end-year)
+  "Start from an arbitrary monday january 1st, go up to a specified year, store a list of (year day-of-week)"
+  (loop :with day-of-week := start-day-of-week
+	:for year from start-year to end-year
+	:collect (list year day-of-week) :into firsts
+	:do (if (leap-year-p year)
+		(setf day-of-week (day-cycle day-of-week 2))
+		(setf day-of-week (day-cycle day-of-week 1)))
+	:finally (return firsts)))
+
+
+(setq firsts-of-january (each-first-of-january 1900 1 2100))
+
+(defun day-of-week (date)
+  (let ((jan1 (second (assoc (year date) firsts-of-january))))
+    (day-cycle jan1 (mod (- (day-nth date) 1) 7))))                 
+                            ;;;;figure out total days between 1/1/year and date, (mod total-days 7)
+
+(defun day-nth (date)
+  "Returns how many days into the year the given date is"
+  (let ((month-list (if (leap-year-p (year date))
+			leap-year-numbers
+			common-year-numbers)))
+    (+ (cond ((equal (month date) 1) 0)
+	     ((equal (month date) 2) 31)
+	     (t (loop for i from 0 to (- (month date) 2)
+		 sum (second (nth i month-list)))))
+       (day date))))
+
+(defun day-cycle (day-value change)
+  (cond ((zerop change) day-value)
+	((equal day-value 6) (day-cycle 0 (- change 1)))
+	(t (day-cycle (+ day-value 1) (- change 1)))))
+;(defun next-week 
+					;1993: january 1st friday, march 26 also friday
+  ;day-nth ;=>  85, (- 85 1) => (mod 84 7) ;=> 0
+;;;;------------------------------------------------------------------------
+;;;;Time Calculations
+;;;;------------------------------------------------------------------------

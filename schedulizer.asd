@@ -7,5 +7,6 @@
   :description "Scheduling System"
   :serial t
   :components ((:file "package")
-	       (:file "clients") ;;;change to "clients"
-	       (:file "appointments")))
+	       (:file "calendar")
+	       (:file "clients")
+	       (:file "appointments"))) ;add invoices.lisp
