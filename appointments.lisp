@@ -17,8 +17,8 @@
 (defclass appointment ()
   ((client     :initarg :client
 	       :accessor client)
-   (date       :initarg :date
-	       :accessor date)
+   (app-date   :initarg :app-date
+	       :accessor app-date)
    (start-time :initarg :start-time
 	       :accessor start-time)
    (duration   :initarg :duration
@@ -29,18 +29,18 @@
 (defmethod print-object ((obj appointment) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((client client)
-		     (date date)
+		     (app-date app-date)
 		     (start-time start-time)
 		     (duration duration)
 		     (notes notes))
 	obj
       (format stream
 	      "~%Date/Time: ~a at ~a~%Client: ~a~%Duration: ~a~%Notes: ~a~%"
-	      date start-time client duration notes))))
+	      app-date start-time client duration notes))))
 	      
-(defun make-appointment (client-id date start-time duration notes)
+(defun make-appointment (client-id app-date start-time duration notes)
   (make-instance 'appointment :client (id-search client-id)
-		              :date date
+		              :app-date app-date
 			      :start-time start-time
 			      :duration duration
 			      :notes notes))
