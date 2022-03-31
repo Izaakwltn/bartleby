@@ -13,10 +13,6 @@
 	        :accessor day)
    (year        :initarg :year
 	        :accessor year)))
-   ;(day-of-week :initarg :day-of-week
-;		:accessor day-of-week))
-
-;print object will print like "March 1st, 2022" with a simple cond statement deciding on st, th, or rd
 
 (defmethod print-object ((obj date) stream)
   (print-unreadable-object (obj stream :type t)
@@ -47,30 +43,18 @@
 		       (5 "Friday")
 		       (6 "Saturday")))
 
+(defun day-cycle (day-value change)
+  "Cycles through days of the week as designated."
+  (cond ((zerop change) day-value)
+	((equal day-value 6) (day-cycle 0 (- change 1)))
+	(t (day-cycle (+ day-value 1) (- change 1)))))
+
 (defun leap-year-p (year)
   "Determines whether a given year is a leap year"
   (cond ((not (zerop (mod year 4))) nil)
 	((not (zerop (mod year 100))) t)
 	((not (zerop (mod year 400))) nil)
 	(t t)))
-
-(defun each-first-of-january (start-year start-day-of-week end-year)
-  "Start from an arbitrary monday january 1st, go up to a specified year, store a list of (year day-of-week)"
-  (loop :with day-of-week := start-day-of-week
-	:for year from start-year to end-year
-	:collect (list year day-of-week) :into firsts
-	:do (if (leap-year-p year)
-		(setf day-of-week (day-cycle day-of-week 2))
-		(setf day-of-week (day-cycle day-of-week 1)))
-	:finally (return firsts)))
-
-
-(setq firsts-of-january (each-first-of-january 1900 1 2100))
-
-(defun day-of-week (date)
-  (let ((jan1 (second (assoc (year date) firsts-of-january))))
-    (day-cycle jan1 (mod (- (day-nth date) 1) 7))))                 
-                            ;;;;figure out total days between 1/1/year and date, (mod total-days 7)
 
 (defun day-nth (date)
   "Returns how many days into the year the given date is"
@@ -83,13 +67,38 @@
 		 sum (second (nth i month-list)))))
        (day date))))
 
-(defun day-cycle (day-value change)
-  (cond ((zerop change) day-value)
-	((equal day-value 6) (day-cycle 0 (- change 1)))
-	(t (day-cycle (+ day-value 1) (- change 1)))))
-;(defun next-week 
-					;1993: january 1st friday, march 26 also friday
-  ;day-nth ;=>  85, (- 85 1) => (mod 84 7) ;=> 0
+(defun each-first-of-january (start-year start-day-of-week end-year)
+  "Start from an arbitrary monday january 1st, go up to a specified year, store a list of (year day-of-week)"
+  (loop :with day-of-week := start-day-of-week
+	:for year from start-year to end-year
+	:collect (list year day-of-week) :into firsts
+	:do (if (leap-year-p year)
+		(setf day-of-week (day-cycle day-of-week 2))
+		(setf day-of-week (day-cycle day-of-week 1)))
+	:finally (return firsts)))
+
+(defvar firsts-of-january (each-first-of-january 1900 1 2100))
+
+(defun day-of-week (date)
+  (let ((jan1 (second (assoc (year date) firsts-of-january))))
+    (day-cycle jan1 (mod (- (day-nth date) 1) 7))))
 ;;;;------------------------------------------------------------------------
 ;;;;Time Calculations
 ;;;;------------------------------------------------------------------------
+
+(defclass set-time ()
+  ((hour    :initarg :hour
+	    :accessor hour)
+   (minutes :initarg :minutes
+	    :accessor minutes)))
+
+(defmethod print-object ((obj set-time) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((hour hour)
+		     (minutes minutes))
+	obj
+      (format stream "~%~a:~a" hour minutes))));;;add am/pm
+
+(defun set-time (hour minutes)
+  (make-instance 'set-time :hour hour
+		           :minutes minutes))

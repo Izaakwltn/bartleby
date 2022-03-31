@@ -9,4 +9,5 @@
   :components ((:file "package")
 	       (:file "calendar")
 	       (:file "clients")
-	       (:file "appointments"))) ;add invoices.lisp
+	       (:file "appointments")
+	       (:file "invoices"))) ;add invoices.lisp
