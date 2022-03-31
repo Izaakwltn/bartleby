@@ -17,6 +17,8 @@
 (defclass appointment ()
   ((client     :initarg :client
 	       :accessor client)
+   (employee   :initarg :employee
+	       :accessor employee)
    (app-date   :initarg :app-date
 	       :accessor app-date)
    (start-time :initarg :start-time
@@ -29,28 +31,125 @@
 (defmethod print-object ((obj appointment) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((client client)
+		     (employee employee)
 		     (app-date app-date)
 		     (start-time start-time)
 		     (duration duration)
 		     (notes notes))
 	obj
       (format stream
-	      "~%Date/Time: ~a at ~a~%Client: ~a~%Duration: ~a~%Notes: ~a~%"
-	      app-date start-time client duration notes))))
+	      "~%Date/Time: ~a at ~a~%Client: ~a~%Employee: ~a~%Duration: ~a~%Notes: ~a~%"
+	      app-date start-time client employee duration notes))))
 	      
-(defun make-appointment (client-id app-date start-time duration notes)
+(defun make-appointment (client-id employee-id app-date time duration notes)
   (make-instance 'appointment :client (id-search client-id)
+		              :employee (employee-search employee-id)
 		              :app-date app-date
-			      :start-time start-time
+			      :start-time time
 			      :duration duration
 			      :notes notes))
 
 ;;;;test
-(defvar test-appointment (make-appointment 1001 (date 3 26 2022) 3 45 "cabbage"))
+(setq test-appointment (make-appointment 1001 2001 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))
 
 ;(defun reccurring (client-id time first-date start-time duration notes) ;optional last-day, default 1 year
 					; (loop for
 
 
+;;;;------------------------------------------------------------------------
+;;;;Unchecked Appointments
+;;;;------------------------------------------------------------------------
 
-				     
+(defvar *appointments* nil)
+
+(defun add-appointment (appointment)
+  (push appointment
+	*appointments*))
+
+(defun backup-appointment (appointment)
+  (with-open-file (out (asdf:system-relative-pathname "schedulizer"
+						      "appointment-backup.lisp")
+		       :direction :output
+		       :if-exists :append)
+    (format out
+	    "~%(add-appointment (make-appointment ~a (date ~a ~a ~a) (set-time ~a ~a) ~a))"
+	    (write-to-string (client-id (client appointment)))
+	    (write-to-string (month (app-date appointment)))
+	    (write-to-string (day (app-date appointment)))
+	    (write-to-string (year (app-date appointment)))
+	    (write-to-string (month (app-date appointment)))
+	    (write-to-string (hour (start-time appointment)))
+	    (write-to-string (minutes (start-time appointment)))
+	    (write-to-string (duration appointment))
+	    (write-to-string (notes appointment)))))
+
+
+
+(defun prompt-read (prompt)
+  (format *query-io* "~a: " prompt)
+  (force-output *query-io*)
+  (read-line *query-io*))
+
+(defun appointment-input ()
+  (let ((new-appointment (make-appointment (prompt-read "Client ID: ")
+					   (date (prompt-read "Month: (1, 2, 3 etc)")
+						 (prompt-read "Day: ")
+						 (prompt-read "Year: "))
+					   (set-time (prompt-read "Hour: ")
+						     (prompt-read "Minutes: "))
+					   (prompt-read "Duration in minutes: ")
+					   (prompt-read "Notes"))))
+    (add-appointment new-appointment)
+    (backup-appointment new-appointment)))
+
+(defun input-appointments ()
+  (loop (appointment-input)
+	(if (not (y-or-n-p "Another new appointment? [y/n]: ")) (return))))
+;;;;------------------------------------------------------------------------
+;;;;Checking out Appointments
+;;;;------------------------------------------------------------------------
+
+(defclass receipt ()
+  ((appointment :initarg :appointment
+		:accessor appointment)
+   (status      :initarg :status
+		:accessor status)))
+
+;status is either no-show, cancelled+makup, arrived, or arrived+15makeup
+
+(defmethod print-object ((obj receipt) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((appointment appointment)
+		     (status status))
+(defvar *receipts* nil)
+
+(defun backup-receipt (receipt)
+  (with-open-file (out (asdf:system-relative-pathname "schedulizer"
+						      "receipt-backup.lisp")
+		       :direction :output
+		       :if-exists :append)
+    (format out
+	    "~%(add-appointment (make-receipt ~a (date ~a ~a ~a) (set-time ~a ~a) ~a))"
+	    (write-to-string (client-id (client appointment)))
+	    (write-to-string (month (app-date appointment)))
+	    (write-to-string (day (app-date appointment)))
+	    (write-to-string (year (app-date appointment)))
+	    (write-to-string (month (app-date appointment)))
+	    (write-to-string (hour (start-time appointment)))
+	    (write-to-string (minutes (start-time appointment)))
+	    (write-to-string (duration appointment))
+	    (write-to-string (notes appointment)))))
+
+(defun ready-appointments (employee-id)
+    (loop :for a in *appointments*
+          :if (and (equal (employee-id (employee a)) employee-id)
+		   (equal-date (later-date (app-date a) (today)) (today)))
+	    :collect a into apts
+	  :finally (return apts)))
+
+(defun checking-out (appointment)
+  (format t "Current Appointment: ~a" appointment)
+  (let 
+
+(defun check-out ()
+  (loop (

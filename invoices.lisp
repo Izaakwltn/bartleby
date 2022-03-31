@@ -44,6 +44,17 @@
 			   :last-name last-name
 			   :hourly-rate hourly-rate))
 
+(defvar izaak (make-employee 2001 "Izaak" "Walton" 37))
+
+(defvar *employees* nil)
+
+(push izaak *employees*)
+
+(defun employee-search (employee-id)
+  (loop for employee in *employees*
+	if (equal (write-to-string employee-id)
+		  (write-to-string (employee-id employee)))
+	  do (return employee)))
 ;;;;------------------------------------------------------------------------
 ;;;;Invoice class
 ;;;;------------------------------------------------------------------------

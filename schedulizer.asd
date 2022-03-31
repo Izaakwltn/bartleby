@@ -5,6 +5,7 @@
   :author "Izaak Walton <izaakw@protonmail.com>"
   :license "GNU General Purpose License"
   :description "Scheduling System"
+  :depends-on ("local-time")
   :serial t
   :components ((:file "package")
 	       (:file "calendar")

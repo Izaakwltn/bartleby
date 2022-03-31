@@ -76,27 +76,13 @@
   (setq last-id (+ last-id 1))
   last-id)
 
-;;;;------------------------------------------------------------------------
-;;;;Client lists and backups
-;;;;------------------------------------------------------------------------
-
-;(defvar *clients* nil)
-
-;(defun add-client (client)
- ; (push client *clients*))
-
-;;;;lookup backup systems- backup both on server and send the backup to a remote vault
-;(add-client (make-client "joe" "jonas" "1001" "45" "4043872185" "joejoe@joe.joe" "not the best jonas"))
-;;;;client page:
-
-
-
 ;;;;search
 (add-client-to-list (new-client "nick" "jonas" "423251324" "nicknick@joe.joe" "i guess"))
 
 (add-client-to-list (new-client "kevin" "jonas" "405321235" "kevinisbest@joe.joe" "the best"))
 
 (add-client-to-list (new-client "jeff" "jonass" "4032458590" "jeff@jonass.com" "ghmm?:"))
+
 ;;;;------------------------------------------------------------------------
 ;;;;search and organization
 ;;;;------------------------------------------------------------------------
@@ -120,3 +106,8 @@
   (loop for client in *clients*
 	if (equal first-name (first-name client))
 	  do (return client)))
+
+;;;;------------------------------------------------------------------------
+;;;;Client Database
+;;;;------------------------------------------------------------------------
+

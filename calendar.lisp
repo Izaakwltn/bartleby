@@ -27,13 +27,56 @@
 		       :day   d
 		       :year  y))
 
+(defun later-date (date1 date2)
+  "Compares two dates, returns the later date."
+  (cond ((> (year date1) (year date2)) date1)
+	((> (year date2) (year date1)) date2)
+	((> (month date1) (month date2)) date1)
+	((> (month date2) (month date1)) date2)
+	((> (day date1) (day date2)) date1)
+	((> (day date2) (day date1)) date2)
+	(t date1)))
+
+(defun equal-date (date1 date2)
+  (cond ((and (equal (month date1)
+		     (month date2))
+	      (equal (day   date1)
+		     (day   date2))
+	      (equal (year  date1)
+		     (year date2)))
+	 t)
+	(t nil)))
+			       
+
 ;;;;------------------------------------------------------------------------
 ;;;;Date Calculations
 ;;;;------------------------------------------------------------------------
 
-(defvar common-year-numbers '((1 31) (2 28) (3 31) (4 30) (5 31) (6 30) (7 31) (8 30) (9 30) (10 31) (11 30) (12 31)))
+(defvar common-year-numbers '((1 31)
+			      (2 28)
+			      (3 31)
+			      (4 30)
+			      (5 31)
+			      (6 30)
+			      (7 31)
+			      (8 30)
+			      (9 30)
+			      (10 31)
+			      (11 30)
+			      (12 31)))
 
-(defvar leap-year-numbers '((1 31) (2 29) (3 31) (4 30) (5 31) (6 30) (7 31) (8 30) (9 30) (10 31) (11 30) (12 31)))
+(defvar leap-year-numbers '((1 31)
+			    (2 29)
+			    (3 31)
+			    (4 30)
+			    (5 31)
+			    (6 30)
+			    (7 31)
+			    (8 30)
+			    (9 30)
+			    (10 31)
+			    (11 30)
+			    (12 31)))
 
 (defvar days-of-week '((0 "Sunday")
 		       (1 "Monday")
@@ -80,15 +123,37 @@
 (defvar firsts-of-january (each-first-of-january 1900 1 2100))
 
 (defun day-of-week (date)
+  "Determines the day of the week for a given date."
   (let ((jan1 (second (assoc (year date) firsts-of-january))))
     (day-cycle jan1 (mod (- (day-nth date) 1) 7))))
+
+(defun number-suffix (n)
+  (let ((s (write-to-string n)))
+    (cond ((> (length s) 1)
+	   (number-suffix
+	    (parse-integer
+	     (subseq s
+	             (- (length s) 1)
+		     (length s)))))
+	  ((equal n 1) "st")
+	  ((equal n 2) "nd")
+	  ((equal n 3) "rd")
+	  (t "th"))));;;;works great except for 11th, 12th...
+				   
+						 
+
+(defun today ()
+  (date (local-time:timestamp-month (local-time:now))
+        (local-time:timestamp-day   (local-time:now))
+	(local-time:timestamp-year  (local-time:now))))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Time Calculations
 ;;;;------------------------------------------------------------------------
 
 (defclass set-time ()
   ((hour    :initarg :hour
-	    :accessor hour)
+	    :accessor hour) ;;;stored in 24 hour system
    (minutes :initarg :minutes
 	    :accessor minutes)))
 
@@ -97,8 +162,26 @@
     (with-accessors ((hour hour)
 		     (minutes minutes))
 	obj
-      (format stream "~%~a:~a" hour minutes))));;;add am/pm
+      (format stream "~%~a:~a ~a"
+	      (if (> hour 12)
+		  (- hour 12)
+		  hour)
+	      (if (equal 1 (length (write-to-string minutes)))
+		  (concatenate 'string "0" (write-to-string minutes))
+		  minutes)
+	      (if (> hour 12)
+		  "pm"
+		  "am")))));;;add am/pm
 
 (defun set-time (hour minutes)
   (make-instance 'set-time :hour hour
 		           :minutes minutes))
+
+(defun add-time (time minutes)
+  (let ((minute-sum (+ minutes (minutes time))))
+    (cond ((< minute-sum 59) (set-time (hour time) minute-sum))
+	  (t "too late"))))
+
+(defun current-time ()
+  (set-time (local-time:timestamp-hour (local-time:now))
+	    (local-time:timestamp-minute (local-time:now))))

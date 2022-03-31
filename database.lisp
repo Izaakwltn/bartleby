@@ -3,7 +3,7 @@
 (in-package :schedulizer)
 
 (defun update-backup (client)
-  (with-open-file (out (asdf:system-relative-pathname "scheduler" "backup.lisp")
+  (with-open-file (out (asdf:system-relative-pathname "schedulizer" "backup.lisp")
 		       :direction :output
 		       :if-exists :append)
     (format out
