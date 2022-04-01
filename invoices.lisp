@@ -15,47 +15,6 @@
 ;;;;functions for appointments by month, by year, by week, within a range of dates, by student id, by 
 
 ;;;;------------------------------------------------------------------------
-;;;;Employee class
-;;;;------------------------------------------------------------------------
-
-(defclass employee ()
-  ((employee-id :initarg :employee-id
-		:accessor employee-id)
-   (first-name  :initarg :first-name
-		:accessor first-name)
-   (last-name   :initarg :last-name
-		:accessor last-name)
-   (hourly-rate :initarg :hourly-rate
-		:accessor hourly-rate)))
-
-(defmethod print-object ((obj employee) stream)
-  (print-unreadable-object (obj stream :type t)
-    (with-accessors ((employee-id employee-id)
-		     (first-name first-name)
-		     (last-name last-name)
-		     (hourly-rate hourly-rate))
-	obj
-      (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%Rate: $~a/hr~%"
-	      employee-id first-name last-name hourly-rate))))
-
-(defun make-employee (employee-id first-name last-name hourly-rate)
-  (make-instance 'employee :employee-id employee-id
-		           :first-name first-name
-			   :last-name last-name
-			   :hourly-rate hourly-rate))
-
-(defvar izaak (make-employee 2001 "Izaak" "Walton" 37))
-
-(defvar *employees* nil)
-
-(push izaak *employees*)
-
-(defun employee-search (employee-id)
-  (loop for employee in *employees*
-	if (equal (write-to-string employee-id)
-		  (write-to-string (employee-id employee)))
-	  do (return employee)))
-;;;;------------------------------------------------------------------------
 ;;;;Invoice class
 ;;;;------------------------------------------------------------------------
 
