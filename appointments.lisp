@@ -83,21 +83,41 @@
 	      "~%Date/Time: ~a at ~a~%Client: ~a~%Employee: ~a~%Duration: ~a~%Notes: ~a~%"
 	      app-date start-time client employee duration notes))))
 	      
-(defun make-appointment (client-id employee-id app-date time duration notes)
+(defun make-appointment (client-id employee-id app-date start-time duration notes)
   (make-instance 'appointment :client (id-search client-id)
 		              :employee (employee-search employee-id)
 		              :app-date app-date
-			      :start-time time
+			      :start-time start-time
 			      :duration duration
 			      :notes notes))
 
+(defun add-appointment (appointment)
+  (push appointment *appointments*))
 ;;;;test
 (setq test-appointment (make-appointment 1001 2001 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))
 
 ;(defun reccurring (client-id time first-date start-time duration notes) ;optional last-day, default 1 year
 					; (loop for
 
+;;;;------------------------------------------------------------------------
+;;;;Recurring Appointments
+;;;;------------------------------------------------------------------------
 
+(defun recurring (appointment number-of-appointments); &optional (recurrence-rate 7))
+  (let ((client   (client appointment))
+	(employee (employee appointment))
+	(app-date    (app-date appointment))
+	(start-time  (start-time appointment))
+        (duration    (duration appointment))
+	(notes       (notes appointment)))
+    (loop :with current-week := app-date
+	  :for i :from 1 to number-of-appointments
+	  :do (add-appointment
+	       (make-appointment (client-id client) (employee-id employee) current-week start-time duration notes))
+	      (setf current-week (add-days current-week 7)))))
+
+ ; (defun weekly (appointment)
+  ;  (
 ;;;;------------------------------------------------------------------------
 ;;;;Unchecked Appointments
 ;;;;------------------------------------------------------------------------
@@ -166,6 +186,9 @@
 	obj
       (format stream"~a ~a" appointment status))))
 
+(defun make-receipt (appointment status)
+  (make-instance 'receipt :appointment appointment
+		          :status status))
 (defvar *receipts* nil)
 
 ;(defun backup-receipt (receipt)

@@ -46,6 +46,21 @@
 		     (year date2)))
 	 t)
 	(t nil)))
+
+(defun month-days (month year)
+  (second (assoc month (if (leap-year-p year)
+			   leap-year-numbers
+			   common-year-numbers))))
+
+(defun add-days (date days)
+  (cond ((zerop days) date)
+	((and (equal (month date) 12)
+	      (equal (day date) 31))
+	 (add-days (date 1 1 (+ (year date) 1)) (- days 1)))
+	((equal (day date) (month-days (month date) (year date)))
+	 (add-days (date (+ (month date) 1) 1 (year date)) (- days 1)))
+	(t (add-days (date (month date) (+ 1 (day date)) (year date))
+		     (- days 1)))))
 			       
 
 ;;;;------------------------------------------------------------------------
