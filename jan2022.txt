@@ -1,0 +1,110 @@
+
+Test Invoice
+
+Izaak Walton
+2047 S Milwaukee St~%Denver, CO 80210
+
+#<RECEIPT #<APPOINTMENT 
+#<DATE 
+Wednesday, January 5th, 2022>
+ #<SET-TIME 
+10:30 am>
+Client: Marlene Thompson
+Employee: Izaak Walton
+Duration: 30
+Notes: 
+>
+a
+45
+-15>
+#<RECEIPT #<APPOINTMENT 
+#<DATE 
+Wednesday, January 12th, 2022>
+ #<SET-TIME 
+10:30 am>
+Client: Marlene Thompson
+Employee: Izaak Walton
+Duration: 30
+Notes: 
+>
+c
+0
+30>
+#<RECEIPT #<APPOINTMENT 
+#<DATE 
+Wednesday, January 19th, 2022>
+ #<SET-TIME 
+10:30 am>
+Client: Marlene Thompson
+Employee: Izaak Walton
+Duration: 30
+Notes: 
+>
+a
+45
+-15>
+#<RECEIPT #<APPOINTMENT 
+#<DATE 
+Wednesday, January 26th, 2022>
+ #<SET-TIME 
+10:30 am>
+Client: Marlene Thompson
+Employee: Izaak Walton
+Duration: 30
+Notes: 
+>
+c
+0
+30>
+#<RECEIPT #<APPOINTMENT 
+#<DATE 
+Wednesday, January 5th, 2022>
+ #<SET-TIME 
+5:00 pm>
+Client: Joslyn Chartrand
+Employee: Izaak Walton
+Duration: 30
+Notes: 
+>
+a
+30
+0>
+#<RECEIPT #<APPOINTMENT 
+#<DATE 
+Wednesday, January 12th, 2022>
+ #<SET-TIME 
+5:00 pm>
+Client: Joslyn Chartrand
+Employee: Izaak Walton
+Duration: 30
+Notes: 
+>
+a
+30
+0>
+#<RECEIPT #<APPOINTMENT 
+#<DATE 
+Wednesday, January 19th, 2022>
+ #<SET-TIME 
+5:00 pm>
+Client: Joslyn Chartrand
+Employee: Izaak Walton
+Duration: 30
+Notes: 
+>
+c
+0
+30>
+#<RECEIPT #<APPOINTMENT 
+#<DATE 
+Wednesday, January 26th, 2022>
+ #<SET-TIME 
+5:00 pm>
+Client: Joslyn Chartrand
+Employee: Izaak Walton
+Duration: 30
+Notes: 
+>
+a
+45
+-15>

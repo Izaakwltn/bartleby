@@ -30,6 +30,12 @@
    (duration      :initarg :duration
 		  :accessor duration)))
 
+(defvar attendance-values '((0 "Arrived")
+			   (1 "No Show")
+			   (2 "Cancelled, Makeup Added")
+			   (3 "Makeup Used")
+			   (4 "Lesson + Makeup Minutes")))
+
 (defmethod print-object ((obj receipt) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((appointment   appointment)
@@ -37,7 +43,11 @@
 		     (duration      duration)
 		     (makeup-change makeup-change))
 	obj
-      (format stream"~a~%~a~%~a~%~a" appointment attendance duration makeup-change))))
+      (format stream"~a~%~a~%~a~%~a"
+	      appointment
+	      attendance
+		duration
+		makeup-change))))
 
 (defun make-receipt (appointment attendance duration makeup-change)
   (make-instance 'receipt :appointment   appointment
@@ -46,7 +56,7 @@
 			  :makeup-change makeup-change))
 
 (defun check-out-appointment (appointment)
-  (format t "~a" appointment)
+  (format t "~%~a~%" appointment)
   (push (make-receipt appointment
 		(prompt-read "Attendance: Arrived(a), No Show(n), Cancelled with makeup Added (c), Makeup(m), Used some makeup (u)")
 		(prompt-read "Duration: ")
@@ -85,7 +95,7 @@
 	      "~%~a:~%~%~a~%~{~a~%~}~%"
 	      title employee receipts))))
 
-(defun draft-invoice (title employee-id appointments)
+(defun draft-invoice (title employee-id receipts)
   (make-instance 'invoice :title title
 		          :employee (employee-search employee-id)
 			  :receipts receipts))
@@ -136,9 +146,10 @@
 		       :direction         :output
 		       :if-does-not-exist :create
 		       :if-exists         :overwrite)
-    (format out "~%~a~%~%~a ~a~%~a~%~%"
+    (format out "~%~a~%~%~a ~a~%~a~%~%~{~a~%~}"
 	    (title invoice)
 	    (first-name (employee invoice))
 	    (last-name (employee invoice))
-	    (address (employee invoice)))))
+	    (address (employee invoice))
+	    (receipts invoice))))
 
