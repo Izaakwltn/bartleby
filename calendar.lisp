@@ -20,7 +20,7 @@
 		     (day day)
 		     (year year))
 	obj
-      (format stream "~%~a, ~a ~a~a, ~a"
+      (format stream "~a, ~a ~a~a, ~a"
 	      (second (assoc (day-of-week (date month day year)) days-of-week))
 	      (second (assoc month month-names))
 	      day
@@ -182,7 +182,7 @@
 	  ((equal n 1) "st")
 	  ((equal n 2) "nd")
 	  ((equal n 3) "rd")
-	  (t "th"))));;;;works great except for 11th, 12th...
+	  (t "th"))))
 				   
 						 
 
@@ -213,7 +213,7 @@
     (with-accessors ((hour hour)
 		     (minutes minutes))
 	obj
-      (format stream "~%~a:~a ~a"
+      (format stream "~a:~a ~a"
 	      (if (> hour 12)
 		  (- hour 12)
 		  hour)
@@ -222,7 +222,7 @@
 		  minutes)
 	      (if (> hour 12)
 		  "pm"
-		  "am")))));;;add am/pm
+		  "am")))))
 
 (defun set-time (hour minutes)
   (make-instance 'set-time :hour hour

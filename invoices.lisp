@@ -43,11 +43,14 @@
 		     (duration      duration)
 		     (makeup-change makeup-change))
 	obj
-      (format stream"~a~%~a~%~a~%~a"
-	      appointment
-	      attendance
-		duration
-		makeup-change))))
+      (format stream"~a~a ~a ~a, ~a ~a minutes, Makeup Change: ~a"
+	      (app-date appointment)
+	      (start-time appointment)
+	      (first-name (client appointment))
+	      (last-name (client appointment))
+	      (second (assoc attendance attendance-values))
+	      duration
+	      makeup-change))))
 
 (defun make-receipt (appointment attendance duration makeup-change)
   (make-instance 'receipt :appointment   appointment
@@ -135,21 +138,52 @@
 	  :collect r into rcpts
 	:finally (return rcpts)))
 
+(defun chronological-receipts (receipts)
+  "Sorts a list of receipts by oldest to newest."
+  (sort (copy-list receipts)
+	#'(lambda (receipt1 receipt2)
+	    (not (later-date (app-date (appointment receipt1))
+			(app-date (appointment receipt2)))))))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Printing Invoices:
 ;;;;------------------------------------------------------------------------
 
-(defvar test-invoice (draft-invoice "Test Invoice" 2001 (month-receipts 2001 1)))
+(defvar test-invoice (draft-invoice "Test Invoice" 2001 (chronological-receipts (month-receipts 2001 1))))
 
 (defun print-invoice (filename invoice)
   (with-open-file (out (asdf:system-relative-pathname "schedulizer" filename)
 		       :direction         :output
 		       :if-does-not-exist :create
 		       :if-exists         :overwrite)
-    (format out "~%~a~%~%~a ~a~%~a~%~%~{~a~%~}"
+    (format out "~%~a~%~%~a ~a~%~a~%~%"
 	    (title invoice)
 	    (first-name (employee invoice))
 	    (last-name (employee invoice))
-	    (address (employee invoice))
-	    (receipts invoice))))
+	    (address (employee invoice)))
+     (loop :for r :in (receipts invoice)
+	   :do (let ((d  (app-date (appointment r)))
+	             (st (start-time (appointment r)))
+	             (cl (client (appointment r))))
+		 (format out "~a, ~a ~a~a, ~a - ~a:~a ~a - ~a ~a - ~a - ~amin - Makeup Change: ~a~%"
+			 (second (assoc (day-of-week d) days-of-week))
+		         (second (assoc (month d) month-names))
+		         (day d)
+		         (number-suffix (day d))
+		         (year d)
+			 (if (> (hour st) 12)
+			     (- (hour st) 12)
+			     (hour st))
+			 (if (equal 1 (length (write-to-string (minutes st))))
+			     (concatenate 'string "0" (write-to-string (minutes st)))
+			     (minutes st))
+			 (if (> (hour st) 12) "pm" "am")
+			 (first-name cl)
+			 (last-name cl)
+			 (second (assoc (attendance r) attendance-values))
+			 (duration r)
+			 (makeup-change r))))))
+			 
+		       
+	  
 
