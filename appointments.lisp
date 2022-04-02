@@ -13,6 +13,8 @@
 		:accessor first-name)
    (last-name   :initarg :last-name
 		:accessor last-name)
+   (address     :initarg :address
+		:accessor address)
    (hourly-rate :initarg :hourly-rate
 		:accessor hourly-rate)))
 
@@ -21,18 +23,20 @@
     (with-accessors ((employee-id employee-id)
 		     (first-name first-name)
 		     (last-name last-name)
+		     (address   address)
 		     (hourly-rate hourly-rate))
 	obj
-      (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%Rate: $~a/hr~%"
-	      employee-id first-name last-name hourly-rate))))
+      (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%~a~%Rate: $~a/hr~%"
+	      employee-id first-name last-name address hourly-rate))))
 
-(defun make-employee (employee-id first-name last-name hourly-rate)
+(defun make-employee (employee-id first-name last-name address hourly-rate)
   (make-instance 'employee :employee-id employee-id
-		           :first-name first-name
-			   :last-name last-name
+		           :first-name  first-name
+			   :last-name   last-name
+			   :address     address
 			   :hourly-rate hourly-rate))
 
-(defvar izaak (make-employee 2001 "Izaak" "Walton" 37))
+(defvar izaak (make-employee 2001 "Izaak" "Walton" "2047 S Milwaukee St~%Denver, CO 80210" 37))
 
 (defvar *employees* nil)
 
@@ -80,8 +84,15 @@
 		     (notes notes))
 	obj
       (format stream
-	      "~%Date/Time: ~a at ~a~%Client: ~a~%Employee: ~a~%Duration: ~a~%Notes: ~a~%"
-	      app-date start-time client employee duration notes))))
+	      "~%Date/Time: ~a at ~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
+	      app-date
+	      start-time
+	      (first-name client)
+	      (last-name client)
+	      (first-name employee)
+	      (last-name employee)
+	      duration
+	      notes))))
 	      
 (defun make-appointment (client-id employee-id app-date start-time duration notes)
   (make-instance 'appointment :client (id-search client-id)
@@ -116,8 +127,8 @@
 	       (make-appointment (client-id client) (employee-id employee) current-week start-time duration notes))
 	      (setf current-week (add-days current-week 7)))))
 
- ; (defun weekly (appointment)
-  ;  (
+(recurring (make-appointment 1002 2001 (date 1 5 2022) (set-time 10 30) 30 "") 50)
+(recurring (make-appointment 1003 2001 (date 1 5 2022) (set-time 5 0) 30 "") 50)
 ;;;;------------------------------------------------------------------------
 ;;;;Unchecked Appointments
 ;;;;------------------------------------------------------------------------
@@ -171,25 +182,24 @@
 ;;;;Checking out Appointments
 ;;;;------------------------------------------------------------------------
 
-(defclass receipt ()
-  ((appointment :initarg :appointment
-		:accessor appointment)
-   (status      :initarg :status
-		:accessor status)))
+;(defclass receipt ()
+ ; ((appointment :initarg :appointment
+;		:accessor appointment)
+ ;  (status      :initarg :status
+;		:accessor status)))
 
 ;status is either no-show, cancelled+makup, arrived, or arrived+15makeup
 
-(defmethod print-object ((obj receipt) stream)
-  (print-unreadable-object (obj stream :type t)
-    (with-accessors ((appointment appointment)
-		     (status status))
-	obj
-      (format stream"~a ~a" appointment status))))
+;(defmethod print-object ((obj receipt) stream)
+ ; (print-unreadable-object (obj stream :type t)
+  ;  (with-accessors ((appointment appointment)
+;		     (status status))
+;	obj
+ ;     (format stream"~a ~a" appointment status))))
 
-(defun make-receipt (appointment status)
-  (make-instance 'receipt :appointment appointment
-		          :status status))
-(defvar *receipts* nil)
+;(defun make-receipt (appointment status)
+ ; (make-instance 'receipt :appointment appointment
+;		          :status status))
 
 ;(defun backup-receipt (receipt)
  ; (with-open-file (out (asdf:system-relative-pathname "schedulizer"

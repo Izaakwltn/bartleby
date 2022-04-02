@@ -8,7 +8,7 @@
 
 (defvar *clients* nil)
 
-(defun add-client-to-list (client)
+(defun add-client (client)
   (push client *clients*))
 
 ;;;;------------------------------------------------------------------------
@@ -27,7 +27,9 @@
 		   :accessor email)
    (makeup-credits :initarg :makeups
 		   :accessor makeups) ;default 0
-   ;(lesson-history :initarg :history
+   ;(upcoming      :initarg :upcoming
+   
+   ;(history :initarg :history
 ;		   :accessor history)
    ;(bookshelf     :initarg :bookshelf   
    (notes          :initarg :notes
@@ -50,23 +52,34 @@
 (defun make-client (first-name last-name client-id makeups phone email notes)
   (make-instance 'client :first-name first-name
 		         :last-name  last-name
-			 :client-id         client-id
+			 :client-id  client-id
 			 :phone      phone
 			 :email      email
 			 :makeups    makeups
 			 :notes      notes))
 
+(add-client (make-client "Test" "Testerson" 1001 "yes" "no" 0 "maybe"))
+
+(defvar last-id (client-id (first *clients*)))
+
+(defun new-id ()
+  (setq last-id (+ last-id 1))
+  last-id)
+
 (defun new-client (first-name last-name phone email notes)
   "generates a client with a new id and default makeups"
-  (make-instance 'client :first-name first-name
-		         :last-name  last-name
-			 :client-id         (new-id)
-			 :phone      phone
-			 :email      email
-			 :makeups    0
-			 :notes      notes))
+  (add-client (make-instance 'client :first-name first-name
+		                     :last-name  last-name
+			             :client-id  (new-id)
+			             :phone      phone
+			             :email      email
+			             :makeups    0
+			             :notes      notes)))
 
-(add-client-to-list (make-client "joe" "jonas" 1001 "45" "4043872185" "joejoe@joe.joe" "not the best jonas"))
+(add-client (make-client "Marlene" "Thompson" 1002 "n/a" "n/a" 165 "violin"))
+(add-client (make-client "Joslyn" "Chartrand" 1003 "n/a" "n/a" 90 "violin"))
+
+;(add-client-to-list (make-client "joe" "jonas" 1001 "45" "4043872185" "joejoe@joe.joe" "not the best jonas"))
 ;;;;------------------------------------------------------------------------
 ;;;;ID generation
 ;;;;------------------------------------------------------------------------
@@ -77,11 +90,11 @@
   last-id)
 
 ;;;;search
-(add-client-to-list (new-client "nick" "jonas" "423251324" "nicknick@joe.joe" "i guess"))
+;(add-client (new-client "nick" "jonas" "423251324" "nicknick@joe.joe" "i guess"))
 
-(add-client-to-list (new-client "kevin" "jonas" "405321235" "kevinisbest@joe.joe" "the best"))
+;(add-client (new-client "kevin" "jonas" "405321235" "kevinisbest@joe.joe" "the best"))
 
-(add-client-to-list (new-client "jeff" "jonass" "4032458590" "jeff@jonass.com" "ghmm?:"))
+;(add-client (new-client "jeff" "jonass" "4032458590" "jeff@jonass.com" "ghmm?:"))
 
 ;;;;------------------------------------------------------------------------
 ;;;;search and organization
@@ -107,6 +120,7 @@
 	if (equal first-name (first-name client))
 	  do (return client)))
 
+	    
 ;;;;------------------------------------------------------------------------
 ;;;;Client Database
 ;;;;------------------------------------------------------------------------

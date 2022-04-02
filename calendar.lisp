@@ -20,12 +20,21 @@
 		     (day day)
 		     (year year))
 	obj
-      (format stream "~%~a/~a/~a" month day year))))
+      (format stream "~%~a, ~a ~a~a, ~a"
+	      (second (assoc (day-of-week (date month day year)) days-of-week))
+	      (second (assoc month month-names))
+	      day
+	      (number-suffix day)
+	      year))))
 
 (defun date (m d y)
   (make-instance 'date :month m
 		       :day   d
 		       :year  y))
+
+;;;;------------------------------------------------------------------------
+;;;;Messing with dates
+;;;;------------------------------------------------------------------------
 
 (defun later-date (date1 date2)
   "Compares two dates, returns the later date."
@@ -38,6 +47,7 @@
 	(t date1)))
 
 (defun equal-date (date1 date2)
+  "Determines whether two dates are equal."
   (cond ((and (equal (month date1)
 		     (month date2))
 	      (equal (day   date1)
@@ -48,11 +58,13 @@
 	(t nil)))
 
 (defun month-days (month year)
+  "Given a month and a year, returns the number of days in that month."
   (second (assoc month (if (leap-year-p year)
 			   leap-year-numbers
 			   common-year-numbers))))
 
 (defun add-days (date days)
+  "Returns a date a specified number of days after a particular date."
   (cond ((zerop days) date)
 	((and (equal (month date) 12)
 	      (equal (day date) 31))
@@ -92,6 +104,19 @@
 			    (10 31)
 			    (11 30)
 			    (12 31)))
+
+(defvar month-names '((1 "January")
+		      (2 "February")
+		      (3 "March")
+		      (4 "April")
+		      (5 "May")
+		      (6 "June")
+		      (7 "July")
+		      (8 "August")
+		      (9 "September")
+		      (10 "October")
+		      (11 "November")
+		      (12 "December")))
 
 (defvar days-of-week '((0 "Sunday")
 		       (1 "Monday")
@@ -143,13 +168,17 @@
     (day-cycle jan1 (mod (- (day-nth date) 1) 7))))
 
 (defun number-suffix (n)
+  "Given a number, returns the English suffix (st, nd, th)."
   (let ((s (write-to-string n)))
-    (cond ((> (length s) 1)
+    (cond ((> (length s) 2)
 	   (number-suffix
 	    (parse-integer
-	     (subseq s
-	             (- (length s) 1)
-		     (length s)))))
+	     (subseq s (- (length s) 2) (length s)))))
+	  ((member n '(11 12 13 14 15 16 17 18 19)) "th")
+	  ((> (length s) 1)
+	   (number-suffix
+	    (parse-integer
+	     (subseq s (- (length s) 1) (length s)))))
 	  ((equal n 1) "st")
 	  ((equal n 2) "nd")
 	  ((equal n 3) "rd")
@@ -158,9 +187,16 @@
 						 
 
 (defun today ()
+  "Returns today's date."
   (date (local-time:timestamp-month (local-time:now))
         (local-time:timestamp-day   (local-time:now))
 	(local-time:timestamp-year  (local-time:now))))
+
+;;;;------------------------------------------------------------------------
+;;;;
+;;;;------------------------------------------------------------------------
+
+;Make calendar- cycle through all days in the month, use day of the week to plot them across a printout
 
 ;;;;------------------------------------------------------------------------
 ;;;;Time Calculations
@@ -193,10 +229,24 @@
 		           :minutes minutes))
 
 (defun add-time (time minutes)
+  "Adds a specified number of minutes to a given time."
   (let ((minute-sum (+ minutes (minutes time))))
-    (cond ((< minute-sum 59) (set-time (hour time) minute-sum))
+    (cond ((zerop minutes)
+	   time)
+	  ((< minute-sum 59) (set-time (hour time) minute-sum))
 	  (t "too late"))))
 
+(defun add-time (time minutes)
+  "Adds a specified number of minutes to a given time."
+  (cond ((zerop minutes) time)
+	((and (equal (minutes time) 59)
+	      (equal (hour time) 24))
+	 (add-time (set-time 1 0) (- minutes 1)))
+	((equal (minutes time) 59)
+	 (add-time (set-time (+ 1 (hour time)) 0) (- minutes 1)))
+	(t (add-time (set-time (hour time) (+ 1 (minutes time))) (- minutes 1)))))
+
 (defun current-time ()
+  "Returns the current time (Hours/Minutes)."
   (set-time (local-time:timestamp-hour (local-time:now))
 	    (local-time:timestamp-minute (local-time:now))))
