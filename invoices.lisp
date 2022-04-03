@@ -110,9 +110,9 @@
 (defun invoice-total (invoice)
   "Returns the total money earned for an invoice."
   (* (/ (loop for r in (receipts invoice)
-	      sum (duration a))
+	      sum (duration (appointment r)))
 	60)
-     (hourly-rate invoice)))
+     (hourly-rate (employee invoice))))
 
 ;(defun ready-appointments (employee-id)
  ; "Returns all past appointments."
@@ -146,10 +146,23 @@
 			(app-date (appointment receipt2)))))))
 
 ;;;;------------------------------------------------------------------------
+;;;;Makeup Table
+;;;;------------------------------------------------------------------------
+
+;(defun make-up table)
+
+;;;;------------------------------------------------------------------------
 ;;;;Printing Invoices:
 ;;;;------------------------------------------------------------------------
 
 (defvar test-invoice (draft-invoice "Test Invoice" 2001 (chronological-receipts (month-receipts 2001 1))))
+
+(defvar jan-invoice (draft-invoice "January Invoice" 2001 (chronological-receipts (month-receipts 2001 1))))
+
+(defvar feb-invoice (draft-invoice "February Invoice" 2001 (chronological-receipts (month-receipts 2001 2))))
+
+(defvar march-invoice (draft-invoice "March Invoice" 2001 (chronological-receipts (month-receipts 2001 3))))
+;;;;automated input for (defun month-invoice (title employee-id month))
 
 (defun print-invoice (filename invoice)
   (with-open-file (out (asdf:system-relative-pathname "schedulizer" filename)
@@ -165,25 +178,36 @@
 	   :do (let ((d  (app-date (appointment r)))
 	             (st (start-time (appointment r)))
 	             (cl (client (appointment r))))
-		 (format out "~a, ~a ~a~a, ~a - ~a:~a ~a - ~a ~a - ~a - ~amin - Makeup Change: ~a~%"
+		 (format out "~a, ~a ~a~a, ~a - ~a:~a ~a            ~a ~a~%~a - ~amin - Makeup Change: ~a~%~%"
 			 (second (assoc (day-of-week d) days-of-week))
 		         (second (assoc (month d) month-names))
-		         (day d)
+		         (if (equal (length (write-to-string (day d))) 1)
+			     (concatenate 'string " " (write-to-string (day d)))
+			     (day d))
 		         (number-suffix (day d))
 		         (year d)
-			 (if (> (hour st) 12)
-			     (- (hour st) 12)
-			     (hour st))
+			 (if (equal 1 (length (write-to-string (hour st))))
+			     (concatenate 'string " "
+					  (write-to-string
+					   (if (> (hour st) 12)
+					       (- (hour st) 12)
+			                       (hour st))))
+			     (if (> (hour st) 12)
+			         (- (hour st) 12)
+			         (hour st)))
 			 (if (equal 1 (length (write-to-string (minutes st))))
 			     (concatenate 'string "0" (write-to-string (minutes st)))
 			     (minutes st))
 			 (if (> (hour st) 12) "pm" "am")
 			 (first-name cl)
 			 (last-name cl)
-			 (second (assoc (attendance r) attendance-values))
+			 (second (assoc (parse-integer (attendance r)) attendance-values))
 			 (duration r)
 			 (makeup-change r))))))
 			 
-		       
+(defun test-print ()
+  (print-invoice "jantest.txt" jan-invoice)
+  (print-invoice "febtest.txt" feb-invoice)
+  (print-invoice "marchtest.txt" march-invoice))
 	  
 

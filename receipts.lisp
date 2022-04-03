@@ -20,11 +20,11 @@
    (duration      :initarg :duration
 		  :accessor duration)))
 
-(defvar attendance-values '((0 "Arrived")
-			   (1 "No Show")
-			   (2 "Cancelled, Makeup Added")
-			   (3 "Makeup Used")
-			   (4 "Lesson + Makeup Minutes")))
+(defvar attendance-values '((0 "Arrived                ")
+			    (1 "No Show                ")
+			    (2 "Cancelled, Makeup Added")
+			    (3 "Makeup Used            ")
+			    (4 "Lesson + Makeup Minutes")))
 
 (defmethod print-object ((obj receipt) stream)
   (print-unreadable-object (obj stream :type t)
@@ -69,9 +69,14 @@
 	:finally (return apts)))
 
 (defun check-out-appointment (appointment)
-  (format t "~%~a~%" appointment)
+  (format t "~%~a~a~%~a ~a, Scheduled Duration: ~a~%"
+	  (app-date appointment)
+	  (start-time appointment)
+	  (first-name (client appointment))
+	  (last-name  (client appointment))
+	  (duration appointment))
   (push (make-receipt appointment
-		(prompt-read "Attendance: Arrived(a), No Show(n), Cancelled with makeup Added (c), Makeup(m), Used some makeup (u)")
+		(prompt-read (format nil "Attendance:~%(0) Arrived~%(1) No Show~%(2) Cancelled, Makeup added~%(3) Makeup~%(4) Lesson + Makeup used"))
 		(prompt-read "Duration: ")
 		(prompt-read "Makeup used or earned"))
 	*receipts*))

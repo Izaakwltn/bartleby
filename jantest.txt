@@ -1,0 +1,30 @@
+
+January Invoice
+
+Izaak Walton
+2047 S Milwaukee St~%Denver, CO 80210
+
+Wednesday, January  5th, 2022 - 10:30 am            Marlene Thompson
+Arrived                 - 30min - Makeup Change: 0
+
+Wednesday, January 12th, 2022 - 10:30 am            Marlene Thompson
+Cancelled, Makeup Added - 30min - Makeup Change: 0
+
+Wednesday, January 19th, 2022 - 10:30 am            Marlene Thompson
+Lesson + Makeup Minutes - 45min - Makeup Change: -15
+
+Wednesday, January 26th, 2022 - 10:30 am            Marlene Thompson
+Cancelled, Makeup Added - 0min - Makeup Change: 30
+
+Wednesday, January  5th, 2022 - 5:00 pm            Joslyn Chartrand
+Arrived                 - 30min - Makeup Change: 0
+
+Wednesday, January 12th, 2022 - 5:00 pm            Joslyn Chartrand
+Arrived                 - 30min - Makeup Change: 0
+
+Wednesday, January 19th, 2022 - 5:00 pm            Joslyn Chartrand
+Cancelled, Makeup Added - 0min - Makeup Change: 30
+
+Wednesday, January 26th, 2022 - 5:00 pm            Joslyn Chartrand
+Lesson + Makeup Minutes - 45min - Makeup Change: -15
+
