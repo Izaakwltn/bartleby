@@ -6,48 +6,48 @@
 ;;;;Employee class
 ;;;;------------------------------------------------------------------------
 
-(defclass employee ()
-  ((employee-id :initarg :employee-id
-		:accessor employee-id)
-   (first-name  :initarg :first-name
-		:accessor first-name)
-   (last-name   :initarg :last-name
-		:accessor last-name)
-   (address     :initarg :address
-		:accessor address)
-   (hourly-rate :initarg :hourly-rate
-		:accessor hourly-rate)))
+;(defclass employee ()
+ ; ((employee-id :initarg :employee-id
+;		:accessor employee-id)
+ ;  (first-name  :initarg :first-name
+;		:accessor first-name)
+ ;  (last-name   :initarg :last-name
+;		:accessor last-name)
+ ;  (address     :initarg :address
+;		:accessor address)
+ ;  (hourly-rate :initarg :hourly-rate
+;		:accessor hourly-rate)))
 
-(defmethod print-object ((obj employee) stream)
-  (print-unreadable-object (obj stream :type t)
-    (with-accessors ((employee-id employee-id)
-		     (first-name first-name)
-		     (last-name last-name)
-		     (address   address)
-		     (hourly-rate hourly-rate))
-	obj
-      (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%~a~%Rate: $~a/hr~%"
-	      employee-id first-name last-name address hourly-rate))))
+;(;defmethod print-object ((obj employee) stream)
+ ; (print-unreadable-object (obj stream :type t)
+  ;  (with-accessors ((employee-id employee-id)
+;		     (first-name first-name)
+;		     (last-name last-name)
+;		     (address   address)
+;		     (hourly-rate hourly-rate))
+;	obj
+  ;    (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%~a~%Rate: $~a/hr~%"
+;;	      employee-id first-name last-name address hourly-rate))))
+;
+;(;defun make-employee (employee-id first-name last-name address hourly-rate)
+ ; (make-instance 'employee :employee-id employee-id
+;		           :first-name  first-name
+;			   :last-name   last-name
+;			   :address     address
+;			   :hourly-rate hourly-rate))
+;
+;(defvar izaak (make-employee 2001 "Izaak" "Walton" "2047 S Milwaukee St~%Denver, CO 80210" 37))
+;
+;(;defvar *employees* nil)
+;
+;(push izaak *employees*)
 
-(defun make-employee (employee-id first-name last-name address hourly-rate)
-  (make-instance 'employee :employee-id employee-id
-		           :first-name  first-name
-			   :last-name   last-name
-			   :address     address
-			   :hourly-rate hourly-rate))
-
-(defvar izaak (make-employee 2001 "Izaak" "Walton" "2047 S Milwaukee St~%Denver, CO 80210" 37))
-
-(defvar *employees* nil)
-
-(push izaak *employees*)
-
-(defun employee-search (employee-id)
-  (loop for employee in *employees*
-	if (equal (write-to-string employee-id)
-		  (write-to-string (employee-id employee)))
-	  do (return employee)))
-
+;(defun employee-search (employee-id)
+ ; (loop for employee in *employees*
+;	if (equal (write-to-string employee-id)
+;		  (write-to-string (employee-id employee)))
+;	  do (return employee)))
+;
 ;;;;------------------------------------------------------------------------
 ;;;;Appointment list
 ;;;;------------------------------------------------------------------------
@@ -217,11 +217,18 @@
 ;	    (write-to-string (minutes (start-time appointment)))
 ;	    (write-to-string (duration appointment))
 ;	    (write-to-string (notes appointment)))))
-;
+					;
+(defun past-appointment-p (appointment)
+  "Checks whether an appointment has passed."
+  (let ((today (today))
+	(ct    (current-time)))
+    (and (equal-date today (later-date (app-date appointment) today))
+	 (equal-time ct    (later-time (start-time appointment) ct)))))
+   
 (defun ready-appointments (employee-id)
     (loop :for a in *appointments*
           :if (and (equal (employee-id (employee a)) employee-id)
-		   (equal-date (later-date (app-date a) (today)) (today)))
+		   (past-appointment-p a))
 	    :collect a into apts
 	  :finally (return apts)))
 

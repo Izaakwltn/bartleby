@@ -60,17 +60,18 @@
 
 (add-client (make-client "Test" "Testerson" 1001 "yes" "no" 0 "maybe"))
 
-(defvar last-id (client-id (first *clients*)))
+(defvar last-client-id (client-id (first *clients*)))
 
-(defun new-id ()
-  (setq last-id (+ last-id 1))
-  last-id)
+(defun new-client-id ()
+  "Generates a new client-id, takes note of the most recent id."
+  (setq last-client-id (+ last-client-id 1))
+  last-client-id)
 
 (defun new-client (first-name last-name phone email notes)
   "generates a client with a new id and default makeups"
   (add-client (make-instance 'client :first-name first-name
 		                     :last-name  last-name
-			             :client-id  (new-id)
+			             :client-id  (new-client-id)
 			             :phone      phone
 			             :email      email
 			             :makeups    0
@@ -80,14 +81,6 @@
 (add-client (make-client "Joslyn" "Chartrand" 1003 "n/a" "n/a" 90 "violin"))
 
 ;(add-client-to-list (make-client "joe" "jonas" 1001 "45" "4043872185" "joejoe@joe.joe" "not the best jonas"))
-;;;;------------------------------------------------------------------------
-;;;;ID generation
-;;;;------------------------------------------------------------------------
-(defvar last-id (client-id (first *clients*)))
-
-(defun new-id ()
-  (setq last-id (+ last-id 1))
-  last-id)
 
 ;;;;search
 ;(add-client (new-client "nick" "jonas" "423251324" "nicknick@joe.joe" "i guess"))
@@ -101,21 +94,25 @@
 ;;;;------------------------------------------------------------------------
 
 (defun clients-with-makeups ()
+  "Returns a list of all clients with makeup credits."
   (loop for client in *clients*
 	if (> (parse-integer (makeups client)) 0)
 	  collect client))
 
 (defun id-search (id)
+  "Searches for a client by their client id."
   (loop for client in *clients*
 	if (equal (write-to-string id) (write-to-string (client-id client)))
 	  do (return client)))
 
 (defun last-name-search (last-name)
+  "Searches for a client by their last name."
   (loop for client in *clients*
 	if (equal last-name (last-name client))
 	  do (return client)))
 
 (defun first-name-search (first-name)
+  "Searches for a client by their first name."
   (loop for client in *clients*
 	if (equal first-name (first-name client))
 	  do (return client)))

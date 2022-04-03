@@ -15,60 +15,60 @@
 ;;;;functions for appointments by month, by year, by week, within a range of dates, by student id, by 
 
 ;;;;------------------------------------------------------------------------
-;;;;Receipts
+;;;;Receipt operations for Invoices
 ;;;;------------------------------------------------------------------------
 
-(defvar *receipts* nil)
+;(defvar *receipts* nil)
+;
+;(defclass receipt ()
+ ; ((appointment   :initarg :appointment
+;		  :accessor appointment)
+ ;  (makeup-change :initarg :makeup-change
+;		  :accessor makeup-change)
+ ;  (attendance    :initarg :attendance
+;		  :accessor attendance)
+ ;  (duration      :initarg :duration
+;		  :accessor duration)))
 
-(defclass receipt ()
-  ((appointment   :initarg :appointment
-		  :accessor appointment)
-   (makeup-change :initarg :makeup-change
-		  :accessor makeup-change)
-   (attendance    :initarg :attendance
-		  :accessor attendance)
-   (duration      :initarg :duration
-		  :accessor duration)))
+;(defvar attendance-values '((0 "Arrived")
+;			   (1 "No Show")
+;			   (2 "Cancelled, Makeup Added")
+;			   (3 "Makeup Used")
+;			   (4 "Lesson + Makeup Minutes")))
 
-(defvar attendance-values '((0 "Arrived")
-			   (1 "No Show")
-			   (2 "Cancelled, Makeup Added")
-			   (3 "Makeup Used")
-			   (4 "Lesson + Makeup Minutes")))
+;(defmethod print-object ((obj receipt) stream)
+ ; (print-unreadable-object (obj stream :type t)
+  ;  (with-accessors ((appointment   appointment)
+;;		     (attendance    attendance)
+;		     (duration      duration)
+;		     (makeup-change makeup-change))
+;	obj
+ ;     (format stream"~a~a ~a ~a, ~a ~a minutes, Makeup Change: ~a"
+;	      (app-date appointment)
+;	      (start-time appointment)
+;	      (first-name (client appointment))
+;	      (last-name (client appointment))
+;	      (second (assoc attendance attendance-values))
+;	      duration
+;	      makeup-change))))
 
-(defmethod print-object ((obj receipt) stream)
-  (print-unreadable-object (obj stream :type t)
-    (with-accessors ((appointment   appointment)
-		     (attendance    attendance)
-		     (duration      duration)
-		     (makeup-change makeup-change))
-	obj
-      (format stream"~a~a ~a ~a, ~a ~a minutes, Makeup Change: ~a"
-	      (app-date appointment)
-	      (start-time appointment)
-	      (first-name (client appointment))
-	      (last-name (client appointment))
-	      (second (assoc attendance attendance-values))
-	      duration
-	      makeup-change))))
+;(defun make-receipt (appointment attendance duration makeup-change)
+ ; (make-instance 'receipt :appointment   appointment
+;		          :attendance    attendance
+;			  :duration      duration
+;			  :makeup-change makeup-change))
 
-(defun make-receipt (appointment attendance duration makeup-change)
-  (make-instance 'receipt :appointment   appointment
-		          :attendance    attendance
-			  :duration      duration
-			  :makeup-change makeup-change))
+;(defun check-out-appointment (appointment)
+ ; (format t "~%~a~%" appointment)
+  ;(push (make-receipt appointment
+;		(prompt-read "Attendance: Arrived(a), No Show(n), Cancelled with makeup Added (c), Makeup(m), Used some makeup (u)")
+;		(prompt-read "Duration: ")
+;		(prompt-read "Makeup used or earned"))
+;	*receipts*))
 
-(defun check-out-appointment (appointment)
-  (format t "~%~a~%" appointment)
-  (push (make-receipt appointment
-		(prompt-read "Attendance: Arrived(a), No Show(n), Cancelled with makeup Added (c), Makeup(m), Used some makeup (u)")
-		(prompt-read "Duration: ")
-		(prompt-read "Makeup used or earned"))
-	*receipts*))
-
-(defun check-out (employee-id)
-  (loop :for a :in (ready-appointments employee-id)
-	:do (check-out-appointment a))) 
+;(defun check-out (employee-id)
+ ; (loop :for a :in (ready-appointments employee-id)
+;	:do (check-out-appointment a))) 
 
 ;;;;------------------------------------------------------------------------
 ;;;;Makeups
@@ -114,21 +114,21 @@
 	60)
      (hourly-rate invoice)))
 
-(defun ready-appointments (employee-id)
-  "Returns all past appointments."
-    (loop :for a in *appointments*
-          :if (and (equal (employee-id (employee a)) employee-id)
-		   (equal-date (later-date (app-date a) (today)) (today)))
-	    :collect a into apts
-	  :finally (return apts)))
+;(defun ready-appointments (employee-id)
+ ; "Returns all past appointments."
+  ;  (loop :for a in *appointments*
+   ;       :if (and (equal (employee-id (employee a)) employee-id)
+;		   (equal-date (later-date (app-date a) (today)) (today)))
+;	    :collect a into apts
+;	  :finally (return apts)))
 
-(defun month-appointments (employee-id month)
-  "Returns all apppointments for an employee in a given month."
-  (loop :for a in *appointments*
-	:if (and (equal (employee-id (employee a)) employee-id)
-		 (equal month (month (app-date a))))
-	  :collect a into apts
-	:finally (return apts)))
+;(defun month-appointments (employee-id month)
+ ; "Returns all apppointments for an employee in a given month."
+  ;(loop :for a in *appointments*
+;	:if (and (equal (employee-id (employee a)) employee-id)
+;		 (equal month (month (app-date a))))
+;;	  :collect a into apts
+;	:finally (return apts)))
 
 (defun month-receipts (employee-id month)
   "Returns all apppointments for an employee in a given month."

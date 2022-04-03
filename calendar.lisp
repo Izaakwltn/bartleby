@@ -3,7 +3,7 @@
 (in-package :schedulizer)
 
 ;;;;------------------------------------------------------------------------
-;;;;Date/Time Classes
+;;;;Date Class
 ;;;;------------------------------------------------------------------------
 
 (defclass date ()
@@ -48,14 +48,11 @@
 
 (defun equal-date (date1 date2)
   "Determines whether two dates are equal."
-  (cond ((and (equal (month date1)
-		     (month date2))
-	      (equal (day   date1)
-		     (day   date2))
-	      (equal (year  date1)
-		     (year date2)))
-	 t)
-	(t nil)))
+  (if (and (equal (month date1) (month date2))
+	   (equal (day   date1) (day   date2))
+	   (equal (year  date1) (year date2)))
+	 t
+	 nil))
 
 (defun month-days (month year)
   "Given a month and a year, returns the number of days in that month."
@@ -184,8 +181,6 @@
 	  ((equal n 3) "rd")
 	  (t "th"))))
 				   
-						 
-
 (defun today ()
   "Returns today's date."
   (date (local-time:timestamp-month (local-time:now))
@@ -214,27 +209,15 @@
 		     (minutes minutes))
 	obj
       (format stream "~a:~a ~a"
-	      (if (> hour 12)
-		  (- hour 12)
-		  hour)
+	      (if (> hour 12) (- hour 12) hour)
 	      (if (equal 1 (length (write-to-string minutes)))
 		  (concatenate 'string "0" (write-to-string minutes))
 		  minutes)
-	      (if (> hour 12)
-		  "pm"
-		  "am")))))
+	      (if (> hour 12) "pm" "am")))))
 
 (defun set-time (hour minutes)
   (make-instance 'set-time :hour hour
 		           :minutes minutes))
-
-(defun add-time (time minutes)
-  "Adds a specified number of minutes to a given time."
-  (let ((minute-sum (+ minutes (minutes time))))
-    (cond ((zerop minutes)
-	   time)
-	  ((< minute-sum 59) (set-time (hour time) minute-sum))
-	  (t "too late"))))
 
 (defun add-time (time minutes)
   "Adds a specified number of minutes to a given time."
@@ -250,3 +233,16 @@
   "Returns the current time (Hours/Minutes)."
   (set-time (local-time:timestamp-hour (local-time:now))
 	    (local-time:timestamp-minute (local-time:now))))
+
+(defun later-time (time1 time2)
+  "Returns the later of two times."
+  (cond ((> (hour time1) (hour time2)) time1)
+	((> (hour time2) (hour time1)) time2)
+	((> (minutes time1) (minutes time2)) time1)
+	((> (minutes time2) (minutes time1)) time2)
+	(t time1)))
+
+(defun equal-time (time1 time2)
+  "Checks whether two times are equal."
+  (and (equal (hour time1) (hour time2))
+       (equal (minutes time1) (minutes time2))))
