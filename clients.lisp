@@ -60,7 +60,9 @@
 
 (add-client (make-client "Test" "Testerson" 1001 "yes" "no" 0 "maybe"))
 
-(defvar last-client-id (client-id (first *clients*)))
+(defvar last-client-id (if (client-id (first *clients*))
+			   (client-id (first *clients*))
+			   1001))
 
 (defun new-client-id ()
   "Generates a new client-id, takes note of the most recent id."
@@ -113,9 +115,4 @@
   (loop for client in *clients*
 	if (equal first-name (first-name client))
 	  do (return client)))
-
-	    
-;;;;------------------------------------------------------------------------
-;;;;Client Database
-;;;;------------------------------------------------------------------------
 

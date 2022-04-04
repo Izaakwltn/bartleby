@@ -78,8 +78,8 @@
 	       (make-appointment (client-id client) (employee-id employee) current-week start-time duration notes))
 	      (setf current-week (add-days current-week 7)))))
 
-(recurring (make-appointment 1002 2001 (date 1 5 2022) (set-time 10 30) 30 "") 50)
-(recurring (make-appointment 1003 2001 (date 1 5 2022) (set-time 17 0) 30 "") 50)
+;(recurring (make-appointment 1002 2001 (date 1 5 2022) (set-time 10 30) 30 "") 50)
+;(recurring (make-appointment 1003 2001 (date 1 5 2022) (set-time 17 0) 30 "") 50)
 ;;;;------------------------------------------------------------------------
 ;;;;Unchecked Appointments
 ;;;;------------------------------------------------------------------------

@@ -13,6 +13,12 @@
 	       (:file "employees")
 	       (:file "appointments")
 	       (:file "receipts")
-	       (:file "invoices"))) ;add makeups.lisp, printing.lisp,
+	       (:file "invoices")
+	       (:module "tests"
+		:serial t
+		:components ((:file "client-tests")
+			     (:file "employee-tests")
+			     (:file "appointment-tests")))));add makeups.lisp, printing.lisp,
 					;maybe separate out date.lisp, time.lisp, calendar.lisp
                                         ;
+;;;;make separate folder for client-tests, employee-tests, appointment-tests
