@@ -23,7 +23,11 @@
 	   #:last-name-search
 	   #:first-name-search)
 
+  ;;;;Finish the other exports before moving on:
+  ;employees.lisp
+  
   ;appointments.lisp
-  (:export #:make-employee
-	   #:employee-search
-	   #:make-appointment))
+  (:export  #:make-appointment))
+
+;receipts.lisp
+;invoices.lisp

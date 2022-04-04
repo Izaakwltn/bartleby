@@ -77,9 +77,6 @@
 			             :makeups    0
 			             :notes      notes)))
 
-(add-client (make-client "Marlene" "Thompson" 1002 "n/a" "n/a" 165 "violin"))
-(add-client (make-client "Joslyn" "Chartrand" 1003 "n/a" "n/a" 90 "violin"))
-
 ;(add-client-to-list (make-client "joe" "jonas" 1001 "45" "4043872185" "joejoe@joe.joe" "not the best jonas"))
 
 ;;;;search

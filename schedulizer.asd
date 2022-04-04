@@ -13,4 +13,6 @@
 	       (:file "employees")
 	       (:file "appointments")
 	       (:file "receipts")
-	       (:file "invoices"))) ;add invoices.lisp
+	       (:file "invoices"))) ;add makeups.lisp, printing.lisp,
+					;maybe separate out date.lisp, time.lisp, calendar.lisp
+                                        ;

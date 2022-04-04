@@ -45,15 +45,8 @@
 			   :address     address
 			   :hourly-rate hourly-rate))
 
-;;;;------------------------------------------------------------------------
-;;;;Employee list
-;;;;------------------------------------------------------------------------
-;(defvar *employees* nil)
 
-;(defvar add-employee (employee)
- ; (push employee *employees*))
-
-(defvar izaak (make-employee 2001 "Izaak" "Walton" "2047 S Milwaukee St~%Denver, CO 80210" 37))
+(defvar izaak (make-employee 2001 "Izaak" "Walton" "Insert Address Here" 37))
 
 (add-employee izaak)
 
