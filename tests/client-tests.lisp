@@ -1,4 +1,4 @@
-;;;;test-clients.lisp
+;;;;client-tests.lisp
 ;;;;
 
 (in-package :schedulizer)
@@ -24,7 +24,7 @@
   
 (defun random-phone ()
   (loop :with number := nil
-        :for i from 1 to 10
+        :for i :from 1 :to 10
 	:do (if (or (equal i 4)
 	            (equal i 7))
 		(setf number

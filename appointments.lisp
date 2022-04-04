@@ -23,6 +23,8 @@
 	       :accessor app-date)
    (start-time :initarg :start-time
 	       :accessor start-time)
+   (end-time   :initarg :end-time
+	       :accessor end-time)
    (duration   :initarg :duration
 	       :accessor duration)
    (notes      :initarg :notes
@@ -34,13 +36,15 @@
 		     (employee employee)
 		     (app-date app-date)
 		     (start-time start-time)
+		     (end-time end-time)
 		     (duration duration)
 		     (notes notes))
 	obj
       (format stream
-	      "~%~a~% ~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
+	      "~%~a~% ~a---~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
 	      app-date
 	      start-time
+	      end-time
 	      (first-name client)
 	      (last-name client)
 	      (first-name employee)
@@ -53,6 +57,7 @@
 		              :employee (employee-search employee-id)
 		              :app-date app-date
 			      :start-time start-time
+			      :end-time (add-time start-time duration)
 			      :duration duration
 			      :notes notes))
 

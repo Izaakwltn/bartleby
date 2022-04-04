@@ -246,3 +246,15 @@
   "Checks whether two times are equal."
   (and (equal (hour time1) (hour time2))
        (equal (minutes time1) (minutes time2))))
+
+(defun time-conflict-p (newtime earlytime latetime)
+  "Checks whether a new time falls between two other times."
+  (cond ((equal-time newtime earlytime) t)
+	((equal-time newtime (later-time newtime latetime)) nil)
+	((equal-time earlytime (later-time newtime earlytime)) nil)
+	((and (equal-time newtime (later-time newtime earlytime))
+	      (equal-time latetime (later-time newtime latetime)))
+	 t)))
+;;;;------------------------------------------------------------------------
+;;;;
+;;;;------------------------------------------------------------------------

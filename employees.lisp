@@ -22,8 +22,12 @@
 		:accessor first-name)
    (last-name   :initarg :last-name
 		:accessor last-name)
+   (phone       :initarg :phone
+		:accessor phone)
+   (email       :initarg :email
+		:accessor email)
    (address     :initarg :address
-		:accessor address)
+		:accessor address) ;add address class (street address, city, state, zip code)
    (hourly-rate :initarg :hourly-rate
 		:accessor hourly-rate)))
 
@@ -32,21 +36,31 @@
     (with-accessors ((employee-id employee-id)
 		     (first-name first-name)
 		     (last-name last-name)
+		     (phone phone)
+		     (email email)
 		     (address   address)
 		     (hourly-rate hourly-rate))
 	obj
-      (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%~a~%Rate: $~a/hr~%"
-	      employee-id first-name last-name address hourly-rate))))
+      (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%~a~%~a~%~a~%Rate: $~a/hr~%"
+	      employee-id first-name last-name phone email address hourly-rate))))
 
-(defun make-employee (employee-id first-name last-name address hourly-rate)
+(defun make-employee (employee-id first-name last-name phone email address hourly-rate)
   (make-instance 'employee :employee-id employee-id
 		           :first-name  first-name
          		   :last-name   last-name
+			   :phone       phone
+			   :email       email
 			   :address     address
 			   :hourly-rate hourly-rate))
 
 
-(defvar izaak (make-employee 2001 "Izaak" "Walton" "Insert Address Here" 37))
+(defvar izaak (make-employee 2001
+			     "Izaak"
+			     "Walton"
+			     (random-phone)
+			     (random-email "Izaak" "Walton")
+			     "Insert Address Here"
+			     37))
 
 (add-employee izaak)
 
@@ -57,9 +71,9 @@
   (setq last-employee-id (+ last-employee-id 1))
   last-client-id)
 
-(defun new-employee (first-name last-name address hourly-rate)
+(defun new-employee (first-name last-name phone email address hourly-rate)
   "Generates a a new employee with a new employee id."
-  (make-employee (new-employee-id) first-name last-name address hourly-rate))
+  (make-employee (new-employee-id) first-name last-name phone email address hourly-rate))
 
 (defun employee-search (employee-id)
   "Searches for an employee by employee-id."
@@ -67,3 +81,4 @@
 	if (equal (write-to-string employee-id)
 		  (write-to-string (employee-id employee)))
 	  do (return employee)))
+

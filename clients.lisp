@@ -58,9 +58,9 @@
 			 :makeups    makeups
 			 :notes      notes))
 
-(add-client (make-client "Test" "Testerson" 1001 "yes" "no" 0 "maybe"))
+;(add-client (make-client "Test" "Testerson" 1001 "yes" "no" 0 "maybe"))
 
-(defvar last-client-id (if (client-id (first *clients*))
+(defvar last-client-id (if (first *clients*)
 			   (client-id (first *clients*))
 			   1001))
 
