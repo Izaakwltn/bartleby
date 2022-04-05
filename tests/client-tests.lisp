@@ -17,21 +17,21 @@
 (defun random-last ()
   (write-to-string (nth (random 199) last-names)))
 
-(defvar email-domains '("gmail.com" "yahoo.com" "hotmail.com" "aol.com" "msn.com"))
+;(defvar email-domains '("gmail.com" "yahoo.com" "hotmail.com" "aol.com" "msn.com"))
 
-(defun random-email (first-name last-name)
-  (concatenate 'string last-name "." first-name "@" (nth (random 4) email-domains)))
+;(defun random-email (first-name last-name)
+ ; (concatenate 'string last-name "." first-name "@" (nth (random 4) email-domains)))
   
-(defun random-phone ()
-  (loop :with number := nil
-        :for i :from 1 :to 10
-	:do (if (or (equal i 4)
-	            (equal i 7))
-		(setf number
-		      (concatenate 'string number "-" (write-to-string (random 9))))
-		(setf number
-	              (concatenate 'string number (write-to-string (random 9)))))
-	:finally (return number)))
+;(defun random-phone ()
+ ; (loop :with number := nil
+  ;      :for i :from 1 :to 10
+;	:do (if (or (equal i 4)
+;	            (equal i 7))
+;		(setf number
+;		      (concatenate 'string number "-" (write-to-string (random 9))))
+;		(setf number
+;	              (concatenate 'string number (write-to-string (random 9)))))
+;	:finally (return number)))
 		       
 (defun generate-clients (number-of-clients)
   (loop :for i :from 1 :to number-of-clients

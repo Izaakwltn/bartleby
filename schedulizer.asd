@@ -9,6 +9,7 @@
   :serial t
   :components ((:file "package")
 	       (:file "calendar")
+	       (:file "contact")
 	       (:file "clients")
 	       (:file "employees")
 	       (:file "appointments")
