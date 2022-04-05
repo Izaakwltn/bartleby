@@ -30,11 +30,18 @@
 ;	:finally (return apts))))
 
 (defun employee-block-off (employee-id app-date start-time duration)
-  (add-appointment (make-appointment 0 employee-id app-date start-time duration "unavailable")))
+  "Creates and unavailable block for an employee."
+  (add-appointment (make-appointment 0 employee-id 0 app-date start-time duration "unavailable")))
 
+(defun room-block-off (room-num app-date start-time duration)
+  (add-appointment (make-appointment 0 0 room-num app-date start-time duration)))
 ;;;room-block-off
-
+				
+;;;;------------------------------------------------------------------------				
+;;;;Availability calculations:
+;;;;------------------------------------------------------------------------
 (defun overlap-p (appointment1 appointment2)
+  "Determines whether two appointments overlap in time."
   (or (time-conflict-p (start-time appointment1)
 		       (start-time appointment2)
 		       (end-time appointment2))

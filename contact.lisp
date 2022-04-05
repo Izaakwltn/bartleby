@@ -54,22 +54,43 @@
    (end     :initarg :end
 	    :accessor end)))
 
-;(defun make-phone-number (number-string)
- ; (let ((l (length number-string)))
-  ;  (make-instance 'phone-number :country (if (> l 10)
-;				            (subseq number-string 0 (- l 10))
-;				            1)
-;		                 :area (if (> l 10)
-;;					   (subseq number-string (- l 10) (- l 8))
-;					   (subseq number-string 0 2))
-;;				 :middle (if (> l 10)
-;					     (subseq number-string (- l 8) (- l 5))
-;					     (subseq number-string 2 4))
-;				 :
+(defmethod print-object ((obj phone-number) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((country country)
+		     (area area)
+		     (middle middle)
+		     (end end))
+	obj
+      (format stream "+~a(~a)~a-~a" country area middle end))))
+
+(defun make-phone-number (number-string)
+  (let ((l (length number-string)))
+    (make-instance 'phone-number :country (if (> l 10)
+				            (subseq number-string 0 (- l 10))
+				            1)
+		                 :area (subseq number-string (- l 10) (- l 7))
+				 :middle (subseq number-string (- l 7) (- l 4))
+				 :end (subseq number-string (- l 4) l))))
 		 
 ;;;;------------------------------------------------------------------------
 ;;;;Random entries for simulated contact information
 ;;;;------------------------------------------------------------------------
+
+(defclass email-address ()
+  ((username :initarg :username
+	     :accessor username)
+   (domain   :initarg :domain
+	     :accessor domain)))
+
+(defmethod print-object ((obj email-address) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((username username)
+		     (domain domain))
+	obj
+      (format stream "~a@~a" username domain))))
+
+;(defun make-email-address (string-email)
+ ; (make-instance 'email-address :username ;;;;parse at @ sign
 
 (defvar email-domains '("gmail.com" "yahoo.com" "hotmail.com" "aol.com" "msn.com"))
 

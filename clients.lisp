@@ -63,6 +63,11 @@
 (defmethod add-client ((client client))
   (push client *clients*))
 
+(defmethod remove-client ((client client))
+  (remove-if #'(lambda (c)
+		 (equal (client-id c) (client-id client)))
+	     *clients*)) ;;;;also make this for employee, appointment, room, receipts, invoices, etc
+
 ;(add-client (make-client "Test" "Testerson" 1001 "yes" "no" 0 "maybe"))
 
 (defvar last-client-id (if (first *clients*)
