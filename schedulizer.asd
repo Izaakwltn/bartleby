@@ -13,6 +13,7 @@
 	       (:file "clients")
 	       (:file "employees")
 	       (:file "appointments")
+	       (:file "scheduling")
 	       (:file "receipts")
 	       (:file "invoices")
 	       (:module "tests"

@@ -14,6 +14,12 @@
 (defmethod appointments ((employee employee))
   "Will return all appointments relating to the employee.")
 
+(defmethod appointments ((meeting-room meeting-room))
+  "Will return all appointments relating to the room")
+
+(defmethod appointments ((date date))
+  "Will return all appointments occuring on the date.")
+
 ;;;also for room, set-time, date, client
 
 ;(defmethod appointments ((obj employee))

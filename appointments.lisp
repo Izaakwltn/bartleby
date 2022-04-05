@@ -3,6 +3,51 @@
 (in-package :schedulizer)
 
 ;;;;------------------------------------------------------------------------
+;;;;Room Class
+;;;;------------------------------------------------------------------------
+
+(defvar *rooms* nil)
+
+(defclass meeting-room ()
+  ((room-num   :initarg :room-num
+	       :accessor room-num)
+   (room-name  :initarg :room-name
+	       :accessor room-name)
+   (capacity   :initarg :capacity
+	       :accessor capacity)
+   (notes      :initarg :notes
+	       :accessor notes)))
+
+(defmethod print-object ((obj meeting-room) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((room-num room-num)
+		     (room-name room-name)
+		     (capacity capacity)
+		     (notes notes))
+	obj
+      (format stream "~%Room ~a, ~a~%Capacity: ~a~%Notes: ~a~%"
+	      room-num
+	      room-name
+	      capacity
+	      notes))))
+
+(defun make-room (room-num room-name capacity notes)
+  (make-instance 'meeting-room :room-num  room-num
+		               :room-name room-name
+			       :capacity  capacity
+		               :notes     notes))
+
+(defun add-room (room-num room-name capacity notes)
+  (push (make-room room-num room-name capacity notes) *rooms*))
+
+(defun room-search (room-num)
+  (loop :for r :in *rooms*
+	:if (equal room-num (room-num r))
+	  :do (return r)))
+
+(add-room 0 "Virtual" 1000 "Default, Virtual lesson space.")
+
+;;;;------------------------------------------------------------------------
 ;;;;Appointment list
 ;;;;------------------------------------------------------------------------
 
@@ -15,25 +60,28 @@
 ;;;;------------------------------------------------------------------------
 
 (defclass appointment ()
-  ((client     :initarg :client
-	       :accessor client)
-   (employee   :initarg :employee
-	       :accessor employee)
-   (app-date   :initarg :app-date
-	       :accessor app-date)
-   (start-time :initarg :start-time
-	       :accessor start-time)
-   (end-time   :initarg :end-time
-	       :accessor end-time)
-   (duration   :initarg :duration
-	       :accessor duration)
-   (notes      :initarg :notes
-	       :accessor notes)))
+  ((client       :initarg :client
+	         :accessor client)
+   (employee     :initarg :employee
+	         :accessor employee)
+   (meeting-room :initarg :meeting-room
+	         :accessor meeting-room)
+   (app-date     :initarg :app-date
+	         :accessor app-date)
+   (start-time   :initarg :start-time
+	         :accessor start-time)
+   (end-time     :initarg :end-time
+	         :accessor end-time)
+   (duration     :initarg :duration
+	         :accessor duration)
+   (notes        :initarg :notes
+	         :accessor notes)))
 
 (defmethod print-object ((obj appointment) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((client client)
 		     (employee employee)
+		     (meeting-room meeting-room)
 		     (app-date app-date)
 		     (start-time start-time)
 		     (end-time end-time)
@@ -41,10 +89,11 @@
 		     (notes notes))
 	obj
       (format stream
-	      "~%~a~% ~a---~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
+	      "~%~a~% ~a---~a~%Room: ~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
 	      app-date
 	      start-time
 	      end-time
+	      meeting-room
 	      (first-name client)
 	      (last-name client)
 	      (first-name employee)
@@ -52,9 +101,10 @@
 	      duration
 	      notes))))
 	      
-(defun make-appointment (client-id employee-id app-date start-time duration notes)
+(defun make-appointment (client-id employee-id room-num app-date start-time duration notes)
   (make-instance 'appointment :client (id-search client-id)
 		              :employee (employee-search employee-id)
+			      :meeting-room (room-search room-num)
 		              :app-date app-date
 			      :start-time start-time
 			      :end-time (add-time start-time duration)
@@ -64,7 +114,7 @@
 (defmethod add-appointment ((appointment appointment))
   (push appointment *appointments*))
 ;;;;test
-(setq test-appointment (make-appointment 1001 2001 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))
+(setq test-appointment (make-appointment 1001 2001 0 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments
@@ -89,11 +139,11 @@
 ;;;;Unchecked Appointments
 ;;;;------------------------------------------------------------------------
 
-(defvar *appointments* nil)
+;(defvar *appointments* nil)
 
-(defmethod add-appointment ((appointment appointment))
-  (push appointment
-	*appointments*))
+;(defmethod add-appointment ((appointment appointment))
+ ; (push appointment
+;	*appointments*))
 
 (defmethod backup-appointment ((appointment appointment))
   (with-open-file (out (asdf:system-relative-pathname "schedulizer"

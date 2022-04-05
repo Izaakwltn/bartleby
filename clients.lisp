@@ -8,9 +8,9 @@
 
 (defvar *clients* nil)
 
-(defun add-client (client)
-  (push client *clients*))
-
+;(defun add-client (client)
+ ; (push client *clients*))
+;
 ;;;;------------------------------------------------------------------------
 ;;;;Defining the client class
 ;;;;------------------------------------------------------------------------
@@ -25,6 +25,8 @@
 		   :accessor phone) ;default to nil
    (email          :initarg :email
 		   :accessor email)
+   (address        :initarg :address
+		   :accessor address)
    (makeup-credits :initarg :makeups
 		   :accessor makeups) ;default 0
    ;(upcoming      :initarg :upcoming
@@ -57,6 +59,9 @@
 			 :email      email
 			 :makeups    makeups
 			 :notes      notes))
+
+(defmethod add-client ((client client))
+  (push client *clients*))
 
 ;(add-client (make-client "Test" "Testerson" 1001 "yes" "no" 0 "maybe"))
 
