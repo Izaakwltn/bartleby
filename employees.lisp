@@ -8,7 +8,7 @@
 ;;;;------------------------------------------------------------------------
 (defvar *employees* nil)
 
-(defun add-employee (employee)
+(defmethod add-employee ((employee employee))
   (push employee *employees*))
 
 ;;;;------------------------------------------------------------------------
@@ -53,6 +53,8 @@
 			   :address     address
 			   :hourly-rate hourly-rate))
 
+(defmethod add-employee ((employee employee))
+  (push employee *employees*))
 
 (defvar izaak (make-employee 2001
 			     "Izaak"

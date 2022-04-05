@@ -11,6 +11,11 @@
 (defgeneric appointments (object)
   (:documentation "Returns a list of appointments associated with an object"))
 
+(defmethod appointments ((employee employee))
+  "Will return all appointments relating to the employee.")
+
+;;;also for room, set-time, date, client
+
 ;(defmethod appointments ((obj employee))
  ; (with-accessors ((employee-id employee-id))
   ;    (loop :for a :in *appointments*

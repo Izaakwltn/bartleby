@@ -50,7 +50,7 @@
 ;;;;------------------------------------------------------------------------
 ;;;;Invoice calculations
 ;;;;------------------------------------------------------------------------
-(defun invoice-total (invoice)
+(defmethod invoice-total ((invoice invoice))
   "Returns the total money earned for an invoice."
   (* (/ (loop for r in (receipts invoice)
 	      sum (duration (appointment r)))
@@ -89,7 +89,7 @@
 (defvar march-invoice (draft-invoice "March Invoice" 2001 (chronological-receipts (month-receipts 2001 3))))
 ;;;;automated input for (defun month-invoice (title employee-id month))
 
-(defun print-invoice (filename invoice)
+(defmethod print-invoice (filename (invoice invoice))
   (with-open-file (out (asdf:system-relative-pathname "schedulizer" filename)
 		       :direction         :output
 		       :if-does-not-exist :create

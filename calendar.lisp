@@ -60,7 +60,7 @@
 			   leap-year-numbers
 			   common-year-numbers))))
 
-(defun add-days (date days)
+(defmethod add-days ((date date) days)
   "Returns a date a specified number of days after a particular date."
   (cond ((zerop days) date)
 	((and (equal (month date) 12)
@@ -136,7 +136,7 @@
 	((not (zerop (mod year 400))) nil)
 	(t t)))
 
-(defun day-nth (date)
+(defmethod day-nth ((date date))
   "Returns how many days into the year the given date is"
   (let ((month-list (if (leap-year-p (year date))
 			leap-year-numbers
@@ -159,7 +159,7 @@
 
 (defvar firsts-of-january (each-first-of-january 1900 1 2100))
 
-(defun day-of-week (date)
+(defmethod day-of-week ((date date))
   "Determines the day of the week for a given date."
   (let ((jan1 (second (assoc (year date) firsts-of-january))))
     (day-cycle jan1 (mod (- (day-nth date) 1) 7))))
@@ -219,7 +219,7 @@
   (make-instance 'set-time :hour hour
 		           :minutes minutes))
 
-(defun add-time (time minutes)
+(defmethod add-time ((time set-time) minutes)
   "Adds a specified number of minutes to a given time."
   (cond ((zerop minutes) time)
 	((and (equal (minutes time) 59)

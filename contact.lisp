@@ -8,6 +8,38 @@
 ;;;;Address Class
 ;;;;------------------------------------------------------------------------
 
+(defclass address ()
+  ((street-number :initarg :street-number
+		  :accessor street-number)
+   (street-name   :initarg :street-name
+		  :accessor street-name)
+   (city          :initarg :city
+		  :accessor city)
+   (state         :initarg :state
+		  :accessor state)
+   (zip-code      :initarg :zip-code
+		  :accessor zip-code)))
+
+(defmethod print-object ((obj address) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((street-number street-number)
+		     (street-name   street-name)
+		     (city          city)
+		     (state         state)
+		     (zip-code      zip-code))
+	obj
+      (format stream "~a ~a~%~a, ~a ~a" street-number street-name city state zip-code))))
+
+(defun make-address (street-number street-name city state zip-code)
+  (make-intance 'address :street-number street-number
+		         :street-name   street-name
+			 :city          city
+			 :state         state
+			 :zip-code      zip-code))
+
+(defun random-address ()
+  "2022 Johnson scuba, Denver, Kansas 90000")
+
 ;;;;------------------------------------------------------------------------
 ;;;;Phone Class
 ;;;;------------------------------------------------------------------------

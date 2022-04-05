@@ -61,7 +61,7 @@
 			      :duration duration
 			      :notes notes))
 
-(defun add-appointment (appointment)
+(defmethod add-appointment ((appointment appointment))
   (push appointment *appointments*))
 ;;;;test
 (setq test-appointment (make-appointment 1001 2001 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))
@@ -70,7 +70,7 @@
 ;;;;Recurring Appointments
 ;;;;------------------------------------------------------------------------
 
-(defun recurring (appointment number-of-appointments); &optional (recurrence-rate 7))
+(defmethod recurring ((appointment appointment) number-of-appointments); &optional (recurrence-rate 7))
   (let ((client   (client appointment))
 	(employee (employee appointment))
 	(app-date    (app-date appointment))
@@ -91,11 +91,11 @@
 
 (defvar *appointments* nil)
 
-(defun add-appointment (appointment)
+(defmethod add-appointment ((appointment appointment))
   (push appointment
 	*appointments*))
 
-(defun backup-appointment (appointment)
+(defmethod backup-appointment ((appointment appointment))
   (with-open-file (out (asdf:system-relative-pathname "schedulizer"
 						      "appointment-backup.lisp")
 		       :direction :output
@@ -138,7 +138,7 @@
 ;;;;Checking out Appointments
 ;;;;------------------------------------------------------------------------
 
-(defun past-appointment-p (appointment)
+(defmethod past-appointment-p ((appointment appointment))
   "Checks whether an appointment has passed."
   (let ((today (today))
 	(ct    (current-time)))

@@ -5,20 +5,9 @@
 
 
 ;;;;;;;;;;;;;probably move somewhere else
-(defclass address ()
-  ((street-number :initarg :street-number
-		  :accessor street-number)
-   (street-name   :initarg :street-name
-		  :accessor street-name)
-   (city          :initarg :city
-		  :accessor city)
-   (state         :initarg :state
-		  :accessor state)
-   (zip-code      :initarg :zip-code
-		  :accessor zip-code)))
 
-(defun random-address ()
-  "2022 Johnson scuba, Denver, Kansas 90000")
+;(defun random-address ()
+ ; "2022 Johnson scuba, Denver, Kansas 90000")
 
 (defun generate-employees (number-of-employees)
   (loop :for i :from 1 :to number-of-employees

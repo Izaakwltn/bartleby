@@ -79,15 +79,6 @@
 			             :makeups    0
 			             :notes      notes)))
 
-;(add-client-to-list (make-client "joe" "jonas" 1001 "45" "4043872185" "joejoe@joe.joe" "not the best jonas"))
-
-;;;;search
-;(add-client (new-client "nick" "jonas" "423251324" "nicknick@joe.joe" "i guess"))
-
-;(add-client (new-client "kevin" "jonas" "405321235" "kevinisbest@joe.joe" "the best"))
-
-;(add-client (new-client "jeff" "jonass" "4032458590" "jeff@jonass.com" "ghmm?:"))
-
 ;;;;------------------------------------------------------------------------
 ;;;;search and organization
 ;;;;------------------------------------------------------------------------
