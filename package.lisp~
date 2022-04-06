@@ -1,4 +1,0 @@
-;;;;package.lisp
-
-(defpackage #:scheduler
-  (:use #:cl))

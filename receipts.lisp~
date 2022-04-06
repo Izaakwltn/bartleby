@@ -1,6 +1,0 @@
-;;;;receipts.lisp
-;;;;
-;;;;
-
-(in-package :schedulizer)
-
