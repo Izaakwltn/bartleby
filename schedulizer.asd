@@ -11,6 +11,7 @@
 	       (:file "calendar")
 	       (:file "contact")
 	       (:file "clients")
+	       (:file "rooms")
 	       (:file "employees")
 	       (:file "appointments")
 	       (:file "scheduling")

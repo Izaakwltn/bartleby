@@ -5,8 +5,11 @@
 (in-package :schedulizer)
 
 ;;;;------------------------------------------------------------------------
-;;;;Availability
+;;;;Appointment functions
 ;;;;------------------------------------------------------------------------
+					;this-day ((meeting-room)) .... employee, client
+					;this-week ... meeting room, employee, client
+					;this month meeting room, employee, client...
 
 (defgeneric appointments (object)
   (:documentation "Returns a list of appointments associated with an object"))

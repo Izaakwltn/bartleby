@@ -3,65 +3,6 @@
 (in-package :schedulizer)
 
 ;;;;------------------------------------------------------------------------
-;;;;Room Class
-;;;;------------------------------------------------------------------------
-
-(defvar *rooms* nil)
-
-(defclass meeting-room ()
-  ((room-num   :initarg :room-num
-	       :accessor room-num)
-   (room-name  :initarg :room-name
-	       :accessor room-name)
-   (capacity   :initarg :capacity
-	       :accessor capacity)
-   (notes      :initarg :notes
-	       :accessor notes)))
-
-(defmethod print-object ((obj meeting-room) stream)
-  (print-unreadable-object (obj stream :type t)
-    (with-accessors ((room-num room-num)
-		     (room-name room-name)
-		     (capacity capacity)
-		     (notes notes))
-	obj
-      (format stream "~%Room ~a, ~a~%Capacity: ~a~%Notes: ~a~%"
-	      room-num
-	      room-name
-	      capacity
-	      notes))))
-
-(defun make-room (room-num room-name capacity notes)
-  (make-instance 'meeting-room :room-num  room-num
-		               :room-name room-name
-			       :capacity  capacity
-		               :notes     notes))
-
-(defmethod add-room ((meeting-room meeting-room))
-  "Adds a meeting room to *rooms*"
-  (push meeting-room *rooms*))
-
-(defmethod remove-room ((meeting-room meeting-room))
-  (remove-if #'(lambda (r)
-		 (equal (room-num r) (room-num meeting-room)))
-	     *rooms*))
-
-(defun room-search (room-num)
-  (loop :for r :in *rooms*
-	:if (equal room-num (room-num r))
-	  :do (return r)))
-
-(add-room (make-room 0 "Virtual" 1000 "Default, Virtual lesson space."))
-
-;;;;------------------------------------------------------------------------
-;;;;Appointment list
-;;;;------------------------------------------------------------------------
-
-(defvar *appointments* nil) ;;;;should this be in virtual memory or saved to hard drive?
-;I guess ideally clients and appointments should both be saved as database files
-;that can be accessed and searched- maybe sql or postgre? ----Mito project?
-
-;;;;------------------------------------------------------------------------
 ;;;;Appointment Class
 ;;;;------------------------------------------------------------------------
 
@@ -84,7 +25,7 @@
 	         :accessor duration)
    (notes        :initarg :notes
 	         :accessor notes)))
-;appointment-number
+
 (defmethod print-object ((obj appointment) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((app-number    app-number)
@@ -121,26 +62,6 @@
 			      :end-time (add-time start-time duration)
 			      :duration duration
 			      :notes notes))
-
-(defvar last-app-number (if (first *appointments*)
-				(app-number (first *appointments*))
-				10001))
-
-(defun new-app-number ()
-  "Generates a new appointment number."
-  (setq last-app-number (+ last-app-number 1))
-  last-app-number)
-
-(defun new-appointment (client-id employee-id room-num app-date start-time duration notes)
-  (make-instance 'appointment :app-number (new-app-number)
-		              :client (id-search client-id)
-		              :employee (employee-search employee-id)
-			      :meeting-room (room-search room-num)
-		              :app-date app-date
-			      :start-time start-time
-			      :end-time (add-time start-time duration)
-			      :duration duration
-			      :notes notes))
 					   
 (defun equal-appointments-p (app1 app2)
   "Compares two appointments, determines if they are equal."
@@ -153,6 +74,14 @@
        (equal (end-time app1) (end-time app2))
        (equal (duration app1) (duration app2))
        (equal (notes app1) (notes app2))))
+
+;;;;------------------------------------------------------------------------
+;;;;Adding to, removing from, and editing *appointments*
+;;;;------------------------------------------------------------------------
+
+(defvar *appointments* nil)
+
+(defvar *appointment-backup* nil)
 
 (defmethod add-appointment ((appointment appointment))
   "Adds an appointment to the *appointments* list."
@@ -194,11 +123,38 @@
 		       (start-time appointment)
 		       (duration appointment)
 		       (notes appointment)))
-;;change client, change employee, time, duration, notes
+;;change client, change employee, room time, duration, notes
 
 (defmethod edit-appointment ((appointment appointment))
   "I'll figure it out");;;maybe prompt with "what would you like to edit? Name: Employee: ..
 
+;;;;------------------------------------------------------------------------
+;;;;Adding new appointments
+;;;;------------------------------------------------------------------------
+
+(defvar last-app-number (if (first *appointments*)
+				(app-number (first *appointments*))
+				10001))
+
+(defun new-app-number ()
+  "Generates a new appointment number."
+  (setq last-app-number (+ last-app-number 1))
+  last-app-number)
+
+(defun new-appointment (client-id employee-id room-num app-date start-time duration notes)
+  (add-appointment (make-instance 'appointment :app-number (new-app-number)
+		              :client (id-search client-id)
+		              :employee (employee-search employee-id)
+			      :meeting-room (room-search room-num)
+		              :app-date app-date
+			      :start-time start-time
+			      :end-time (add-time start-time duration)
+			      :duration duration
+			      :notes notes)))
+					   
+;;;;------------------------------------------------------------------------
+;;;;
+;;;;------------------------------------------------------------------------
 
 ;;;;test
 (defvar test-appointment (make-appointment 10001 1002 2001 0 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))

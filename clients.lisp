@@ -60,15 +60,54 @@
 			 :makeups    makeups
 			 :notes      notes))
 
+;;;;------------------------------------------------------------------------
+;;;;Adding to, removing from, and editing *clients*
+;;;;------------------------------------------------------------------------
+
+(defvar *clients* nil)
+
+(defvar *client-backup* nil)
+
 (defmethod add-client ((client client))
+  "Add a client to *clients*"
   (push client *clients*))
 
 (defmethod remove-client ((client client))
+  "Removes the client from *clients*, backup tbd."
   (remove-if #'(lambda (c)
 		 (equal (client-id c) (client-id client)))
 	     *clients*)) ;;;;also make this for employee, appointment, room, receipts, invoices, etc
+(defmethod replace-client ((client client) new-client)
+  "Removes the client, adds a new client in its place."
+  (remove-client client)
+  (add-client new-client))
 
-;(add-client (make-client "Test" "Testerson" 1001 "yes" "no" 0 "maybe"))
+;;;;Editing one attribute at a time
+;;;;;;can I do this with a macro (change-attribute object attribute)
+
+(defmethod change-first-name ((client client) first-name)
+  "Changes the first name of a client"
+  (replace-client client (make-client first-name
+				      (last-name client)
+				      (client-id client)
+				      (makeups   client)
+				      (phone     client)
+				      (email     client)
+				      (notes     client))))
+
+(defmethod change-last-name ((client client) last-name)
+  "Changes the last name of a client."
+  (replace-client client (make-client (first-name client)
+				      last-name
+				      (client-id client)
+				      (makeups   client)
+				      (phone     client)
+				      (email     client)
+				      (notes     client))))
+
+;;;;------------------------------------------------------------------------
+;;;;Adding new clients
+;;;;------------------------------------------------------------------------
 
 (defvar last-client-id (if (first *clients*)
 			   (client-id (first *clients*))
@@ -90,30 +129,37 @@
 			             :notes      notes)))
 
 ;;;;------------------------------------------------------------------------
-;;;;search and organization
+;;;;Searching for clients
 ;;;;------------------------------------------------------------------------
 
 (defun clients-with-makeups ()
   "Returns a list of all clients with makeup credits."
-  (loop for client in *clients*
-	if (> (parse-integer (makeups client)) 0)
-	  collect client))
+  (loop :for client :in *clients*
+	:if (> (parse-integer (makeups client)) 0)
+	  :collect client))
 
 (defun id-search (id)
   "Searches for a client by their client id."
-  (loop for client in *clients*
-	if (equal (write-to-string id) (write-to-string (client-id client)))
-	  do (return client)))
+  (loop :for client :in *clients*
+	:if (equal (write-to-string id) (write-to-string (client-id client)))
+	  :do (return client)))
 
 (defun last-name-search (last-name)
   "Searches for a client by their last name."
-  (loop for client in *clients*
-	if (equal last-name (last-name client))
-	  do (return client)))
+  (loop :for client :in *clients*
+	:if (equal last-name (last-name client))
+	  :do (return client)))
 
 (defun first-name-search (first-name)
   "Searches for a client by their first name."
-  (loop for client in *clients*
-	if (equal first-name (first-name client))
-	  do (return client)))
+  (loop :for client :in *clients*
+	:if (equal first-name (first-name client))
+	  :do (return client)))
+
+(defun full-name-search (first-name last-name)
+  "Searches for a client by their full name."
+  (loop :for client :in *clients*
+	:if (and (equal first-name (first-name client))
+		(equal last-name  (last-name client)))
+	  :do (return client)))
 

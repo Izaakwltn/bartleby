@@ -3,10 +3,6 @@
 
 (in-package :schedulizer)
 
-;;;;------------------------------------------------------------------------
-;;;;Employee list
-;;;;------------------------------------------------------------------------
-(defvar *employees* nil)
 
 ;;;;------------------------------------------------------------------------
 ;;;;Employee class
@@ -24,9 +20,10 @@
    (email       :initarg :email
 		:accessor email)
    (address     :initarg :address
-		:accessor address) ;add address class (street address, city, state, zip code)
+		:accessor address)
    (hourly-rate :initarg :hourly-rate
 		:accessor hourly-rate)))
+					;maybe assigned room, can be nil
 
 (defmethod print-object ((obj employee) stream)
   (print-unreadable-object (obj stream :type t)
@@ -50,20 +47,47 @@
 			   :address     address
 			   :hourly-rate hourly-rate))
 
+
+;add equal-employees
+
+;;;;------------------------------------------------------------------------
+;;;;Adding to, removing from, and editing *clients*
+;;;;------------------------------------------------------------------------
+
+(defvar *employees* nil)
+
+(defvar *employee-backup* nil)
+
 (defmethod add-employee ((employee employee))
+  "Adds an employee to *employees*"
   (push employee *employees*))
 
-(defvar izaak (make-employee 2001
-			     "Izaak"
-			     "Walton"
-			     (random-phone)
-			     (random-email "Izaak" "Walton")
-			     "Insert Address Here"
-			     37))
+(defmethod remove-employee ((employee employee))
+  "Removes an employee from *employees*"
+  (remove-if #'(lambda (e)
+		 (equal (employee-id employee) (employee-id e)))
+	     *employees*))
+
+(defmethod replace-employee ((employee employee) new-employee)
+  "Replaces an existing employee with a new-employee in its place."
+  (remove-employee employee)
+  (add-employee new-employee))
+
+;;editing one attribute at a time
+;change first-name last-name phone email address hourly....
+;;;;------------------------------------------------------------------------
+;;;;Adding New Employees
+;;;;------------------------------------------------------------------------
+
+(defvar izaak
+  (make-employee 2001 "Izaak" "Walton" (random-phone) (random-email "Izaak" "Walton")
+		 "Insert Address Here" 37))
 
 (add-employee izaak)
 
-(defvar last-employee-id (employee-id (first *employees*)))
+(defvar last-employee-id (if (employee-id (first *employees*))
+			     (+ (employee-id (first *employees*)) 1)
+			     2001))
 
 (defun new-employee-id ()
   "Generates a new employee id, updates last-employee-id."
@@ -72,7 +96,11 @@
 
 (defun new-employee (first-name last-name phone email address hourly-rate)
   "Generates a a new employee with a new employee id."
-  (make-employee (new-employee-id) first-name last-name phone email address hourly-rate))
+  (add-employee (make-employee (new-employee-id) first-name last-name phone email address hourly-rate)))
+
+;;;;------------------------------------------------------------------------
+;;;;Searching for employees:
+;;;;------------------------------------------------------------------------
 
 (defun employee-search (employee-id)
   "Searches for an employee by employee-id."
