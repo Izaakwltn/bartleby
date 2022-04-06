@@ -37,15 +37,21 @@
 			       :capacity  capacity
 		               :notes     notes))
 
-(defun add-room (room-num room-name capacity notes)
-  (push (make-room room-num room-name capacity notes) *rooms*))
+(defmethod add-room ((meeting-room meeting-room))
+  "Adds a meeting room to *rooms*"
+  (push meeting-room *rooms*))
+
+(defmethod remove-room ((meeting-room meeting-room))
+  (remove-if #'(lambda (r)
+		 (equal (room-num r) (room-num meeting-room)))
+	     *rooms*))
 
 (defun room-search (room-num)
   (loop :for r :in *rooms*
 	:if (equal room-num (room-num r))
 	  :do (return r)))
 
-(add-room 0 "Virtual" 1000 "Default, Virtual lesson space.")
+(add-room (make-room 0 "Virtual" 1000 "Default, Virtual lesson space."))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Appointment list
@@ -60,7 +66,9 @@
 ;;;;------------------------------------------------------------------------
 
 (defclass appointment ()
-  ((client       :initarg :client
+  ((app-number   :initarg :app-number
+		 :accessor app-number)
+   (client       :initarg :client
 	         :accessor client)
    (employee     :initarg :employee
 	         :accessor employee)
@@ -76,20 +84,22 @@
 	         :accessor duration)
    (notes        :initarg :notes
 	         :accessor notes)))
-
+;appointment-number
 (defmethod print-object ((obj appointment) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((client client)
-		     (employee employee)
-		     (meeting-room meeting-room)
-		     (app-date app-date)
-		     (start-time start-time)
-		     (end-time end-time)
-		     (duration duration)
+    (with-accessors ((app-number    app-number)
+		     (client        client)
+		     (employee      employee)
+		     (meeting-room  meeting-room)
+		     (app-date      app-date)
+		     (start-time    start-time)
+		     (end-time      end-time)
+		     (duration      duration)
 		     (notes notes))
 	obj
       (format stream
-	      "~%~a~% ~a---~a~%Room: ~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
+	      "~%~a~%~a~% ~a---~a~%Room: ~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
+	      app-number
 	      app-date
 	      start-time
 	      end-time
@@ -101,8 +111,9 @@
 	      duration
 	      notes))))
 	      
-(defun make-appointment (client-id employee-id room-num app-date start-time duration notes)
-  (make-instance 'appointment :client (id-search client-id)
+(defun make-appointment (app-number client-id employee-id room-num app-date start-time duration notes)
+  (make-instance 'appointment :app-number app-number
+		              :client (id-search client-id)
 		              :employee (employee-search employee-id)
 			      :meeting-room (room-search room-num)
 		              :app-date app-date
@@ -111,10 +122,86 @@
 			      :duration duration
 			      :notes notes))
 
+(defvar last-app-number (if (first *appointments*)
+				(app-number (first *appointments*))
+				10001))
+
+(defun new-app-number ()
+  "Generates a new appointment number."
+  (setq last-app-number (+ last-app-number 1))
+  last-app-number)
+
+(defun new-appointment (client-id employee-id room-num app-date start-time duration notes)
+  (make-instance 'appointment :app-number (new-app-number)
+		              :client (id-search client-id)
+		              :employee (employee-search employee-id)
+			      :meeting-room (room-search room-num)
+		              :app-date app-date
+			      :start-time start-time
+			      :end-time (add-time start-time duration)
+			      :duration duration
+			      :notes notes))
+					   
+(defun equal-appointments-p (app1 app2)
+  "Compares two appointments, determines if they are equal."
+  (and (equal (app-number app1) (app-number app2))
+       (equal (client-id (client app1)) (client-id (client app2)))
+       (equal (employee-id (employee app1)) (employee-id (employee app2)))
+       (equal (room-num (meeting-room app1)) (room-num (meeting-room app-2)))
+       (equal (app-date app1) (app-date app2))
+       (equal (start-time app1) (start-time app2))
+       (equal (end-time app1) (end-time app2))
+       (equal (duration app1) (duration app2))
+       (equal (notes app1) (notes app2))))
+
 (defmethod add-appointment ((appointment appointment))
+  "Adds an appointment to the *appointments* list."
   (push appointment *appointments*))
+
+(defmethod remove-appointment ((appointment appointment))
+  "Removes an appointment from the *appointments* list"
+  (remove-if #'(lambda (a)
+		 (equal-appointment-p a appointment))))
+
+(defmethod replace-appointment ((appointment appointment)
+				client-id employee-id room-num app-date start-time duration notes)
+  "Removes appointment, adds a replacement appointment."
+  (remove-appointment appointment)
+  (add-appointment (make-appointment (app-number appointment) client-id employee-id room-num app-date start-time duration notes)))
+
+;;;;;;;make appointment-number so that it's still "the same appointment"
+
+;;;make (defmethod change-date ((appointment appointment)),
+  ;performs replace-appointment with everything the same but the date.
+  ;Do the same for change-client change-employee change-room change-date change-time
+
+(defmethod change-date ((appointment appointment) new-date)
+  (replace-appointment appointment
+		       (app-number appointment)
+		       (employee-id (employee appointment))
+		       (room-num (meeting-room appointment))
+		       new-date
+		       (start-time appointment)
+		       (duration appointment)
+		       (notes appointment)))
+
+(defmethod change-employee ((appointment appointment) new-employee)
+  (replace-appointment appointment
+		       (app-number appointment)
+		       (employee-id new-employee)
+		       (room-num (meeting-room appointment))
+		       (app-date appointment)
+		       (start-time appointment)
+		       (duration appointment)
+		       (notes appointment)))
+;;change client, change employee, time, duration, notes
+
+(defmethod edit-appointment ((appointment appointment))
+  "I'll figure it out");;;maybe prompt with "what would you like to edit? Name: Employee: ..
+
+
 ;;;;test
-(setq test-appointment (make-appointment 1001 2001 0 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))
+(defvar test-appointment (make-appointment 10001 1002 2001 0 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments
@@ -143,25 +230,27 @@
 
 ;(defmethod add-appointment ((appointment appointment))
  ; (push appointment
-;	*appointments*))
-
-(defmethod backup-appointment ((appointment appointment))
-  (with-open-file (out (asdf:system-relative-pathname "schedulizer"
-						      "appointment-backup.lisp")
-		       :direction :output
-		       :if-exists :append)
-    (format out
-	    "~%(add-appointment (make-appointment ~a (date ~a ~a ~a) (set-time ~a ~a) ~a))"
-	    (write-to-string (client-id (client appointment)))
-	    (write-to-string (month (app-date appointment)))
-	    (write-to-string (day (app-date appointment)))
-	    (write-to-string (year (app-date appointment)))
-	    (write-to-string (month (app-date appointment)))
-	    (write-to-string (hour (start-time appointment)))
-	    (write-to-string (minutes (start-time appointment)))
-	    (write-to-string (duration appointment))
-	    (write-to-string (notes appointment)))))
-
+					;	*appointments*))
+;;;;------------------------------------------------------------------------
+;;;;;backupsystem
+;;;;------------------------------------------------------------------------
+;(defmethod backup-appointment ((appointment appointment))
+ ; (with-open-file (out (asdf:system-relative-pathname "schedulizer"
+;						      "appointment-backup.lisp")
+;		       :direction :output
+;		       :if-exists :append)
+ ;   (format out
+;	    "~%(add-appointment (make-appointment ~a (date ~a ~a ~a) (set-time ~a ~a) ~a))"
+;	    (write-to-string (client-id (client appointment)))
+;	    (write-to-string (month (app-date appointment)))
+;	    (write-to-string (day (app-date appointment)))
+;	    (write-to-string (year (app-date appointment)))
+;	    (write-to-string (month (app-date appointment)))
+;	    (write-to-string (hour (start-time appointment)))
+;	    (write-to-string (minutes (start-time appointment)))
+;	    (write-to-string (duration appointment))
+;	    (write-to-string (notes appointment)))))
+;;
 
 
 (defun prompt-read (prompt)
@@ -169,21 +258,24 @@
   (force-output *query-io*)
   (read-line *query-io*))
 
-(defun appointment-input ()
-  (let ((new-appointment (make-appointment (prompt-read "Client ID: ")
-					   (date (prompt-read "Month: (1, 2, 3 etc)")
-						 (prompt-read "Day: ")
-						 (prompt-read "Year: "))
-					   (set-time (prompt-read "Hour: ")
-						     (prompt-read "Minutes: "))
-					   (prompt-read "Duration in minutes: ")
-					   (prompt-read "Notes"))))
-    (add-appointment new-appointment)
-    (backup-appointment new-appointment)))
+;(defun appointment-input ()
+ ; (let ((new-appointment (make-appointment (new-app-number) 
+;			                   (prompt-read "Client ID: ")
+;					   (date (prompt-read "Month: (1, 2, 3 etc)")
+;						 (prompt-read "Day: ")
+;						 (prompt-read "Year: "))
+;					   (set-time (prompt-read "Start time: Hour: ")
+;						     (prompt-read "Minutes: ")) ;;;maybe input as x:xx
+		                           
+;					   (prompt-read "Meeting Room 0 for virtual, 1-5: ")
+;					   (prompt-read "Duration in minutes: ")
+;					   (prompt-read "Notes"))))
+ ;   (add-appointment new-appointment)
+  ;  (backup-appointment new-appointment)))
 
-(defun input-appointments ()
-  (loop (appointment-input)
-	(if (not (y-or-n-p "Another new appointment? [y/n]: ")) (return))))
+;(defun input-appointments ()
+ ; (loop (appointment-input)
+;	(if (not (y-or-n-p "Another new appointment? [y/n]: ")) (return))))
 ;;;;------------------------------------------------------------------------
 ;;;;Checking out Appointments
 ;;;;------------------------------------------------------------------------
