@@ -1,4 +1,4 @@
-;;;scheduler.asd
+;;;schedulizer.asd
 
 (asdf:defsystem #:schedulizer
   :version "0.0.1"
@@ -10,6 +10,7 @@
   :components ((:file "package")
 	       (:file "calendar")
 	       (:file "contact")
+	       (:file "editing-generics")
 	       (:file "clients")
 	       (:file "rooms")
 	       (:file "employees")

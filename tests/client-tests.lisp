@@ -37,7 +37,7 @@
   (loop :for i :from 1 :to number-of-clients
 	:do (let ((fn (random-first))
 		  (ln (random-last)))
-	      (new-client fn ln (random-phone) (random-email fn ln) "n/a"))))
+	      (new-client fn ln (random-phone) (random-email fn ln) (random-address) "n/a"))))
 
 (setq first-names '(Michael Christopher Jessica Matthew Ashley Jennifer Joshua Amanda Daniel David James Robert John Joseph Andrew Ryan Brandon Jason Justin Sarah William Jonathan Stephanie Brian Nicole Nicholas Anthony Heather Eric Elizabeth Adam Megan
 Melissa

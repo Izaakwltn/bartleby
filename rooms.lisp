@@ -78,7 +78,7 @@
 		       notes)))
 
 ;;;;Editing one attribute at a time
-(defmethod change-number ((meeting-room meeting-room) new-number)
+(defmethod change-id ((meeting-room meeting-room) new-number)
   (replace-room meeting-room (make-room new-number
 					(room-name meeting-room)
 				        (capacity meeting-room)

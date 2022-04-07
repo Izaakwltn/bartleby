@@ -74,6 +74,15 @@
   (add-employee new-employee))
 
 ;;editing one attribute at a time
+
+(defmethod change-first-name ((employee employee) first-name)
+  (replace-employee employee (make-employee first-name
+					    (last-name employee)
+					    (employee-id employee)
+					    (phone employee)
+					    (email employee)
+					    (address employee)
+					    (hourly-rate employee))))
 ;change first-name last-name phone email address hourly....
 ;;;;------------------------------------------------------------------------
 ;;;;Adding New Employees
@@ -92,7 +101,7 @@
 (defun new-employee-id ()
   "Generates a new employee id, updates last-employee-id."
   (setq last-employee-id (+ last-employee-id 1))
-  last-client-id)
+  last-employee-id)
 
 (defun new-employee (first-name last-name phone email address hourly-rate)
   "Generates a a new employee with a new employee id."

@@ -5,6 +5,7 @@
 ;;;;------------------------------------------------------------------------
 ;;;;Defining the client class
 ;;;;------------------------------------------------------------------------
+
 (defclass client ()
   ((first-name     :initarg :first-name
                    :accessor first-name)
@@ -101,7 +102,7 @@
 				      (address   client)
 				      (notes     client))))
 
-(defmethod change-client-id ((client client) client-id)
+(defmethod change-id ((client client) client-id)
   "Changes the first name of a client"
   (replace-client client (make-client (first-name client)
 				      (last-name  client)
@@ -111,6 +112,28 @@
 				      (email      client)
 				      (address    client)
 				      (notes      client))))
+
+(defmethod change-credits    ((client client) credits)
+  "Changes the first name of a client"
+  (replace-client client (make-client (first-name client)
+				      (last-name client)
+				      (client-id client)
+				      credits
+				      (phone     client)
+				      (email     client)
+				      (address   client)
+				      (notes     client))))
+
+(defmethod change-phone ((client client) new-phone)
+  "Changes the first name of a client"
+  (replace-client client (make-client (first-name     client)
+ 				      (last-name      client)
+				      (client-id      client)
+				      (credit-minutes client)
+				      new-phone
+				      (email          client)
+				      (address        client)
+				      (notes          client))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding new clients
@@ -125,7 +148,7 @@
   (setq last-client-id (+ last-client-id 1))
   last-client-id)
 
-(defun new-client (first-name last-name phone email notes)
+(defun new-client (first-name last-name phone email address notes)
   "generates a client with a new id and default makeups"
   (add-client (make-instance 'client :first-name first-name
 		                     :last-name  last-name
@@ -140,7 +163,7 @@
 ;;;;Searching for clients
 ;;;;------------------------------------------------------------------------
 
-(defun clients-with-makeups ()
+(defun clients-with-credits ()
   "Returns a list of all clients with makeup credits."
   (loop :for client :in *clients*
 	:if (> (parse-integer (credit-minutes client)) 0)

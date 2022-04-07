@@ -104,6 +104,9 @@
   ;performs replace-appointment with everything the same but the date.
   ;Do the same for change-client change-employee change-room change-date change-time
 
+(defmethod change-id ((appointment appointment) app-id)
+  "Will figure it out later")
+  
 (defmethod change-date ((appointment appointment) new-date)
   (replace-appointment appointment
 		       (app-number appointment)
