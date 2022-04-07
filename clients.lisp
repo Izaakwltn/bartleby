@@ -3,15 +3,6 @@
 (in-package :schedulizer)
 
 ;;;;------------------------------------------------------------------------
-;;;;Client lists and backups
-;;;;------------------------------------------------------------------------
-
-(defvar *clients* nil)
-
-;(defun add-client (client)
- ; (push client *clients*))
-;
-;;;;------------------------------------------------------------------------
 ;;;;Defining the client class
 ;;;;------------------------------------------------------------------------
 (defclass client ()
@@ -27,13 +18,13 @@
 		   :accessor email)
    (address        :initarg :address
 		   :accessor address)
-   (makeup-credits :initarg :makeups
-		   :accessor makeups) ;default 0
+   (credit-minutes :initarg :credit-minutes
+		   :accessor credit-minutes) ;default 0
    ;(upcoming      :initarg :upcoming
    
    ;(history :initarg :history
 ;		   :accessor history)
-   ;(bookshelf     :initarg :bookshelf   
+   ;(bookshelf     :initarg :bookshelf   ;;files
    (notes          :initarg :notes
 		   :accessor notes)))
 
@@ -44,21 +35,23 @@
 		     (client-id client-id)
 		     (phone phone)
 		     (email email)
-		     (makeups makeups)
+		     (address address)
+		     (credit-minutes credit-minutes)
 		     (notes notes))
 	obj
       (format stream
-	      "~%Name: ~a ~a~% ID: ~a~% Phone: ~a~%Email: ~a~%Makeup Minutes: ~a~%Notes: ~a~%"
-	      first-name last-name client-id phone email makeups notes))))
+	      "~%Name: ~a ~a~% ID: ~a~% Phone: ~a~%Email: ~a~%Address: ~a~%Makeup Minutes: ~a~%Notes: ~a~%"
+	      first-name last-name client-id phone email address credit-minutes notes))))
 
-(defun make-client (first-name last-name client-id makeups phone email notes)
-  (make-instance 'client :first-name first-name
-		         :last-name  last-name
-			 :client-id  client-id
-			 :phone      phone
-			 :email      email
-			 :makeups    makeups
-			 :notes      notes))
+(defun make-client (first-name last-name client-id credit-minutes phone email address  notes)
+  (make-instance 'client :first-name     first-name
+		         :last-name      last-name
+			 :client-id      client-id
+			 :phone          phone
+			 :email          email
+			 :address        address
+			 :credit-minutes credit-minutes
+			 :notes          notes))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding to, removing from, and editing *clients*
@@ -77,6 +70,7 @@
   (remove-if #'(lambda (c)
 		 (equal (client-id c) (client-id client)))
 	     *clients*)) ;;;;also make this for employee, appointment, room, receipts, invoices, etc
+
 (defmethod replace-client ((client client) new-client)
   "Removes the client, adds a new client in its place."
   (remove-client client)
@@ -90,9 +84,10 @@
   (replace-client client (make-client first-name
 				      (last-name client)
 				      (client-id client)
-				      (makeups   client)
+				      (credit-minutes client)
 				      (phone     client)
 				      (email     client)
+				      (address     client)
 				      (notes     client))))
 
 (defmethod change-last-name ((client client) last-name)
@@ -100,10 +95,22 @@
   (replace-client client (make-client (first-name client)
 				      last-name
 				      (client-id client)
-				      (makeups   client)
+				      (credit-minutes   client)
 				      (phone     client)
 				      (email     client)
+				      (address   client)
 				      (notes     client))))
+
+(defmethod change-client-id ((client client) client-id)
+  "Changes the first name of a client"
+  (replace-client client (make-client (first-name client)
+				      (last-name  client)
+				      client-id 
+				      (credit-minutes client)
+				      (phone      client)
+				      (email      client)
+				      (address    client)
+				      (notes      client))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding new clients
@@ -125,7 +132,8 @@
 			             :client-id  (new-client-id)
 			             :phone      phone
 			             :email      email
-			             :makeups    0
+				     :address    address
+			             :credit-minutes    0
 			             :notes      notes)))
 
 ;;;;------------------------------------------------------------------------
@@ -135,7 +143,7 @@
 (defun clients-with-makeups ()
   "Returns a list of all clients with makeup credits."
   (loop :for client :in *clients*
-	:if (> (parse-integer (makeups client)) 0)
+	:if (> (parse-integer (credit-minutes client)) 0)
 	  :collect client))
 
 (defun id-search (id)
