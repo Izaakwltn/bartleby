@@ -15,7 +15,12 @@
   (:documentation "Returns a list of appointments associated with an object"))
 
 (defmethod appointments ((employee employee))
-  "Will return all appointments relating to the employee.")
+  "Will return all appointments relating to the employee."
+  (let ((id (employee-id employee)))
+    (loop :for a :in *appointments*
+	  :if (equal (employee-id (employee a)) id)
+	    :collect a :into apts
+	  :finally (return apts))))
 
 (defmethod appointments ((meeting-room meeting-room))
   "Will return all appointments relating to the room")

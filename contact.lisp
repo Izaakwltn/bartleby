@@ -31,14 +31,14 @@
       (format stream "~a ~a~%~a, ~a ~a" street-number street-name city state zip-code))))
 
 (defun make-address (street-number street-name city state zip-code)
-  (make-intance 'address :street-number street-number
+  (make-instance 'address :street-number street-number
 		         :street-name   street-name
 			 :city          city
 			 :state         state
 			 :zip-code      zip-code))
 
 (defun random-address ()
-  "2022 Johnson scuba, Denver, Kansas 90000")
+ (make-address "2022" "Johnson Street" " Denver" "Kansas" "90000"))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Phone Class
