@@ -44,12 +44,13 @@
 
 (defvar *room-backup* nil) ; do the backup stuff on each other class
 ;move to backups.lisp
-(defun make-backup (filename list)
-  "Make a backup for the list in the named file.")
+;(defun make-backup (filename list)
+ ; "Make a backup for the list in the named file.")
   ;to add or remove items from the backup, for now, just rewrite the file with the updated list
    
 (defun update-room-backup ()
   "later man")
+
 (defmethod add-backup-room ((meeting-room meeting-room) filename)
   "Backs up the room to the room backup.")
 

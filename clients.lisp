@@ -135,6 +135,37 @@
 				      (address        client)
 				      (notes          client))))
 
+(defmethod change-email ((client client) email)
+  "Changes the first name of a client"
+  (replace-client client (make-client (first-name     client)
+ 				      (last-name      client)
+				      (client-id      client)
+				      (credit-minutes client)
+				      (phone          client)
+				      email
+				      (address        client)
+				      (notes          client))))
+
+(defmethod change-address ((client client) address)
+  "Changes the first name of a client"
+  (replace-client client (make-client (first-name     client)
+ 				      (last-name      client)
+				      (client-id      client)
+				      (credit-minutes client)
+				      (phone          client)
+				      (email          client)
+				      address
+				      (notes          client))))
+(defmethod change-address ((client client) address)
+  "Changes the first name of a client"
+  (replace-client client (make-client (first-name     client)
+ 				      (last-name      client)
+				      (client-id      client)
+				      (credit-minutes client)
+				      (phone          client)
+				      (email          client)
+				      (address        client)
+				      notes)))
 ;;;;------------------------------------------------------------------------
 ;;;;Adding new clients
 ;;;;------------------------------------------------------------------------

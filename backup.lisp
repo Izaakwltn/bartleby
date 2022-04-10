@@ -2,12 +2,14 @@
 
 (in-package :schedulizer)
 
+;;;;For now, backing up is simple- just overwrite the previous backup with all items in the designated list
+
 ;;;;function for generating a backup given a filename, list to backup, function for formatting them
 (defgeneric backup-unit (object)
   (:documentation "Prepares an object for backup."))
 
 (defmethod backup-unit ((client client))
-  (format nil "~a ~a" (write-to-string (first-name client))
+  (format nil "(~a ~a)" (write-to-string (first-name client))
 	  (last-name client)))
 
 ;make backup-unit for appointments, clients, employees, rooms, maybe more categories
@@ -17,9 +19,10 @@
 		       :direction         :output
 		       :if-does-not-exist :create
 		       :if-exists         :overwrite)
-    (format out ";;;;~a~%(in-package :schedulizer)~%~%(defvar ~a" filename backup-name)
+    (format out ";;;;~a~%(in-package :schedulizer)~%~%(defvar ~a '(" filename backup-name)
   ;;;;;write to file code....
   (format nil "~a" filename)
   (loop :for o :in object-list
 	:do (backup-unit o)))) ;;;;;;;so backup-unit will work for any object
 
+;;;;make backup then make functions for loading the backup when the program is loaded
