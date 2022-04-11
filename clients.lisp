@@ -103,7 +103,7 @@
 				      (notes     client))))
 
 (defmethod change-id ((client client) client-id)
-  "Changes the first name of a client"
+  "Changes the client ID of a client"
   (replace-client client (make-client (first-name client)
 				      (last-name  client)
 				      client-id 
@@ -114,7 +114,7 @@
 				      (notes      client))))
 
 (defmethod change-credits    ((client client) credits)
-  "Changes the first name of a client"
+  "Changes the credit minutes of a client"
   (replace-client client (make-client (first-name client)
 				      (last-name client)
 				      (client-id client)
@@ -125,7 +125,7 @@
 				      (notes     client))))
 
 (defmethod change-phone ((client client) new-phone)
-  "Changes the first name of a client"
+  "Changes the phone number of a client"
   (replace-client client (make-client (first-name     client)
  				      (last-name      client)
 				      (client-id      client)
@@ -136,7 +136,7 @@
 				      (notes          client))))
 
 (defmethod change-email ((client client) email)
-  "Changes the first name of a client"
+  "Changes the email of a client"
   (replace-client client (make-client (first-name     client)
  				      (last-name      client)
 				      (client-id      client)
@@ -147,7 +147,7 @@
 				      (notes          client))))
 
 (defmethod change-address ((client client) address)
-  "Changes the first name of a client"
+  "Changes the address of a client"
   (replace-client client (make-client (first-name     client)
  				      (last-name      client)
 				      (client-id      client)
@@ -156,8 +156,8 @@
 				      (email          client)
 				      address
 				      (notes          client))))
-(defmethod change-address ((client client) address)
-  "Changes the first name of a client"
+(defmethod change-notes ((client client) notes)
+  "Changes notes on a client"
   (replace-client client (make-client (first-name     client)
  				      (last-name      client)
 				      (client-id      client)
@@ -189,6 +189,8 @@
 				     :address    address
 			             :credit-minutes    0
 			             :notes      notes)))
+
+;maybe phone and email should be lists to allow for multiple?
 
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for clients

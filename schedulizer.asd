@@ -15,9 +15,10 @@
 	       (:file "rooms")
 	       (:file "employees")
 	       (:file "appointments")
-	       (:file "scheduling")
+	       (:file "scheduling") ;rename to "availability"
 	       (:file "receipts")
 	       (:file "invoices")
+	       (:file "backup")
 	       (:module "tests"
 		:serial t
 		:components ((:file "client-tests")

@@ -24,6 +24,7 @@
    (hourly-rate :initarg :hourly-rate
 		:accessor hourly-rate)))
 					;maybe assigned room, can be nil
+;add notes
 
 (defmethod print-object ((obj employee) stream)
   (print-unreadable-object (obj stream :type t)
@@ -83,7 +84,60 @@
 					    (email employee)
 					    (address employee)
 					    (hourly-rate employee))))
-;change first-name last-name phone email address hourly....
+
+(defmethod change-last-name ((employee employee) last-name)
+  (replace-employee employee (make-employee (first-name employee)
+					    last-name
+					    (employee-id employee)
+					    (phone employee)
+					    (email employee)
+					    (address employee)
+					    (hourly-rate employee))))
+
+(defmethod change-id ((employee employee) employee-id)
+  (replace-employee employee (make-employee (first-name employee)
+					    (last-name employee)
+					    employee-id
+					    (phone employee)
+					    (email employee)
+					    (address employee)
+					    (hourly-rate employee))))
+
+(defmethod change-phone ((employee employee) phone)
+  (replace-employee employee (make-employee (first-name employee)
+					    (last-name employee)
+					    (employee-id employee)
+					    phone
+					    (email employee)
+					    (address employee)
+					    (hourly-rate employee))))
+
+(defmethod change-email ((employee employee) email)
+  (replace-employee employee (make-employee (first-name employee)
+					    (last-name employee)
+					    (employee-id employee)
+					    (phone employee)
+					    email
+					    (address employee)
+					    (hourly-rate employee))))
+
+(defmethod change-address ((employee employee) address)
+  (replace-employee employee (make-employee (first-name employee)
+					    (last-name employee)
+					    (employee-id employee)
+					    (phone employee)
+					    (email employee)
+					    address
+					    (hourly-rate employee))))
+
+(defmethod change-hourly ((employee employee) hourly-rate)
+  (replace-employee employee (make-employee (first-name employee)
+					    (last-name employee)
+					    (employee-id employee)
+					    (phone employee)
+					    (email employee)
+					    (address employee)
+					    hourly-rate)))
 ;;;;------------------------------------------------------------------------
 ;;;;Adding New Employees
 ;;;;------------------------------------------------------------------------

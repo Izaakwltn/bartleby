@@ -64,6 +64,7 @@
       (format stream "+~a(~a)~a-~a" country area middle end))))
 
 (defun make-phone-number (number-string)
+  "Stores a string phone number as an object including country and area codes"
   (let ((l (length number-string)))
     (make-instance 'phone-number :country (if (> l 10)
 				            (subseq number-string 0 (- l 10))
@@ -71,7 +72,16 @@
 		                 :area (subseq number-string (- l 10) (- l 7))
 				 :middle (subseq number-string (- l 7) (- l 4))
 				 :end (subseq number-string (- l 4) l))))
-		 
+
+(defun random-phone ()
+  "Generates a random, probably not functioning US phone number."
+  (make-phone-number
+   (loop :with number := nil
+        :for i :from 1 :to 10
+	 :do (setf number
+		   (concatenate 'string number (write-to-string (random 9))))
+	 :finally (return number))))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Random entries for simulated contact information
 ;;;;------------------------------------------------------------------------
@@ -89,22 +99,32 @@
 	obj
       (format stream "~a@~a" username domain))))
 
-;(defun make-email-address (string-email)
- ; (make-instance 'email-address :username ;;;;parse at @ sign
+(defun parse-email (email-string)
+  "Parses an email address and splits username from domain."
+  (loop :with switch := nil ;username, then domain
+	:with u := ""
+	:with d := ""
+
+	:for ch :from 0 :to (- (length email-string) 1)
+	:if (equal (subseq email-string ch (+ ch 1)) "@")
+	  :do (setq switch t)
+	:else :if (null switch)
+	  :do (setq u (concatenate 'string u (subseq email-string ch (+ ch 1))))
+	:else
+	  :do (setq d (concatenate 'string d (subseq email-string ch (+ ch 1))))
+	:finally (return (list u d))))
+
+
+	  
+(defun make-email (email-string)
+  "Generates an email object from its username and domain."
+  (let ((parsed-email (parse-email email-string)))
+	(make-instance 'email-address :username (first parsed-email)
+		       :domain (second parsed-email))))
 
 (defvar email-domains '("gmail.com" "yahoo.com" "hotmail.com" "aol.com" "msn.com"))
 
-(defun random-email (first-name last-name)
-  (concatenate 'string last-name "." first-name "@" (nth (random 4) email-domains)))
+(defun auto-email (first-name last-name)
+  "Automatically generates a *random* email using someone's name"
+  (make-email (concatenate 'string last-name "." first-name "@" (nth (random 4) email-domains))))
   
-(defun random-phone ()
-  (loop :with number := nil
-        :for i :from 1 :to 10
-	:do (if (or (equal i 4)
-	            (equal i 7))
-		(setf number
-		      (concatenate 'string number "-" (write-to-string (random 9))))
-		(setf number
-	              (concatenate 'string number (write-to-string (random 9)))))
-	:finally (return number)))
-

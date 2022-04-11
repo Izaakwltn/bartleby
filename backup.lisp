@@ -9,7 +9,7 @@
   (:documentation "Prepares an object for backup."))
 
 (defmethod backup-unit ((client client))
-  (format nil "(~a ~a)" (write-to-string (first-name client))
+  (format nil "(~a ~a)~%" (write-to-string (first-name client))
 	  (last-name client)))
 
 ;make backup-unit for appointments, clients, employees, rooms, maybe more categories
@@ -21,8 +21,8 @@
 		       :if-exists         :overwrite)
     (format out ";;;;~a~%(in-package :schedulizer)~%~%(defvar ~a '(" filename backup-name)
   ;;;;;write to file code....
-  (format nil "~a" filename)
   (loop :for o :in object-list
-	:do (backup-unit o)))) ;;;;;;;so backup-unit will work for any object
+	:do (backup-unit o))
+    )) ;;;;;;;so backup-unit will work for any object
 
 ;;;;make backup then make functions for loading the backup when the program is loaded
