@@ -13,4 +13,4 @@
   (loop :for i :from 1 :to number-of-employees
 	:do (let ((fn (random-first))
 		  (ln (random-last)))
-	      (new-employee fn ln (random-phone) (random-email fn ln) (random-address) 37))))
+	      (new-employee fn ln (random-phone) (auto-email fn ln) (random-address) 37))))

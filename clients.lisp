@@ -166,6 +166,7 @@
 				      (email          client)
 				      (address        client)
 				      notes)))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Adding new clients
 ;;;;------------------------------------------------------------------------
@@ -192,6 +193,19 @@
 
 ;maybe phone and email should be lists to allow for multiple?
 
+;;;;------------------------------------------------------------------------
+;;;;Backing up clients
+;;;;------------------------------------------------------------------------
+(defmethod backup-unit ((client client))
+  (format nil "(add-client ~a ~a ~a ~a ~a ~a ~a ~a)~%"
+	  (write-to-string (first-name client))
+	  (write-to-string (last-name client))
+	  (client-id client)
+	  (credit-minutes client)
+	  (phone-backup (phone client))
+	  (email-backup (email client))
+	  (address-backup (address client))
+	  (write-to-string (notes client))))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for clients
 ;;;;------------------------------------------------------------------------

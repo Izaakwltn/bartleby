@@ -4,6 +4,9 @@
 
 (in-package :schedulizer)
 
+;;;;------------------------------------------------------------------------
+;;;;Changing attributes
+;;;;------------------------------------------------------------------------
 (defgeneric change-first-name (object first-name)
   (:documentation "Change the first name of the object"))
 
@@ -38,3 +41,7 @@
   (:documentation "Changes the name of an object")) ;rooms
 
 
+;;;;backing up
+
+(defgeneric backup-unit (object)
+  (:documentation "Prepares an item to be printed to backup."))

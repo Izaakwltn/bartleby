@@ -32,10 +32,18 @@
 
 (defun make-address (street-number street-name city state zip-code)
   (make-instance 'address :street-number street-number
-		         :street-name   street-name
-			 :city          city
-			 :state         state
-			 :zip-code      zip-code))
+		          :street-name   street-name
+			  :city          city
+			  :state         state
+			  :zip-code      zip-code))
+
+(defmethod address-backup ((address address))
+  (format nil "(make-address ~a ~a ~a ~a ~a)"
+	  (street-number address)
+	  (street-name address)
+	  (city address)
+	  (state address)
+	  (zip-code address)))
 
 (defun random-address ()
  (make-address "2022" "Johnson Street" " Denver" "Kansas" "90000"))
@@ -82,6 +90,13 @@
 		   (concatenate 'string number (write-to-string (random 9))))
 	 :finally (return number))))
 
+(defmethod phone-backup ((phone-number phone-number))
+  (format nil "(make-instance 'phone-number :country ~a :area ~a :middle ~a :end ~a)"
+	  (country phone-number)
+	  (area phone-number)
+	  (middle phone-number)
+	  (end phone-number)))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Random entries for simulated contact information
 ;;;;------------------------------------------------------------------------
@@ -120,11 +135,16 @@
   "Generates an email object from its username and domain."
   (let ((parsed-email (parse-email email-string)))
 	(make-instance 'email-address :username (first parsed-email)
-		       :domain (second parsed-email))))
+				      :domain (second parsed-email))))
+
+(defmethod email-backup ((email-address email-address))
+  (format nil "(make-instance 'email-address :username ~a :domain ~a)"
+	  (username email-address)
+	  (domain email-address)))
 
 (defvar email-domains '("gmail.com" "yahoo.com" "hotmail.com" "aol.com" "msn.com"))
 
 (defun auto-email (first-name last-name)
-  "Automatically generates a *random* email using someone's name"
+  "Automatically generates an email using someone's name"
   (make-email (concatenate 'string last-name "." first-name "@" (nth (random 4) email-domains))))
   

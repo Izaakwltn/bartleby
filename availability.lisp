@@ -1,4 +1,4 @@
-;;;;scheduling.lisp
+;;;;availability.lisp
 ;;;;
 ;;;;
 

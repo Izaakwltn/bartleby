@@ -11,14 +11,15 @@
 	       (:file "calendar")
 	       (:file "contact")
 	       (:file "editing-generics")
+               (:file "backup")
 	       (:file "clients")
 	       (:file "rooms")
 	       (:file "employees")
 	       (:file "appointments")
-	       (:file "scheduling") ;rename to "availability"
+	       (:file "availability") ;rename to "availability"
 	       (:file "receipts")
 	       (:file "invoices")
-	       (:file "backup")
+	       ;(:file "backup") ;;;maybe backups module
 	       (:module "tests"
 		:serial t
 		:components ((:file "client-tests")
