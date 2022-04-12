@@ -18,19 +18,19 @@
 (defgeneric appointments (object)
   (:documentation "Returns a list of appointments associated with an object"))
 
-(defmethod appointments ((employee employee))
-  "Will return all appointments relating to the employee."
-  (let ((id (employee-id employee)))
-    (loop :for a :in *appointments*
-	  :if (equal (employee-id (employee a)) id)
-	    :collect a :into apts
-	  :finally (return apts))))
+;(defmethod appointments ((employee employee))
+ ;; "Will return all appointments relating to the employee."
+  ;(let ((id (employee-id employee)))
+   ; (loop :for a :in *appointments*
+;	  :if (equal (employee-id (employee a)) id)
+;	    :collect a :into apts
+;	  :finally (return apts))))
 
-(defmethod appointments ((meeting-room meeting-room))
-  "Will return all appointments relating to the room")
+;(defmethod appointments ((meeting-room meeting-room))
+ ; "Will return all appointments relating to the room")
 
-(defmethod appointments ((date date))
-  "Will return all appointments occuring on the date.")
+;(defmethod appointments ((date date))
+ ; "Will return all appointments occuring on the date.")
 
 ;;;also for room, set-time, date, client
 
@@ -47,8 +47,8 @@
 (defgeneric block-off (object app-date start-time duration)
   (:documentation "Creates a blank appointment block for the given object."))
 
-(defmethod block-off ((employee-employee) app-date start-time duration)
-  (add-appointment (make-appointment 0 (employee-id employee) 0 app-date start-time duration)))
+;(defmethod block-off ((employee-employee) app-date start-time duration)
+ ; (add-appointment (make-appointment 0 (employee-id employee) 0 app-date start-time duration)))
 ;;;repeat for room, maybe client
 
 ;(defun employee-block-off (employee-id app-date start-time duration)
@@ -62,14 +62,14 @@
 ;;;;------------------------------------------------------------------------				
 ;;;;Availability calculations:
 ;;;;------------------------------------------------------------------------
-(defun overlap-p (appointment1 appointment2)
-  "Determines whether two appointments overlap in time."
-  (or (time-conflict-p (start-time appointment1)
-		       (start-time appointment2)
-		       (end-time appointment2))
-      (time-conflict-p (start-time appointment2)
-		       (start-time appointment1)
-		       (end-time appointment1))))
+;(defun overlap-p (appointment1 appointment2)
+ ; "Determines whether two appointments overlap in time."
+  ;(or (time-conflict-p (start-time appointment1)
+;		       (start-time appointment2)
+;		       (end-time appointment2))
+ ;     (time-conflict-p (start-time appointment2)
+;		       (start-time appointment1)
+;		       (end-time appointment1))))
 
 
 

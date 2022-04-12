@@ -11,8 +11,8 @@
                    :accessor first-name)
    (last-name      :initarg :last-name
 	           :accessor last-name)
-   (client-id      :initarg :client-id
-	           :accessor client-id)
+   (id             :initarg :id
+	           :accessor id)
    (phone          :initarg :phone
 		   :accessor phone) ;default to nil
    (email          :initarg :email
@@ -33,7 +33,7 @@
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((first-name first-name)
 		     (last-name last-name)
-		     (client-id client-id)
+		     (id id)
 		     (phone phone)
 		     (email email)
 		     (address address)
@@ -42,12 +42,12 @@
 	obj
       (format stream
 	      "~%Name: ~a ~a~% ID: ~a~% Phone: ~a~%Email: ~a~%Address: ~a~%Makeup Minutes: ~a~%Notes: ~a~%"
-	      first-name last-name client-id phone email address credit-minutes notes))))
+	      first-name last-name id phone email address credit-minutes notes))))
 
 (defun make-client (first-name last-name client-id credit-minutes phone email address  notes)
   (make-instance 'client :first-name     first-name
 		         :last-name      last-name
-			 :client-id      client-id
+			 :id             id
 			 :phone          phone
 			 :email          email
 			 :address        address
@@ -68,9 +68,10 @@
 
 (defmethod remove-client ((client client))
   "Removes the client from *clients*, backup tbd."
-  (remove-if #'(lambda (c)
-		 (equal (client-id c) (client-id client)))
-	     *clients*)) ;;;;also make this for employee, appointment, room, receipts, invoices, etc
+  (setq *clients*
+	(remove-if #'(lambda (c)
+		       (equal (id c) (id client)))
+		   *clients*))) ;;;;also make this for employee, appointment, room, receipts, invoices, etc
 
 (defmethod replace-client ((client client) new-client)
   "Removes the client, adds a new client in its place."
@@ -85,7 +86,7 @@
   "Changes the first name of a client"
   (replace-client client (make-client first-name
 				      (last-name client)
-				      (client-id client)
+				      (id client)
 				      (credit-minutes client)
 				      (phone     client)
 				      (email     client)
@@ -96,7 +97,7 @@
   "Changes the last name of a client."
   (replace-client client (make-client (first-name client)
 				      last-name
-				      (client-id client)
+				      (id client)
 				      (credit-minutes   client)
 				      (phone     client)
 				      (email     client)
@@ -107,7 +108,7 @@
   "Changes the client ID of a client"
   (replace-client client (make-client (first-name client)
 				      (last-name  client)
-				      client-id 
+				      id 
 				      (credit-minutes client)
 				      (phone      client)
 				      (email      client)
@@ -118,7 +119,7 @@
   "Changes the credit minutes of a client"
   (replace-client client (make-client (first-name client)
 				      (last-name client)
-				      (client-id client)
+				      (id client)
 				      credits
 				      (phone     client)
 				      (email     client)
@@ -129,7 +130,7 @@
   "Changes the phone number of a client"
   (replace-client client (make-client (first-name     client)
  				      (last-name      client)
-				      (client-id      client)
+				      (id      client)
 				      (credit-minutes client)
 				      new-phone
 				      (email          client)
@@ -140,7 +141,7 @@
   "Changes the email of a client"
   (replace-client client (make-client (first-name     client)
  				      (last-name      client)
-				      (client-id      client)
+				      (id      client)
 				      (credit-minutes client)
 				      (phone          client)
 				      email
@@ -151,7 +152,7 @@
   "Changes the address of a client"
   (replace-client client (make-client (first-name     client)
  				      (last-name      client)
-				      (client-id      client)
+				      (id      client)
 				      (credit-minutes client)
 				      (phone          client)
 				      (email          client)
@@ -161,7 +162,7 @@
   "Changes notes on a client"
   (replace-client client (make-client (first-name     client)
  				      (last-name      client)
-				      (client-id      client)
+				      (id      client)
 				      (credit-minutes client)
 				      (phone          client)
 				      (email          client)
@@ -173,7 +174,7 @@
 ;;;;------------------------------------------------------------------------
 
 (defvar last-client-id (if (first *clients*)
-			   (client-id (first *clients*))
+			   (id (first *clients*))
 			   1001))
 
 (defun new-client-id ()
@@ -185,7 +186,7 @@
   "generates a client with a new id and default makeups"
   (add-client (make-instance 'client :first-name first-name
 		                     :last-name  last-name
-			             :client-id  (new-client-id)
+			             :id  (new-client-id)
 			             :phone      phone
 			             :email      email
 				     :address    address
@@ -201,11 +202,11 @@
   (format nil "(add-client (make-client ~a ~a ~a ~a ~a ~a ~a ~a))~%"
 	  (write-to-string (first-name client))
 	  (write-to-string (last-name client))
-	  (client-id client)
+	  (id client)
 	  (credit-minutes client)
-	  (phone-backup (phone client))
-	  (email-backup (email client))
-	  (address-backup (address client))
+	  (backup-unit (phone client))
+	  (backup-unit (email client))
+	  (backup-unit (address client))
 	  (write-to-string (notes client))))
 
 (defun refresh-client-backup ()
@@ -223,7 +224,7 @@
 (defun id-search (id)
   "Searches for a client by their client id."
   (loop :for client :in *clients*
-	:if (equal (write-to-string id) (write-to-string (client-id client)))
+	:if (equal (write-to-string id) (write-to-string (id client)))
 	  :do (return client)))
 
 (defun last-name-search (last-name)

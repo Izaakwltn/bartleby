@@ -1,20 +1,20 @@
 ;;;;database.lisp
 
-(in-package :schedulizer)
+;(in-package :schedulizer)
 
-(defun update-backup (client)
-  (with-open-file (out (asdf:system-relative-pathname "schedulizer" "backup.lisp")
-		       :direction :output
-		       :if-exists :append)
-    (format out
-	    "~%(add-client (make-client ~a ~a ~a ~a ~a ~a ~a))"
-	    (write-to-string (first-name client))
-	    (write-to-string (last-name client))
-	    (write-to-string (id client))
-	    (write-to-string (phone client))
-	    (write-to-string (email client))
-	    (write-to-string (makeups client))
-	    (write-to-string (notes client)))))
+;(defun update-backup (client)
+;  (with-open-file (out (asdf:system-relative-pathname "schedulizer" "backup.lisp")
+;		       :direction :output
+;		       :if-exists :append)
+ ;   (format out
+;	    "~%(add-client (make-client ~a ~a ~a ~a ~a ~a ~a))"
+;	    (write-to-string (first-name client))
+;	    (write-to-string (last-name client))
+;	    (write-to-string (id client))
+;	    (write-to-string (phone client))
+;	    (write-to-string (email client))
+;	    (write-to-string (makeups client))
+;	    (write-to-string (notes client)))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;entry interface

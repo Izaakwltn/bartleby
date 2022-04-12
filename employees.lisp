@@ -9,8 +9,8 @@
 ;;;;------------------------------------------------------------------------
 
 (defclass employee ()
-  ((employee-id :initarg :employee-id
-		:accessor employee-id)
+  ((id          :initarg :id
+		:accessor id)
    (first-name  :initarg :first-name
 		:accessor first-name)
    (last-name   :initarg :last-name
@@ -28,7 +28,7 @@
 
 (defmethod print-object ((obj employee) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((employee-id employee-id)
+    (with-accessors ((id id)
 		     (first-name first-name)
 		     (last-name last-name)
 		     (phone phone)
@@ -37,10 +37,10 @@
 		     (hourly-rate hourly-rate))
 	obj
       (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%~a~%~a~%~a~%Rate: $~a/hr~%"
-	      employee-id first-name last-name phone email address hourly-rate))))
+	      id first-name last-name phone email address hourly-rate))))
 
-(defun make-employee (employee-id first-name last-name phone email address hourly-rate)
-  (make-instance 'employee :employee-id employee-id
+(defun make-employee (id first-name last-name phone email address hourly-rate)
+  (make-instance 'employee :id          id
 		           :first-name  first-name
          		   :last-name   last-name
 			   :phone       phone
@@ -65,9 +65,9 @@
 
 (defmethod remove-employee ((employee employee))
   "Removes an employee from *employees*"
-  (remove-if #'(lambda (e)
-		 (equal (employee-id employee) (employee-id e)))
-	     *employees*))
+  (setq *employees* (remove-if #'(lambda (e)
+		 (equal (id employee) (id e)))
+	     *employees*)))
 
 (defmethod replace-employee ((employee employee) new-employee)
   "Replaces an existing employee with a new-employee in its place."
@@ -80,7 +80,7 @@
 (defmethod change-first-name ((employee employee) first-name)
   (replace-employee employee (make-employee first-name
 					    (last-name employee)
-					    (employee-id employee)
+					    (id employee)
 					    (phone employee)
 					    (email employee)
 					    (address employee)
@@ -89,16 +89,16 @@
 (defmethod change-last-name ((employee employee) last-name)
   (replace-employee employee (make-employee (first-name employee)
 					    last-name
-					    (employee-id employee)
+					    (id employee)
 					    (phone employee)
 					    (email employee)
 					    (address employee)
 					    (hourly-rate employee))))
 
-(defmethod change-id ((employee employee) employee-id)
+(defmethod change-id ((employee employee) id)
   (replace-employee employee (make-employee (first-name employee)
 					    (last-name employee)
-					    employee-id
+					    id
 					    (phone employee)
 					    (email employee)
 					    (address employee)
@@ -107,7 +107,7 @@
 (defmethod change-phone ((employee employee) phone)
   (replace-employee employee (make-employee (first-name employee)
 					    (last-name employee)
-					    (employee-id employee)
+					    (id employee)
 					    phone
 					    (email employee)
 					    (address employee)
@@ -116,7 +116,7 @@
 (defmethod change-email ((employee employee) email)
   (replace-employee employee (make-employee (first-name employee)
 					    (last-name employee)
-					    (employee-id employee)
+					    (id employee)
 					    (phone employee)
 					    email
 					    (address employee)
@@ -125,7 +125,7 @@
 (defmethod change-address ((employee employee) address)
   (replace-employee employee (make-employee (first-name employee)
 					    (last-name employee)
-					    (employee-id employee)
+					    (id employee)
 					    (phone employee)
 					    (email employee)
 					    address
@@ -134,7 +134,7 @@
 (defmethod change-hourly ((employee employee) hourly-rate)
   (replace-employee employee (make-employee (first-name employee)
 					    (last-name employee)
-					    (employee-id employee)
+					    (id employee)
 					    (phone employee)
 					    (email employee)
 					    (address employee)
@@ -144,13 +144,16 @@
 ;;;;------------------------------------------------------------------------
 
 (defvar izaak
-  (make-employee 2001 "Izaak" "Walton" (random-phone) (auto-email "Izaak" "Walton")
-		 (random-address) 37))
+  (make-employee 2001 "Izaak" "Walton"
+		 (make-phone-number "4043872185")
+		 (make-email "izaakviolin@gmail.com")
+		 (random-address)
+		 37))
 
 (add-employee izaak)
 
-(defvar last-employee-id (if (employee-id (first *employees*))
-			     (+ (employee-id (first *employees*)) 1)
+(defvar last-employee-id (if (first *employees*)
+			     (+ (id (first *employees*)) 1)
 			     2001))
 
 (defun new-employee-id ()
@@ -168,12 +171,12 @@
 
 (defmethod backup-unit ((employee employee))
   (format nil "(add-employee (make-employee ~a ~a ~a ~a ~a ~a ~a))~%"
-	  (employee-id employee)
-	  (first-name employee)
-	  (last-name employee)
-	  (phone-backup (phone employee))
-	  (email-backup (email employee))
-	  (address-backup (address employee))
+	  (id employee)
+	  (write-to-string (first-name employee))
+	  (write-to-string (last-name employee))
+	  (backup-unit (phone employee))
+	  (backup-unit (email employee))
+	  (backup-unit (address employee))
 	  (hourly-rate employee)))
 
 (defun refresh-employee-backup ()
@@ -186,6 +189,6 @@
   "Searches for an employee by employee-id."
   (loop for employee in *employees*
 	if (equal (write-to-string employee-id)
-		  (write-to-string (employee-id employee)))
+		  (write-to-string (id employee)))
 	  do (return employee)))
 

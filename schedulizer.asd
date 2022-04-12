@@ -8,10 +8,10 @@
   :depends-on ("local-time")
   :serial t
   :components ((:file "package")
+	       (:file "backup")
 	       (:file "calendar")
 	       (:file "contact")
 	       (:file "editing-generics")
-               (:file "backup")
 	       (:file "clients")
 	       (:file "rooms")
 	       (:file "employees")
@@ -19,10 +19,9 @@
 	       (:file "availability") ;rename to "availability"
 	       (:file "receipts")
 	       (:file "invoices")
-	       ;(:file "backup") ;;;maybe backups module
 	       (:file "client-backup")
 	       (:file "employee-backup")
-	       ;(:file "room-backup")
+	       (:file "room-backup")
 	       ;(:file "appointment-backup")
 	       (:module "tests"
 		:serial t

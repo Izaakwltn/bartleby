@@ -66,9 +66,9 @@
 (defun equal-appointments-p (app1 app2)
   "Compares two appointments, determines if they are equal."
   (and (equal (app-number app1) (app-number app2))
-       (equal (client-id (client app1)) (client-id (client app2)))
-       (equal (employee-id (employee app1)) (employee-id (employee app2)))
-       (equal (room-num (meeting-room app1)) (room-num (meeting-room app-2)))
+       (equal (id (client app1)) (id (client app2)))
+       (equal (id (employee app1)) (id (employee app2)))
+       (equal (id (meeting-room app1)) (id (meeting-room app-2)))
        (equal (app-date app1) (app-date app2))
        (equal (start-time app1) (start-time app2))
        (equal (end-time app1) (end-time app2))
@@ -89,8 +89,10 @@
 
 (defmethod remove-appointment ((appointment appointment))
   "Removes an appointment from the *appointments* list"
-  (remove-if #'(lambda (a)
-		 (equal-appointment-p a appointment))))
+  (setq *appointments*
+	(remove-if #'(lambda (a)
+		       (equal-appointments-p a appointment))
+		   *appointments*)))
 
 (defmethod replace-appointment ((appointment appointment)
 				client-id employee-id room-num app-date start-time duration notes)
@@ -98,11 +100,9 @@
   (remove-appointment appointment)
   (add-appointment (make-appointment (app-number appointment) client-id employee-id room-num app-date start-time duration notes)))
 
-;;;;;;;make appointment-number so that it's still "the same appointment"
-
-;;;make (defmethod change-date ((appointment appointment)),
-  ;performs replace-appointment with everything the same but the date.
-  ;Do the same for change-client change-employee change-room change-date change-time
+;;;;------------------------------------------------------------------------
+;;;;Changing one attribute at a time: 
+;;;;------------------------------------------------------------------------
 
 (defmethod change-id ((appointment appointment) app-id)
   "Will figure it out later")
@@ -127,9 +127,6 @@
 		       (duration appointment)
 		       (notes appointment)))
 ;;change client, change employee, room time, duration, notes
-
-(defmethod edit-appointment ((appointment appointment))
-  "I'll figure it out");;;maybe prompt with "what would you like to edit? Name: Employee: ..
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding new appointments
@@ -162,9 +159,9 @@
 (defmethod backup-unit ((appointment appointment))
   (format nil "(make-appointment ~a ~a ~a ~a ~a ~a ~a ~a)"
 	  (app-number appointment)
-	  (client-id (client appointment))
-	  (employee-id (employee appointment))
-	  (room-num (meeting-room appointment))
+	  (id (client appointment))
+	  (id (employee appointment))
+	  (id (meeting-room appointment))
 	  (backup-unit (app-date appointment))
 	  (backup-unit (start-time appointment))
 	  (duration appointment)
@@ -183,16 +180,17 @@
 ;;;;------------------------------------------------------------------------
 
 (defmethod recurring ((appointment appointment) number-of-appointments); &optional (recurrence-rate 7))
-  (let ((client   (client appointment))
-	(employee (employee appointment))
-	(app-date    (app-date appointment))
-	(start-time  (start-time appointment))
-        (duration    (duration appointment))
-	(notes       (notes appointment)))
+  (let ((client     (client appointment))
+	(employee   (employee appointment))
+	(room       (meeting-room appointment))
+	(app-date   (app-date appointment))
+	(start-time (start-time appointment))
+        (duration   (duration appointment))
+	(notes      (notes appointment)))
     (loop :with current-week := app-date
 	  :for i :from 1 to number-of-appointments
 	  :do (add-appointment
-	       (make-appointment (client-id client) (employee-id employee) current-week start-time duration notes))
+	       (make-appointment (new-app-number) (id client) (id employee) (id room) current-week start-time duration notes))
 	      (setf current-week (add-days current-week 7)))))
 
 ;(recurring (make-appointment 1002 2001 (date 1 5 2022) (set-time 10 30) 30 "") 50)
