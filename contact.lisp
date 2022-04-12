@@ -37,12 +37,12 @@
 			  :state         state
 			  :zip-code      zip-code))
 
-(defmethod address-backup ((address address))
+(defmethod backup-unit ((address address))
   (format nil "(make-address ~a ~a ~a ~a ~a)"
 	  (street-number address)
-	  (street-name address)
-	  (city address)
-	  (state address)
+	  (write-to-string (street-name address))
+	  (write-to-string (city address))
+	  (write-to-string (state address))
 	  (zip-code address)))
 
 (defun random-address ()
@@ -90,7 +90,7 @@
 		   (concatenate 'string number (write-to-string (random 9))))
 	 :finally (return number))))
 
-(defmethod phone-backup ((phone-number phone-number))
+(defmethod backup-unit ((phone-number phone-number))
   (format nil "(make-instance 'phone-number :country ~a :area ~a :middle ~a :end ~a)"
 	  (country phone-number)
 	  (area phone-number)
@@ -128,8 +128,6 @@
 	:else
 	  :do (setq d (concatenate 'string d (subseq email-string ch (+ ch 1))))
 	:finally (return (list u d))))
-
-
 	  
 (defun make-email (email-string)
   "Generates an email object from its username and domain."
@@ -137,10 +135,10 @@
 	(make-instance 'email-address :username (first parsed-email)
 				      :domain (second parsed-email))))
 
-(defmethod email-backup ((email-address email-address))
+(defmethod backup-unit ((email-address email-address))
   (format nil "(make-instance 'email-address :username ~a :domain ~a)"
-	  (username email-address)
-	  (domain email-address)))
+	  (write-to-string (username email-address))
+	  (write-to-string (domain email-address))))
 
 (defvar email-domains '("gmail.com" "yahoo.com" "hotmail.com" "aol.com" "msn.com"))
 

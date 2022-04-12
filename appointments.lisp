@@ -160,12 +160,21 @@
 ;;;;------------------------------------------------------------------------
 
 (defmethod backup-unit ((appointment appointment))
-  (format nil "(make-appointment ~a ~a ~a ~a)"
+  (format nil "(make-appointment ~a ~a ~a ~a ~a ~a ~a ~a)"
 	  (app-number appointment)
 	  (client-id (client appointment))
 	  (employee-id (employee appointment))
-	  (room-num (meeting-room appointment)))) ;date backup-unit, time backup-unit
+	  (room-num (meeting-room appointment))
+	  (backup-unit (app-date appointment))
+	  (backup-unit (start-time appointment))
+	  (duration appointment)
+	  (notes appointment)))
+
+					;date backup-unit, time backup-unit
 	  
+(defun refresh-appointment-backup ()
+  (make-backup "appointment-backup.lisp" *appointments*))
+
 ;;;;test
 (defvar test-appointment (make-appointment 10001 1002 2001 0 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))
 

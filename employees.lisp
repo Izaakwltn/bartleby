@@ -145,7 +145,7 @@
 
 (defvar izaak
   (make-employee 2001 "Izaak" "Walton" (random-phone) (auto-email "Izaak" "Walton")
-		 "Insert Address Here" 37))
+		 (random-address) 37))
 
 (add-employee izaak)
 

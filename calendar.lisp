@@ -32,6 +32,12 @@
 		       :day   d
 		       :year  y))
 
+(defmethod backup-unit ((date date))
+  (format nil "(date ~a ~a ~a)"
+	  (month date)
+	  (day date)
+	  (year date)))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Messing with dates
 ;;;;------------------------------------------------------------------------
@@ -218,6 +224,11 @@
 (defun set-time (hour minutes)
   (make-instance 'set-time :hour hour
 		           :minutes minutes))
+
+(defmethod backup-unit ((set-time set-time))
+  (format nil "(set-time ~a ~a)"
+	  (hour set-time)
+	  (minutes set-time)))
 
 (defmethod add-time ((time set-time) minutes)
   "Adds a specified number of minutes to a given time."
