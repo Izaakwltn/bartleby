@@ -7,6 +7,10 @@
 ;;;;------------------------------------------------------------------------
 ;;;;Appointment functions
 ;;;;------------------------------------------------------------------------
+
+;;;;;;;;;;;;;;;;;;;;;;Make clients, rooms, and employees lists instead of just one per appointment
+;;;;;or just accomodate either option
+
 					;this-day ((meeting-room)) .... employee, client
 					;this-week ... meeting room, employee, client
 					;this month meeting room, employee, client...
@@ -37,12 +41,22 @@
 ;	  :collect a into apts
 ;	:finally (return apts))))
 
-(defun employee-block-off (employee-id app-date start-time duration)
-  "Creates and unavailable block for an employee."
-  (add-appointment (make-appointment 0 employee-id 0 app-date start-time duration "unavailable")))
+;;;;------------------------------------------------------------------------
+;;;;Unavailability
+;;;;------------------------------------------------------------------------
+(defgeneric block-off (object app-date start-time duration)
+  (:documentation "Creates a blank appointment block for the given object."))
 
-(defun room-block-off (room-num app-date start-time duration)
-  (add-appointment (make-appointment 0 0 room-num app-date start-time duration)))
+(defmethod block-off ((employee-employee) app-date start-time duration)
+  (add-appointment (make-appointment 0 (employee-id employee) 0 app-date start-time duration)))
+;;;repeat for room, maybe client
+
+;(defun employee-block-off (employee-id app-date start-time duration)
+ ; "Creates and unavailable block for an employee."
+  ;(add-appointment (make-appointment 0 employee-id 0 app-date start-time duration "unavailable")))
+
+;(defun room-block-off (room-num app-date start-time duration)
+ ; (add-appointment (make-appointment 0 0 room-num app-date start-time duration)))
 ;;;room-block-off
 				
 ;;;;------------------------------------------------------------------------				
