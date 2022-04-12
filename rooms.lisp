@@ -76,7 +76,8 @@
   (add-room (make-room (room-num meeting-room)
 		       room-name
 		       capacity
-		       notes)))
+		       notes))
+  (refresh-room-backup))
 
 ;;;;Editing one attribute at a time
 (defmethod change-id ((meeting-room meeting-room) new-number)
@@ -118,8 +119,19 @@
   "Generates a new room with a new room number."
   (add-room (make-room (new-room-num) room-name capacity notes)))
 
+;;;;------------------------------------------------------------------------
+;;;;Backing up rooms
+;;;;------------------------------------------------------------------------
 
+(defmethod backup-unit ((meeting-room meeting-room))
+  (format nil "(add-room (make-room ~a ~a ~a ~a))~%"
+	  (room-num meeting-room)
+	  (room-name meeting-room)
+	  (capacity meeting-room)
+	  (notes meeting-room)))
 
+(defun refresh-room-backup ()
+  (make-backup "room-backup.lisp" *rooms*))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for rooms
 ;;;;------------------------------------------------------------------------

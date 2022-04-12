@@ -20,6 +20,10 @@
 	       (:file "receipts")
 	       (:file "invoices")
 	       ;(:file "backup") ;;;maybe backups module
+	       (:file "client-backup")
+	       ;(:file "employee-backup")
+	       ;(:file "room-backup")
+	       ;(:file "appointment-backup")
 	       (:module "tests"
 		:serial t
 		:components ((:file "client-tests")

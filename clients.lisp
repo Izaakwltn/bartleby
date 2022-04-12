@@ -60,7 +60,7 @@
 
 (defvar *clients* nil)
 
-(defvar *client-backup* nil)
+;(defvar *client-backup* nil)
 
 (defmethod add-client ((client client))
   "Add a client to *clients*"
@@ -75,7 +75,8 @@
 (defmethod replace-client ((client client) new-client)
   "Removes the client, adds a new client in its place."
   (remove-client client)
-  (add-client new-client))
+  (add-client new-client)
+  (refresh-client-backup))
 
 ;;;;Editing one attribute at a time
 ;;;;;;can I do this with a macro (change-attribute object attribute)
@@ -197,7 +198,7 @@
 ;;;;Backing up clients
 ;;;;------------------------------------------------------------------------
 (defmethod backup-unit ((client client))
-  (format nil "(add-client ~a ~a ~a ~a ~a ~a ~a ~a)~%"
+  (format nil "(add-client (make-client ~a ~a ~a ~a ~a ~a ~a ~a))~%"
 	  (write-to-string (first-name client))
 	  (write-to-string (last-name client))
 	  (client-id client)
@@ -206,6 +207,9 @@
 	  (email-backup (email client))
 	  (address-backup (address client))
 	  (write-to-string (notes client))))
+
+(defun refresh-client-backup ()
+  (make-backup "client-backup.lisp" *clients*))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for clients
 ;;;;------------------------------------------------------------------------

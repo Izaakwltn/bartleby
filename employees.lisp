@@ -72,7 +72,8 @@
 (defmethod replace-employee ((employee employee) new-employee)
   "Replaces an existing employee with a new-employee in its place."
   (remove-employee employee)
-  (add-employee new-employee))
+  (add-employee new-employee)
+  (refresh-employee-backup))
 
 ;;editing one attribute at a time
 
@@ -161,6 +162,22 @@
   "Generates a a new employee with a new employee id."
   (add-employee (make-employee (new-employee-id) first-name last-name phone email address hourly-rate)))
 
+;;;;------------------------------------------------------------------------
+;;;;Backing up employees
+;;;;------------------------------------------------------------------------
+
+(defmethod backup-unit ((employee employee))
+  (format nil "(add-employee (make-employee ~a ~a ~a ~a ~a ~a ~a))~%"
+	  (employee-id employee)
+	  (first-name employee)
+	  (last-name employee)
+	  (phone-backup (phone employee))
+	  (email-backup (email employee))
+	  (address-backup (address employee))
+	  (hourly-rate employee)))
+
+(defun refresh-employee-backup ()
+  (make-backup "employee-backup.lisp" *employees*))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for employees:
 ;;;;------------------------------------------------------------------------
