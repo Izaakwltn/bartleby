@@ -11,7 +11,7 @@
 	       (:file "backup")
 	       (:file "calendar")
 	       (:file "contact")
-	       (:file "editing-generics")
+	       (:file "system-generics")
 	       (:file "clients")
 	       (:file "rooms")
 	       (:file "employees")
