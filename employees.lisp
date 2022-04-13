@@ -3,7 +3,6 @@
 
 (in-package :schedulizer)
 
-
 ;;;;------------------------------------------------------------------------
 ;;;;Employee class
 ;;;;------------------------------------------------------------------------
@@ -48,8 +47,22 @@
 			   :address     address
 			   :hourly-rate hourly-rate))
 
+;;;;------------------------------------------------------------------------
+;;;;Backing up employees
+;;;;------------------------------------------------------------------------
 
-;add equal-employees
+(defmethod backup-unit ((employee employee))
+  (format nil "(add-employee (make-employee ~a ~a ~a ~a ~a ~a ~a))~%"
+	  (id employee)
+	  (write-to-string (first-name employee))
+	  (write-to-string (last-name employee))
+	  (backup-unit (phone employee))
+	  (backup-unit (email employee))
+	  (backup-unit (address employee))
+	  (hourly-rate employee)))
+
+(defun refresh-employee-backup ()
+  (make-backup "employee-backup.lisp" *employees*))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding to, removing from, and editing *clients*
@@ -61,21 +74,24 @@
 
 (defmethod add-employee ((employee employee))
   "Adds an employee to *employees*"
-  (push employee *employees*))
+  (push employee *employees*)
+  (refresh-employee-backup))
 
 (defmethod remove-employee ((employee employee))
   "Removes an employee from *employees*"
   (setq *employees* (remove-if #'(lambda (e)
 		 (equal (id employee) (id e)))
-	     *employees*)))
+			       *employees*))
+  (refresh-employee-backup))
 
 (defmethod replace-employee ((employee employee) new-employee)
   "Replaces an existing employee with a new-employee in its place."
   (remove-employee employee)
-  (add-employee new-employee)
-  (refresh-employee-backup))
+  (add-employee new-employee))
 
-;;editing one attribute at a time
+;;;;------------------------------------------------------------------------
+;;;;Editing one attribute at a time
+;;;;------------------------------------------------------------------------
 
 (defmethod change-first-name ((employee employee) first-name)
   (replace-employee employee (make-employee first-name
@@ -139,6 +155,7 @@
 					    (email employee)
 					    (address employee)
 					    hourly-rate)))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Adding New Employees
 ;;;;------------------------------------------------------------------------
@@ -164,23 +181,6 @@
 (defun new-employee (first-name last-name phone email address hourly-rate)
   "Generates a a new employee with a new employee id."
   (add-employee (make-employee (new-employee-id) first-name last-name phone email address hourly-rate)))
-
-;;;;------------------------------------------------------------------------
-;;;;Backing up employees
-;;;;------------------------------------------------------------------------
-
-(defmethod backup-unit ((employee employee))
-  (format nil "(add-employee (make-employee ~a ~a ~a ~a ~a ~a ~a))~%"
-	  (id employee)
-	  (write-to-string (first-name employee))
-	  (write-to-string (last-name employee))
-	  (backup-unit (phone employee))
-	  (backup-unit (email employee))
-	  (backup-unit (address employee))
-	  (hourly-rate employee)))
-
-(defun refresh-employee-backup ()
-  (make-backup "employee-backup.lisp" *employees*))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for employees:
 ;;;;------------------------------------------------------------------------

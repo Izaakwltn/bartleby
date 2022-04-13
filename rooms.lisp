@@ -42,23 +42,17 @@
 
 (defvar *rooms* nil)
 
-(defvar *room-backup* nil) ; do the backup stuff on each other class
-;move to backups.lisp
-;(defun make-backup (filename list)
- ; "Make a backup for the list in the named file.")
-  ;to add or remove items from the backup, for now, just rewrite the file with the updated list
-
 (defmethod add-room ((meeting-room meeting-room))
   "Adds a meeting room to *rooms*"
-  (if *room-backup*
-      (add-backup-room meeting-room *room-backup*))
-  (push meeting-room *rooms*))
+  (push meeting-room *rooms*)
+  (refresh-room-backup))
 
 (defmethod remove-room ((meeting-room meeting-room))
   "Removes a room from *rooms*"
   (setq *rooms* (remove-if #'(lambda (r)
 		 (equal (id r) (id meeting-room)))
-	     *rooms*)))
+			   *rooms*))
+  (refresh-room-backup))
 
 (defmethod replace-room ((meeting-room meeting-room)
 			 room-name capacity notes)
@@ -67,8 +61,7 @@
   (add-room (make-room (id meeting-room)
 		       room-name
 		       capacity
-		       notes))
-  (refresh-room-backup))
+		       notes)))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Editing one attribute at a time

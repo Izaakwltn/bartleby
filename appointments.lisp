@@ -68,7 +68,7 @@
   (and (equal (app-number app1) (app-number app2))
        (equal (id (client app1)) (id (client app2)))
        (equal (id (employee app1)) (id (employee app2)))
-       (equal (id (meeting-room app1)) (id (meeting-room app-2)))
+       (equal (id (meeting-room app1)) (id (meeting-room app2)))
        (equal (app-date app1) (app-date app2))
        (equal (start-time app1) (start-time app2))
        (equal (end-time app1) (end-time app2))
@@ -81,18 +81,18 @@
 
 (defvar *appointments* nil)
 
-(defvar *appointment-backup* nil)
-
 (defmethod add-appointment ((appointment appointment))
   "Adds an appointment to the *appointments* list."
-  (push appointment *appointments*))
+  (push appointment *appointments*)
+  (refresh-appointment-backup))
 
 (defmethod remove-appointment ((appointment appointment))
   "Removes an appointment from the *appointments* list"
   (setq *appointments*
 	(remove-if #'(lambda (a)
 		       (equal-appointments-p a appointment))
-		   *appointments*)))
+		   *appointments*))
+  (refresh-appointment-backup))
 
 (defmethod replace-appointment ((appointment appointment)
 				client-id employee-id room-num app-date start-time duration notes)
@@ -104,7 +104,7 @@
 ;;;;Changing one attribute at a time: 
 ;;;;------------------------------------------------------------------------
 
-(defmethod change-id ((appointment appointment) app-id)
+(defmethod change-id ((appointment appointment) app-number)
   "Will figure it out later")
   
 (defmethod change-date ((appointment appointment) new-date)
@@ -167,13 +167,8 @@
 	  (duration appointment)
 	  (notes appointment)))
 
-					;date backup-unit, time backup-unit
-	  
 (defun refresh-appointment-backup ()
   (make-backup "appointment-backup.lisp" *appointments*))
-
-;;;;test
-(defvar test-appointment (make-appointment 10001 1002 2001 0 (date 3 26 2022) (set-time 15 30) 45 "cabbage"))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments
@@ -195,65 +190,18 @@
 
 ;(recurring (make-appointment 1002 2001 (date 1 5 2022) (set-time 10 30) 30 "") 50)
 ;(recurring (make-appointment 1003 2001 (date 1 5 2022) (set-time 17 0) 30 "") 50)
+
 ;;;;------------------------------------------------------------------------
-;;;;Unchecked Appointments
+;;;;
 ;;;;------------------------------------------------------------------------
 
-;(defvar *appointments* nil)
+;(defun appointment-search (id) 
 
-;(defmethod add-appointment ((appointment appointment))
- ; (push appointment
-					;	*appointments*))
-;;;;------------------------------------------------------------------------
-;;;;;backupsystem
-;;;;------------------------------------------------------------------------
-;(defmethod backup-appointment ((appointment appointment))
- ; (with-open-file (out (asdf:system-relative-pathname "schedulizer"
-;						      "appointment-backup.lisp")
-;		       :direction :output
-;		       :if-exists :append)
- ;   (format out
-;	    "~%(add-appointment (make-appointment ~a (date ~a ~a ~a) (set-time ~a ~a) ~a))"
-;	    (write-to-string (client-id (client appointment)))
-;	    (write-to-string (month (app-date appointment)))
-;	    (write-to-string (day (app-date appointment)))
-;	    (write-to-string (year (app-date appointment)))
-;	    (write-to-string (month (app-date appointment)))
-;	    (write-to-string (hour (start-time appointment)))
-;	    (write-to-string (minutes (start-time appointment)))
-;	    (write-to-string (duration appointment))
-;	    (write-to-string (notes appointment)))))
-;;
-
-
-(defun prompt-read (prompt)
-  (format *query-io* "~a: " prompt)
-  (force-output *query-io*)
-  (read-line *query-io*))
-
-;(defun appointment-input ()
- ; (let ((new-appointment (make-appointment (new-app-number) 
-;			                   (prompt-read "Client ID: ")
-;					   (date (prompt-read "Month: (1, 2, 3 etc)")
-;						 (prompt-read "Day: ")
-;						 (prompt-read "Year: "))
-;					   (set-time (prompt-read "Start time: Hour: ")
-;						     (prompt-read "Minutes: ")) ;;;maybe input as x:xx
-		                           
-;					   (prompt-read "Meeting Room 0 for virtual, 1-5: ")
-;					   (prompt-read "Duration in minutes: ")
-;					   (prompt-read "Notes"))))
- ;   (add-appointment new-appointment)
-  ;  (backup-appointment new-appointment)))
-
-;(defun input-appointments ()
- ; (loop (appointment-input)
-;	(if (not (y-or-n-p "Another new appointment? [y/n]: ")) (return))))
 ;;;;------------------------------------------------------------------------
 ;;;;Checking out Appointments
 ;;;;------------------------------------------------------------------------
 
-(defmethod past-appointment-p ((appointment appointment))
+(defmethod past-p ((appointment appointment))
   "Checks whether an appointment has passed."
   (let ((today (today))
 	(ct    (current-time)))
@@ -263,6 +211,6 @@
 ;(defun ready-appointments (employee-id)
  ;   (loop :for a in *appointments*
   ;        :if (and (equal (employee-id (employee a)) employee-id)
-;		   (past-appointment-p a))
+;		   (past-p a))
 ;	    :collect a into apts
 ;	  :finally (return apts)))

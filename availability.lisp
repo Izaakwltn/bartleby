@@ -18,28 +18,28 @@
 (defgeneric appointments (object)
   (:documentation "Returns a list of appointments associated with an object"))
 
-;(defmethod appointments ((employee employee))
- ;; "Will return all appointments relating to the employee."
-  ;(let ((id (employee-id employee)))
-   ; (loop :for a :in *appointments*
-;	  :if (equal (employee-id (employee a)) id)
-;	    :collect a :into apts
-;	  :finally (return apts))))
+(defmethod appointments ((employee employee))
+  "Will return all appointments relating to the employee."
+  (let ((id (id employee)))
+    (loop :for a :in *appointments*
+	  :if (equal (id (employee a)) id)
+	    :collect a :into apts
+	  :finally (return apts))))
 
-;(defmethod appointments ((meeting-room meeting-room))
- ; "Will return all appointments relating to the room")
+(defmethod appointments ((client client))
+  (let ((id (id client)))
+    (loop :for a in *appointments*
+	  :if (equal (id (client a)) id)
+	    :collect a :into apts
+	  :finally (return apts))))
 
-;(defmethod appointments ((date date))
- ; "Will return all appointments occuring on the date.")
+(defmethod appointments ((date date))
+  (loop :for a :in *appointments*
+	:if (equal-date date (app-date a))
+	  :collect a :into apts
+	:finally (return apts)))
 
 ;;;also for room, set-time, date, client
-
-;(defmethod appointments ((obj employee))
- ; (with-accessors ((employee-id employee-id))
-  ;    (loop :for a :in *appointments*
-;	:if (equal employee-id (employee-id (employee a)))
-;	  :collect a into apts
-;	:finally (return apts))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Unavailability

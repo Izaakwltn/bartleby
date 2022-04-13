@@ -14,18 +14,13 @@
    (id             :initarg :id
 	           :accessor id)
    (phone          :initarg :phone
-		   :accessor phone) ;default to nil
+		   :accessor phone)
    (email          :initarg :email
 		   :accessor email)
    (address        :initarg :address
 		   :accessor address)
    (credit-minutes :initarg :credit-minutes
-		   :accessor credit-minutes) ;default 0
-   ;(upcoming      :initarg :upcoming
-   
-   ;(history :initarg :history
-;		   :accessor history)
-   ;(bookshelf     :initarg :bookshelf   ;;files
+		   :accessor credit-minutes)
    (notes          :initarg :notes
 		   :accessor notes)))
 
@@ -60,27 +55,27 @@
 
 (defvar *clients* nil)
 
-;(defvar *client-backup* nil)
-
 (defmethod add-client ((client client))
   "Add a client to *clients*"
-  (push client *clients*))
+  (push client *clients*)
+  (refresh-client-backup))
 
 (defmethod remove-client ((client client))
   "Removes the client from *clients*, backup tbd."
   (setq *clients*
 	(remove-if #'(lambda (c)
 		       (equal (id c) (id client)))
-		   *clients*))) ;;;;also make this for employee, appointment, room, receipts, invoices, etc
+		   *clients*))
+  (refresh-client-backup))
 
 (defmethod replace-client ((client client) new-client)
   "Removes the client, adds a new client in its place."
   (remove-client client)
-  (add-client new-client)
-  (refresh-client-backup))
+  (add-client new-client))
 
+;;;;------------------------------------------------------------------------
 ;;;;Editing one attribute at a time
-;;;;;;can I do this with a macro (change-attribute object attribute)
+;;;;------------------------------------------------------------------------
 
 (defmethod change-first-name ((client client) first-name)
   "Changes the first name of a client"
@@ -193,11 +188,10 @@
 			             :credit-minutes    0
 			             :notes      notes)))
 
-;maybe phone and email should be lists to allow for multiple?
-
 ;;;;------------------------------------------------------------------------
 ;;;;Backing up clients
 ;;;;------------------------------------------------------------------------
+
 (defmethod backup-unit ((client client))
   (format nil "(add-client (make-client ~a ~a ~a ~a ~a ~a ~a ~a))~%"
 	  (write-to-string (first-name client))
@@ -211,6 +205,7 @@
 
 (defun refresh-client-backup ()
   (make-backup "client-backup.lisp" *clients*))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for clients
 ;;;;------------------------------------------------------------------------
@@ -245,4 +240,8 @@
 	:if (and (equal first-name (first-name client))
 		(equal last-name  (last-name client)))
 	  :do (return client)))
+
+;;;;------------------------------------------------------------------------
+;;;;
+;;;;------------------------------------------------------------------------
 
