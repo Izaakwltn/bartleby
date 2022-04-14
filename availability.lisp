@@ -39,11 +39,27 @@
 	  :collect a :into apts
 	:finally (return apts)))
 
+;;;;move to calendar.lisp;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun this-day ()
+  (appointments (today)))
+
+(defmethod most-recent-sunday ((date))
+  "Determine the most recent sunday.")
+
+(defun this-week ()
+  "Returns all appointments for each of the next 7 days")
+;find the most recent sunday
+
+
+(defun this-month ()
+  "Returns all appointments for each of the next 7 days")
+
 ;;;also for room, set-time, date, client
 
 ;;;;------------------------------------------------------------------------
 ;;;;Unavailability
 ;;;;------------------------------------------------------------------------
+
 (defgeneric block-off (object app-date start-time duration)
   (:documentation "Creates a blank appointment block for the given object."))
 

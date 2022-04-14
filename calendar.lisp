@@ -76,6 +76,15 @@
 	 (add-days (date (+ (month date) 1) 1 (year date)) (- days 1)))
 	(t (add-days (date (month date) (+ 1 (day date)) (year date))
 		     (- days 1)))))
+
+(defmethod sub-days ((date date) days)
+  (cond ((zerop days) date)
+	((and (equal (month date) 1)
+	      (equal (day date) 1))
+	 (sub-days (date 12 31 (- (year date) 1)) (- days 1)))
+	((equal (day date) 1)
+	 (sub-days (date (- (month date) 1) (month-days (- (month date) 1) (year date)))))
+	(t (sub-days (date (month date) (- (day date) 1) (year date))))))
 			       
 
 ;;;;------------------------------------------------------------------------
