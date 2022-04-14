@@ -39,7 +39,7 @@
 	      "~%Name: ~a ~a~% ID: ~a~% Phone: ~a~%Email: ~a~%Address: ~a~%Makeup Minutes: ~a~%Notes: ~a~%"
 	      first-name last-name id phone email address credit-minutes notes))))
 
-(defun make-client (first-name last-name client-id credit-minutes phone email address  notes)
+(defun make-client (first-name last-name id credit-minutes phone email address  notes)
   (make-instance 'client :first-name     first-name
 		         :last-name      last-name
 			 :id             id

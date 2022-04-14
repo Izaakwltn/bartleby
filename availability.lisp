@@ -11,10 +11,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;Make clients, rooms, and employees lists instead of just one per appointment
 ;;;;;or just accomodate either option
 
-					;this-day ((meeting-room)) .... employee, client
-					;this-week ... meeting room, employee, client
-					;this month meeting room, employee, client...
-
 (defgeneric appointments (object)
   (:documentation "Returns a list of appointments associated with an object"))
 
@@ -33,28 +29,29 @@
 	    :collect a :into apts
 	  :finally (return apts))))
 
+(defmethod appointments ((meeting-room meeting-room))
+  (loop :for a :in *appointments*
+	:if (equal (id meeting-room) (id meeting-room))
+	  :collect a :into apts
+	:finally (return apts)))
+
 (defmethod appointments ((date date))
   (loop :for a :in *appointments*
 	:if (equal-date date (app-date a))
 	  :collect a :into apts
 	:finally (return apts)))
 
-;;;;move to calendar.lisp;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun this-day ()
-  (appointments (today)))
+(defmethod appointments ((week week))
+  (loop :for a :in *appointments*
+	:if (member (app-date a) (days week))
+	  :collect a :into apts
+	:finally (return apts)))
 
-(defmethod most-recent-sunday ((date))
-  "Determine the most recent sunday.")
-
-(defun this-week ()
-  "Returns all appointments for each of the next 7 days")
-;find the most recent sunday
-
-
-(defun this-month ()
-  "Returns all appointments for each of the next 7 days")
-
-;;;also for room, set-time, date, client
+(defmethod appointments ((month month))
+  (loop :for a :in *appointments*
+	:if (member (app-date a) (days month))
+	  :collect a :into apts
+	:finally (return apts)))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Unavailability
@@ -63,32 +60,74 @@
 (defgeneric block-off (object app-date start-time duration)
   (:documentation "Creates a blank appointment block for the given object."))
 
-;(defmethod block-off ((employee-employee) app-date start-time duration)
- ; (add-appointment (make-appointment 0 (employee-id employee) 0 app-date start-time duration)))
-;;;repeat for room, maybe client
+(defmethod block-off ((employee employee) app-date start-time duration)
+  (add-appointment
+   (make-appointment 0 0 (id employee) 404 app-date start-time duration "Unavailable")))
 
-;(defun employee-block-off (employee-id app-date start-time duration)
- ; "Creates and unavailable block for an employee."
-  ;(add-appointment (make-appointment 0 employee-id 0 app-date start-time duration "unavailable")))
+(defmethod block-off ((meeting-room meeting-room) app-date start-time duration)
+  (add-appointment
+   (make-appointment 0 0 0 (id meeting-room) app-date start-time duration "Unavailable")))
 
-;(defun room-block-off (room-num app-date start-time duration)
- ; (add-appointment (make-appointment 0 0 room-num app-date start-time duration)))
-;;;room-block-off
 				
-;;;;------------------------------------------------------------------------				
+;;;;------------------------------------------------------------------------
 ;;;;Availability calculations:
 ;;;;------------------------------------------------------------------------
-;(defun overlap-p (appointment1 appointment2)
- ; "Determines whether two appointments overlap in time."
-  ;(or (time-conflict-p (start-time appointment1)
-;		       (start-time appointment2)
-;		       (end-time appointment2))
- ;     (time-conflict-p (start-time appointment2)
-;		       (start-time appointment1)
-;		       (end-time appointment1))))
+(defun overlap-p (appointment1 appointment2)
+  "Determines whether two appointments overlap in time."
+  (or (time-conflict-p (start-time appointment1)
+		       (start-time appointment2)
+		       (end-time appointment2))
+      (time-conflict-p (start-time appointment2)
+		       (start-time appointment1)
+		       (end-time appointment1))))
 
+(defmethod available-p ((appointment appointment))
+  "Determines whether a suggested appointment poses conflicts."
+  (let ((e (id (employee appointment)))
+	(r (id (meeting-room appointment)))
+	(c (id (meeting-room appointment))))
+    (loop :for a :in *appointments*
+	  :if (and (or (equal e (id (employee a)))
+		       (equal r (id (meeting-room a)))
+		       (equal c (id (client a))))
+		   (overlap-p a appointment))
+	    :do (return nil)
+	  :else
+	    :do (return t))))
 
+(defgeneric availability-cycle (object start-time start-date end-time end-date duration)
+  (:documentation "Cycles through the given time-frame, returns all open slots."))
 
+(defmethod availability-cycle ((employee employee) start-time start-date end-time end-date duration)
+  (loop :with ct      := start-time
+	:with cd      := start-date
+	:with opts    := nil
+
+	:if (and (equal-date (later-date cd end-date) cd)
+		 (equal-time (later-time ct end-time) ct))
+	  :do (return opts)
+	:else :if (available-p (make-appointment 0 0 (id employee) 0 cd ct duration ""))
+		:do (progn (setq opts
+				 (cons (make-appointment
+					0 0 (id employee) 0 cd ct duration "")
+				       opts))
+			   (setq ct (add-time ct duration))
+			   (if (and (equal (hour ct) 24)
+				    (> (+ (minutes ct) duration) 60))
+			       (setq cd (add-days cd 1))))
+	:else :do (progn (setq ct (add-time ct duration))
+			        (if (and (equal (hour ct) 24)
+				         (> (+ (minutes ct) duration) 60))
+				    (setq cd (add-days cd 1))))))
+	
+;;;;------------------------------------------------------------------------
+;;;;Object availability
+;;;;------------------------------------------------------------------------
+(defgeneric availability (object start-date end-date duration)
+  (:documentation "Returns all available appointments for a given object."))
+
+(defmethod availability ((employee employee) start-date end-date duration)
+  "Use availability cycle")
 ;(defun available-p (appointment)
  ; "Checks availability of employee and room against the list of appointments"
   ;(and (loop :for a :in (

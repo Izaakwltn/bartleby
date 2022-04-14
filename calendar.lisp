@@ -7,56 +7,56 @@
 ;;;;------------------------------------------------------------------------
 
 (defclass date ()
-  ((month       :initarg :month
-	        :accessor month)
-   (day         :initarg :day
-	        :accessor day)
-   (year        :initarg :year
-	        :accessor year)))
+  ((month :initarg :m
+          :accessor m)
+   (day   :initarg :d
+          :accessor d)
+   (year  :initarg :y
+          :accessor y)))
 
 (defmethod print-object ((obj date) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((month month)
-		     (day day)
-		     (year year))
+    (with-accessors ((m m)
+		     (d d)
+		     (y y))
 	obj
       (format stream "~a, ~a ~a~a, ~a"
-	      (second (assoc (day-of-week (date month day year)) days-of-week))
-	      (second (assoc month month-names))
-	      day
-	      (number-suffix day)
-	      year))))
+	      (second (assoc (day-of-week (date m d y)) days-of-week))
+	      (second (assoc m month-names))
+	      d
+	      (number-suffix d)
+	      y))))
 
 (defun date (m d y)
-  (make-instance 'date :month m
-		       :day   d
-		       :year  y))
+  (make-instance 'date :m m
+		       :d d
+		       :y y))
 
 (defmethod backup-unit ((date date))
   (format nil "(date ~a ~a ~a)"
-	  (month date)
-	  (day date)
-	  (year date)))
+	  (m date)
+	  (d date)
+	  (y date)))
 
 ;;;;------------------------------------------------------------------------
-;;;;Messing with dates
+;;;;Date Functions
 ;;;;------------------------------------------------------------------------
 
 (defun later-date (date1 date2)
   "Compares two dates, returns the later date."
-  (cond ((> (year date1) (year date2)) date1)
-	((> (year date2) (year date1)) date2)
-	((> (month date1) (month date2)) date1)
-	((> (month date2) (month date1)) date2)
-	((> (day date1) (day date2)) date1)
-	((> (day date2) (day date1)) date2)
+  (cond ((> (y date1) (y date2)) date1)
+	((> (y date2) (y date1)) date2)
+	((> (m date1) (m date2)) date1)
+	((> (m date2) (m date1)) date2)
+	((> (d date1) (d date2)) date1)
+	((> (d date2) (d date1)) date2)
 	(t date1)))
 
 (defun equal-date (date1 date2)
   "Determines whether two dates are equal."
-  (if (and (equal (month date1) (month date2))
-	   (equal (day   date1) (day   date2))
-	   (equal (year  date1) (year date2)))
+  (if (and (equal (m date1) (m date2))
+	   (equal (d date1) (d date2))
+	   (equal (y date1) (y date2)))
 	 t
 	 nil))
 
@@ -69,22 +69,27 @@
 (defmethod add-days ((date date) days)
   "Returns a date a specified number of days after a particular date."
   (cond ((zerop days) date)
-	((and (equal (month date) 12)
-	      (equal (day date) 31))
-	 (add-days (date 1 1 (+ (year date) 1)) (- days 1)))
-	((equal (day date) (month-days (month date) (year date)))
-	 (add-days (date (+ (month date) 1) 1 (year date)) (- days 1)))
-	(t (add-days (date (month date) (+ 1 (day date)) (year date))
+	((and (equal (m date) 12)
+	      (equal (d date) 31))
+	 (add-days (date 1 1 (+ (y date) 1)) (- days 1)))
+	((equal (d date) (month-days (m date) (y date)))
+	 (add-days (date (+ (m date) 1) 1 (y date)) (- days 1)))
+	(t (add-days (date (m date) (+ 1 (d date)) (y date))
 		     (- days 1)))))
 
 (defmethod sub-days ((date date) days)
   (cond ((zerop days) date)
-	((and (equal (month date) 1)
-	      (equal (day date) 1))
-	 (sub-days (date 12 31 (- (year date) 1)) (- days 1)))
-	((equal (day date) 1)
-	 (sub-days (date (- (month date) 1) (month-days (- (month date) 1) (year date)))))
-	(t (sub-days (date (month date) (- (day date) 1) (year date))))))
+	((and (equal (m date) 1)
+	      (equal (d date) 1))
+	 (sub-days (date 12 31 (- (y date) 1))
+		   (- days 1)))
+	((equal (d date) 1)
+	 (sub-days (date (- (m date) 1)
+			 (month-days (- (m date) 1) (y date))
+			 (y date))
+		   (- days 1)))
+	(t (sub-days (date (m date) (- (d date) 1) (y date))
+		     (- days 1)))))
 			       
 
 ;;;;------------------------------------------------------------------------
@@ -153,14 +158,14 @@
 
 (defmethod day-nth ((date date))
   "Returns how many days into the year the given date is"
-  (let ((month-list (if (leap-year-p (year date))
+  (let ((month-list (if (leap-year-p (y date))
 			leap-year-numbers
 			common-year-numbers)))
-    (+ (cond ((equal (month date) 1) 0)
-	     ((equal (month date) 2) 31)
-	     (t (loop for i from 0 to (- (month date) 2)
+    (+ (cond ((equal (m date) 1) 0)
+	     ((equal (m date) 2) 31)
+	     (t (loop for i from 0 to (- (m date) 2)
 		 sum (second (nth i month-list)))))
-       (day date))))
+       (d date))))
 
 (defun each-first-of-january (start-year start-day-of-week end-year)
   "Start from an arbitrary monday january 1st, go up to a specified year, store a list of (year day-of-week)"
@@ -176,7 +181,7 @@
 
 (defmethod day-of-week ((date date))
   "Determines the day of the week for a given date."
-  (let ((jan1 (second (assoc (year date) firsts-of-january))))
+  (let ((jan1 (second (assoc (y date) firsts-of-january))))
     (day-cycle jan1 (mod (- (day-nth date) 1) 7))))
 
 (defun number-suffix (n)
@@ -202,11 +207,123 @@
         (local-time:timestamp-day   (local-time:now))
 	(local-time:timestamp-year  (local-time:now))))
 
+
 ;;;;------------------------------------------------------------------------
-;;;;
+;;;;Week Class
 ;;;;------------------------------------------------------------------------
 
-;Make calendar- cycle through all days in the month, use day of the week to plot them across a printout
+(defclass week ()
+  ((days :initarg :days
+	 :accessor days)))
+				    
+
+(defmethod print-object ((obj week) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((days days))
+	obj
+      (format stream "~{~a~%~}~%" days))))
+
+(defmethod most-recent-sunday ((date date))
+  "Returns the most recent sunday."
+  (if (equal (day-of-week date) 0)
+      date
+      (most-recent-sunday (sub-days date 1))))
+
+(defmethod week ((date date))
+  "Generates the specific week for a given day"
+  (make-instance 'week :days (let ((sunday (most-recent-sunday date)))
+			       (loop :for i :from 0 :to 6
+	                             :collect (add-days sunday i)))))
+
+(defun this-week ()
+  (week (today)))
+
+(defgeneric last-week (object)
+  (:documentation "Returns the previous week"))
+
+(defmethod last-week ((date date))
+  (week (sub-days date 7)))
+
+(defmethod last-week ((week week))
+  (last-week (first (days week))))
+
+(defgeneric next-week (object)
+  (:documentation "Returns the following week"))
+
+(defmethod next-week ((date date))
+  (week (add-days date 7)))
+
+(defmethod next-week ((week week))
+  (next-week (first (days week))))
+
+;;;;------------------------------------------------------------------------
+;;;;Month Class
+;;;;------------------------------------------------------------------------
+
+(defclass month ()
+  ((month-num  :initarg :month-num
+	       :accessor month-num)
+   (month-name :initarg :month-name
+	       :accessor month-name)
+   (year       :initarg :year
+	       :accessor year)
+   (days       :initarg :days
+	       :accessor days)))
+
+(defmethod print-object ((obj month) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((month-name month-name)
+		     (year year)
+		     (days days))
+	obj
+      (format stream "~a ~a:~%~{~a~%~}~%" month-name year days))))
+
+(defmethod month ((date date))
+  (make-instance 'month :month-num (m date)
+		        :month-name (second (assoc (m date) month-names))
+			:year (y date)
+			:days (let ((m (m date))
+				    (y (y date))
+	                            (m-days (month-days (m date) (y date))))
+				(loop :for i :from 1 :to m-days
+	                              :collect (date m i y)))))
+
+(defun this-month ()
+  (month (today)))
+
+(defgeneric last-month (object)
+  (:documentation "Generates the previous month of a given date, month, or week."))
+
+(defmethod last-month ((date date))
+  (let ((m (m date))
+	(y (y date)))
+    (month (date (if (equal m 1)
+		     12
+		     (- m 1))
+		 1
+		 (if (equal m 1)
+		     (- y 1)
+		     y)))))
+
+(defmethod last-month ((month month))
+  (last-month (first (days month))))
+
+(defgeneric next-month (object)
+  (:documentation "Returns the subsequent month."))
+
+(defmethod next-month ((date date))
+  (let ((m (m date))
+	(y (y date)))
+    (month (date (if (equal m 12)
+		     1
+		     (+ m 1))
+		 1
+		 (if (equal m 12)
+		     (+ y 1)
+		     y)))))
+
+(defmethod next-month ((month month))
+  (next-month (first (days month))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Time Calculations
