@@ -1,6 +1,6 @@
 ;;;;backup.lisp
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 ;;;;------------------------------------------------------------------------
 ;;;;Functions for backing up

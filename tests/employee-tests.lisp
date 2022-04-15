@@ -1,7 +1,7 @@
 ;;;;employee-tests.lisp
 ;;;;
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 
 ;;;;;;;;;;;;;probably move somewhere else

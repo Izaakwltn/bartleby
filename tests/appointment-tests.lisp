@@ -1,6 +1,6 @@
 ;;;;appointment-tests.lisp
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 
 ;;;;------------------------------------------------------------------------

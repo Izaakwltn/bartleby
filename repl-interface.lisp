@@ -1,7 +1,7 @@
 ;;;;repl-interface.lisp
 ;;;;
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 ;;;a system for inputing, editing, and managing appointments
 

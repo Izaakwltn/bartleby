@@ -1,5 +1,5 @@
 ;;;;employees
-(in-package :schedulizer)
+(in-package :bartleby)
 (load-saved-item (make-employee 2021 "CYNTHIA" "KENNEDY" (make-instance 'phone-number :country 1 :area 140 :middle 877 :end 1323) (make-instance 'email-address :username "KENNEDY.CYNTHIA" :domain "yahoo.com") (make-address 2022 "Johnson Street" " Denver" "Kansas" 90000) 37))
 
 (load-saved-item (make-employee 2020 "ALICIA" "LANE" (make-instance 'phone-number :country 1 :area 254 :middle 680 :end 8274) (make-instance 'email-address :username "LANE.ALICIA" :domain "hotmail.com") (make-address 2022 "Johnson Street" " Denver" "Kansas" 90000) 37))

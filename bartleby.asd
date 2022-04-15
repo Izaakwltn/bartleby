@@ -1,6 +1,6 @@
-;;;schedulizer.asd
+;;;bartleby.asd
 
-(asdf:defsystem #:schedulizer
+(asdf:defsystem #:bartleby
   :version "0.0.1"
   :author "Izaak Walton <izaakw@protonmail.com>"
   :license "GNU General Purpose License"

@@ -1,6 +1,6 @@
 ;;;;search.lisp
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 ;;;;------------------------------------------------------------------------
 ;;;;Search methods

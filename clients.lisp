@@ -1,6 +1,6 @@
 ;;;;clients.lisp
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 ;;;;------------------------------------------------------------------------
 ;;;;Clients

@@ -1,5 +1,5 @@
 ;;;;clients
-(in-package :schedulizer)
+(in-package :bartleby)
 (load-saved-item (make-client "KRISTIN" "EASON" 1011 0 (make-instance 'phone-number :country 1 :area 048 :middle 002 :end 8883) (make-instance 'email-address :username "EASON.KRISTIN" :domain "yahoo.com") (make-address 2022 "Johnson Street" " Denver" "Kansas" 90000) "n/a"))
 
 (load-saved-item (make-client "ALLISON" "CASE" 1010 0 (make-instance 'phone-number :country 1 :area 287 :middle 432 :end 2827) (make-instance 'email-address :username "CASE.ALLISON" :domain "hotmail.com") (make-address 2022 "Johnson Street" " Denver" "Kansas" 90000) "n/a"))

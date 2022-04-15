@@ -1,6 +1,6 @@
 ;;;;time.lisp
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 ;;;;------------------------------------------------------------------------
 ;;;;Set-time class

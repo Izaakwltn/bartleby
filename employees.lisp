@@ -1,7 +1,7 @@
 ;;;;employees.lisp
 ;;;;
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 ;;;;------------------------------------------------------------------------
 ;;;;Employee class

@@ -1,6 +1,6 @@
 ;;;;appointments.lisp
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 ;;;;------------------------------------------------------------------------
 ;;;;Appointment Class

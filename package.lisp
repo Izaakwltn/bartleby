@@ -1,6 +1,6 @@
 ;;;;package.lisp
 
-(defpackage #:schedulizer
+(defpackage #:bartleby
   (:use #:cl)
 
   ;system-generics.lisp

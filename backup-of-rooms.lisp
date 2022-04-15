@@ -1,5 +1,5 @@
 ;;;;rooms
-(in-package :schedulizer)
+(in-package :bartleby)
 (load-saved-item (make-room 6 "The Library" 4 ""))
 
 (load-saved-item (make-room 5 "The Library" 1 ""))

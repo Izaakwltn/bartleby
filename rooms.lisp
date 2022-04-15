@@ -1,7 +1,7 @@
 ;;;;rooms.lisp
 ;;;;
 
-(in-package :schedulizer)
+(in-package :bartleby)
 
 ;;;;------------------------------------------------------------------------
 ;;;;Room Class
