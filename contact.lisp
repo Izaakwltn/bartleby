@@ -35,7 +35,7 @@
 		          :street-name   street-name
 			  :city          city
 			  :state         state
-			  :zip-code      zip-code))
+			  :zip-code      zip-code))    
 
 (defmethod backup-unit ((address address))
   (format nil "(make-address ~a ~a ~a ~a ~a)"
@@ -45,7 +45,7 @@
 	  (write-to-string (state address))
 	  (zip-code address)))
 
-(defun random-address ()
+(defun random-address () ;;;;make an actual function soon
  (make-address "2022" "Johnson Street" " Denver" "Kansas" "90000"))
 
 ;;;;------------------------------------------------------------------------
@@ -98,7 +98,7 @@
 	  (end phone-number)))
 
 ;;;;------------------------------------------------------------------------
-;;;;Random entries for simulated contact information
+;;;;Email Addresses
 ;;;;------------------------------------------------------------------------
 
 (defclass email-address ()

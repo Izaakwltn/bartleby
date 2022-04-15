@@ -9,14 +9,16 @@
   :serial t
   :components ((:file "package")
 	       (:file "backup")
-	       (:file "calendar")
+	       (:file "time")
+	       (:file "dates")
+	       ;(:file "calendar")
 	       (:file "contact")
 	       (:file "system-generics")
 	       (:file "clients")
 	       (:file "rooms")
 	       (:file "employees")
 	       (:file "appointments")
-	       (:file "availability") ;rename to "availability"
+	       (:file "availability") 
 	       (:file "receipts")
 	       (:file "invoices")
 	       (:file "client-backup")

@@ -1,9 +1,9 @@
-;;;;students.lisp
+;;;;clients.lisp
 
 (in-package :schedulizer)
 
 ;;;;------------------------------------------------------------------------
-;;;;Defining the client class
+;;;;Clients
 ;;;;------------------------------------------------------------------------
 
 (defclass client ()
@@ -209,14 +209,16 @@
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for clients
 ;;;;------------------------------------------------------------------------
+;;;;composite search- return combined list of items that match each search
 
+;(defun item-search 
 (defun clients-with-credits ()
   "Returns a list of all clients with makeup credits."
   (loop :for client :in *clients*
 	:if (> (parse-integer (credit-minutes client)) 0)
 	  :collect client))
 
-(defun id-search (id)
+(defun client-id-search (id)
   "Searches for a client by their client id."
   (loop :for client :in *clients*
 	:if (equal (write-to-string id) (write-to-string (id client)))

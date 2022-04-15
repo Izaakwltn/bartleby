@@ -1,4 +1,4 @@
-;;;;editing-generics.lisp
+;;;;system-generics.lisp
 ;;;;
 ;;;;
 
@@ -20,13 +20,12 @@
   (sort object-list #'(lambda (o1 o2)
 			(< (id o1) (id o2)))))
 
-;;;;------------------------------------------------------------------------
-;;;;Searching
-;;;;------------------------------------------------------------------------
- 
+;sort-by-area-code
+
 ;;;;------------------------------------------------------------------------
 ;;;;Changing attributes
 ;;;;------------------------------------------------------------------------
+
 (defgeneric change-first-name (object first-name)
   (:documentation "Change the first name of the object"))
 
@@ -61,7 +60,9 @@
   (:documentation "Changes the name of an object")) ;rooms
 
 
-;;;;backing up
+;;;;------------------------------------------------------------------------
+;;;;Backing Up
+;;;;------------------------------------------------------------------------
 
 (defgeneric backup-unit (object)
   (:documentation "Prepares an item to be printed to backup."))
