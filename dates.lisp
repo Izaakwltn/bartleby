@@ -202,12 +202,69 @@
 	  ((equal n 2) "nd")
 	  ((equal n 3) "rd")
 	  (t "th"))))
-				   
+
+;;;;------------------------------------------------------------------------
+;;;;This day and that
+;;;;------------------------------------------------------------------------
+
 (defun today ()
   "Returns today's date."
   (date (local-time:timestamp-month (local-time:now))
         (local-time:timestamp-day   (local-time:now))
 	(local-time:timestamp-year  (local-time:now))))
+
+(defmethod next-day ((date date))
+  (add-days date 1))
+
+(defun tomorrow ()
+  "Returns tomorrow's date."
+  (next-day (today)))
+
+;;;;------------------------------------------------------------------------
+;;;;Date Time
+;;;;------------------------------------------------------------------------
+
+(defclass date-time ()
+  ((date-o   :initarg :date-o
+	   :accessor date-o)
+   (time-o :initarg :time-o
+	   :accessor time-o)))
+
+(defmethod print-object ((obj date-time) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-accessors ((date-o date-o)
+		     (time-o time-o))
+	obj
+      (format stream "~a ~a" date-o time-o))))
+
+(defun date-time (date time)
+  (make-instance 'date-time :date-o date
+		            :time-o time))
+
+(defmethod backup-unit ((date-time date-time))
+  (let ((cd (date-o date-time))
+	(ct (time-o date-time)))
+    (format nil "(date-time (date ~a ~a ~a) (set-time ~a ~a))"
+	    (m cd)
+	    (d cd)
+	    (y cd)
+	    (hour ct)
+	    (minutes ct))))
+
+(defmethod add-days ((date-time date-time) days)
+  (date-time (add-days (date-o date-time) days) (time-o date-time)))
+
+(defmethod add-time ((date-time date-time) minutes) 
+  (let ((ct (time-o date-time))
+	(cd (date-o date-time)))
+    (cond ((zerop minutes) date-time)
+ 	  ((and (equal (minutes ct) 59)
+	        (equal (hour ct) 23))
+	   (add-time (date-time (add-days cd 1) (add-time ct 1))
+		     (- minutes 1)))
+	  ((equal (minutes ct) 59)
+	   (add-time (date-time cd (add-time ct 1)) (- minutes 1)))
+	  (t (add-time (date-time cd (add-time ct 1)) (- minutes 1))))))
 
 
 ;;;;------------------------------------------------------------------------

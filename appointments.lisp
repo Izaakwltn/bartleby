@@ -15,12 +15,8 @@
 	         :accessor employee)
    (meeting-room :initarg :meeting-room
 	         :accessor meeting-room)
-   (app-date     :initarg :app-date
-	         :accessor app-date)
-   (start-time   :initarg :start-time
-	         :accessor start-time)
-   (end-time     :initarg :end-time
-	         :accessor end-time)
+   (date-time    :initarg :dt
+		 :accessor dt)
    (duration     :initarg :duration
 	         :accessor duration)
    (notes        :initarg :notes
@@ -32,18 +28,14 @@
 		     (client        client)
 		     (employee      employee)
 		     (meeting-room  meeting-room)
-		     (app-date      app-date)
-		     (start-time    start-time)
-		     (end-time      end-time)
+		     (dt            dt)
 		     (duration      duration)
 		     (notes notes))
 	obj
       (format stream
 	      "~%~a~%~a~% ~a---~a~%Room: ~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
 	      app-number
-	      app-date
-	      start-time
-	      end-time
+	      dt
 	      meeting-room
 	      (first-name client)
 	      (last-name client)
@@ -52,28 +44,26 @@
 	      duration
 	      notes))))
 	      
-(defun make-appointment (app-number client-id employee-id room-num app-date start-time duration notes)
+(defun make-appointment (app-number client-id employee-id room-num date-time duration notes)
   (make-instance 'appointment :app-number app-number
 		              :client (id-search client-id)
 		              :employee (employee-search employee-id)
 			      :meeting-room (room-search room-num)
-		              :app-date app-date
-			      :start-time start-time
-			      :end-time (add-time start-time duration)
+		              :dt date-time
 			      :duration duration
 			      :notes notes))
 					   
-(defun equal-appointments-p (app1 app2)
-  "Compares two appointments, determines if they are equal."
-  (and (equal (app-number app1) (app-number app2))
-       (equal (id (client app1)) (id (client app2)))
-       (equal (id (employee app1)) (id (employee app2)))
-       (equal (id (meeting-room app1)) (id (meeting-room app2)))
-       (equal (app-date app1) (app-date app2))
-       (equal (start-time app1) (start-time app2))
-       (equal (end-time app1) (end-time app2))
-       (equal (duration app1) (duration app2))
-       (equal (notes app1) (notes app2))))
+;(defun equal-appointments-p (app1 app2)
+ ; "Compares two appointments, determines if they are equal."
+  ;;(and (equal (app-number app1) (app-number app2))
+    ;   (equal (id (client app1)) (id (client app2)))
+     ;  (equal (id (employee app1)) (id (employee app2)))
+      ; (equal (id (meeting-room app1)) (id (meeting-room app2)))
+       ;(equal (app-date app1) (app-date app2))
+       ;(equal (start-time app1) (start-time app2))
+       ;(equal (end-time app1) (end-time app2))
+       ;(equal (duration app1) (duration app2))
+       ;(equal (notes app1) (notes app2))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding to, removing from, and editing *appointments*
@@ -141,14 +131,12 @@
   (setq last-app-number (+ last-app-number 1))
   last-app-number)
 
-(defun new-appointment (client-id employee-id room-num app-date start-time duration notes)
+(defun new-appointment (client-id employee-id room-num date-time duration notes)
   (add-appointment (make-instance 'appointment :app-number (new-app-number)
 		              :client (id-search client-id)
 		              :employee (employee-search employee-id)
 			      :meeting-room (room-search room-num)
-		              :app-date app-date
-			      :start-time start-time
-			      :end-time (add-time start-time duration)
+		              :dt date-time
 			      :duration duration
 			      :notes notes)))
 					   
@@ -162,8 +150,7 @@
 	  (id (client appointment))
 	  (id (employee appointment))
 	  (id (meeting-room appointment))
-	  (backup-unit (app-date appointment))
-	  (backup-unit (start-time appointment))
+	  (backup-unit (dt appointment))
 	  (duration appointment)
 	  (notes appointment)))
 
@@ -178,15 +165,14 @@
   (let ((client     (client appointment))
 	(employee   (employee appointment))
 	(room       (meeting-room appointment))
-	(app-date   (app-date appointment))
-	(start-time (start-time appointment))
+        (date-time  (dt appointment))
         (duration   (duration appointment))
 	(notes      (notes appointment)))
-    (loop :with current-week := app-date
+    (loop :with current-date := date-time
 	  :for i :from 1 to number-of-appointments
 	  :do (add-appointment
-	       (make-appointment (new-app-number) (id client) (id employee) (id room) current-week start-time duration notes))
-	      (setf current-week (add-days current-week 7)))))
+	       (make-appointment (new-app-number) (id client) (id employee) (id room) current-date duration notes))
+	      (setf current-date (add-days current-date 7)))))
 
 ;(recurring (make-appointment 1002 2001 (date 1 5 2022) (set-time 10 30) 30 "") 50)
 ;(recurring (make-appointment 1003 2001 (date 1 5 2022) (set-time 17 0) 30 "") 50)
@@ -201,12 +187,12 @@
 ;;;;Checking out Appointments
 ;;;;------------------------------------------------------------------------
 
-(defmethod past-p ((appointment appointment))
-  "Checks whether an appointment has passed."
-  (let ((today (today))
-	(ct    (current-time)))
-    (and (equal-date today (later-date (app-date appointment) today))
-	 (equal-time ct    (later-time (start-time appointment) ct)))))
+;(defmethod past-p ((appointment appointment))
+ ; "Checks whether an appointment has passed."
+  ;(let ((today (today))
+;	(ct    (current-time)))
+ ;   (and (equal-date today (later-date (app-date appointment) today))
+;	 (equal-time ct    (later-time (start-time appointment) ct)))))
    
 ;(defun ready-appointments (employee-id)
  ;   (loop :for a in *appointments*

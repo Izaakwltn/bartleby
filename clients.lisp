@@ -153,6 +153,7 @@
 				      (email          client)
 				      address
 				      (notes          client))))
+
 (defmethod change-notes ((client client) notes)
   "Changes notes on a client"
   (replace-client client (make-client (first-name     client)

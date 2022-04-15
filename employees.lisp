@@ -48,23 +48,6 @@
 			   :hourly-rate hourly-rate))
 
 ;;;;------------------------------------------------------------------------
-;;;;Backing up employees
-;;;;------------------------------------------------------------------------
-
-(defmethod backup-unit ((employee employee))
-  (format nil "(add-employee (make-employee ~a ~a ~a ~a ~a ~a ~a))~%"
-	  (id employee)
-	  (write-to-string (first-name employee))
-	  (write-to-string (last-name employee))
-	  (backup-unit (phone employee))
-	  (backup-unit (email employee))
-	  (backup-unit (address employee))
-	  (hourly-rate employee)))
-
-(defun refresh-employee-backup ()
-  (make-backup "employee-backup.lisp" *employees*))
-
-;;;;------------------------------------------------------------------------
 ;;;;Adding to, removing from, and editing *clients*
 ;;;;------------------------------------------------------------------------
 
@@ -88,6 +71,23 @@
   "Replaces an existing employee with a new-employee in its place."
   (remove-employee employee)
   (add-employee new-employee))
+
+;;;;------------------------------------------------------------------------
+;;;;Backing up employees
+;;;;------------------------------------------------------------------------
+
+(defmethod backup-unit ((employee employee))
+  (format nil "(add-employee (make-employee ~a ~a ~a ~a ~a ~a ~a))~%"
+	  (id employee)
+	  (write-to-string (first-name employee))
+	  (write-to-string (last-name employee))
+	  (backup-unit (phone employee))
+	  (backup-unit (email employee))
+	  (backup-unit (address employee))
+	  (hourly-rate employee)))
+
+(defun refresh-employee-backup ()
+  (make-backup "employee-backup.lisp" *employees*))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Editing one attribute at a time

@@ -9,11 +9,12 @@
   :serial t
   :components ((:file "package")
 	       (:file "backup")
+	       (:file "system-generics")
 	       (:file "time")
 	       (:file "dates")
 	       ;(:file "calendar")
 	       (:file "contact")
-	       (:file "system-generics")
+	       ;(:file "system-generics")
 	       (:file "clients")
 	       (:file "rooms")
 	       (:file "employees")

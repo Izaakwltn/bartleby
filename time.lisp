@@ -33,6 +33,9 @@
 	  (hour set-time)
 	  (minutes set-time)))
 
+(defgeneric add-time (object minutes)
+  (:documentation "Adds a specified number of minutes to a given object"))
+  
 (defmethod add-time ((time set-time) minutes)
   "Adds a specified number of minutes to a given time."
   (cond ((zerop minutes) time)
