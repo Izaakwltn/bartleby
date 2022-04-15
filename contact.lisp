@@ -46,7 +46,7 @@
 	  (zip-code address)))
 
 (defun random-address () ;;;;make an actual function soon
- (make-address "2022" "Johnson Street" " Denver" "Kansas" "90000"))
+ (make-address "2022" "Johnson Street" " Denver" "Kansas" "90000")) ;;;;;;;;;;;;;;;make this
 
 ;;;;------------------------------------------------------------------------
 ;;;;Phone Class
@@ -145,4 +145,12 @@
 (defun auto-email (first-name last-name)
   "Automatically generates an email using someone's name"
   (make-email (concatenate 'string last-name "." first-name "@" (nth (random 4) email-domains))))
+
+(defun auto-employee-email (first-name last-name company-email-domain)
+  (make-email (concatenate 'string last-name "." first-name "@" company-email-domain)))
+;;;;fix these up
+
+;;;;------------------------------------------------------------------------
+;;;;------------------------------------------------------------------------
+;;;;------------------------------------------------------------------------
   

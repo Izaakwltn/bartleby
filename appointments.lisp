@@ -145,7 +145,7 @@
 ;;;;------------------------------------------------------------------------
 
 (defmethod backup-unit ((appointment appointment))
-  (format nil "(make-appointment ~a ~a ~a ~a ~a ~a ~a ~a)"
+  (format nil "(load-saved-item (make-appointment ~a ~a ~a ~a ~a ~a ~a ~a))"
 	  (app-number appointment)
 	  (id (client appointment))
 	  (id (employee appointment))
@@ -155,7 +155,11 @@
 	  (notes appointment)))
 
 (defun refresh-appointment-backup ()
-  (make-backup "appointment-backup.lisp" *appointments*))
+  (make-backup "appointments" *appointments*))
+
+(defmethod load-saved-item ((appointment appointment))
+  (push appointment *appointments*)
+  appointment)
 
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments

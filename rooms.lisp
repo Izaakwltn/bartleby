@@ -90,6 +90,7 @@
 					(room-name meeting-room)
 					(capacity meeting-room)
 					new-notes)))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Adding New Rooms
 ;;;;------------------------------------------------------------------------
@@ -112,15 +113,17 @@
 ;;;;------------------------------------------------------------------------
 
 (defmethod backup-unit ((meeting-room meeting-room))
-  (format nil "(add-room (make-room ~a ~a ~a ~a))~%"
+  (format nil "(load-saved-item (make-room ~a ~a ~a ~a))~%"
 	  (id meeting-room)
 	  (write-to-string (room-name meeting-room))
 	  (capacity meeting-room)
 	  (write-to-string (notes meeting-room))))
 
 (defun refresh-room-backup ()
-  (make-backup "room-backup.lisp" *rooms*))
+  (make-backup "rooms" *rooms*))
 
+(defmethod load-saved-item ((meeting-room meeting-room))
+  (push meeting-room *rooms*))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for rooms
 ;;;;------------------------------------------------------------------------
@@ -132,3 +135,18 @@
 	  :do (return r)))
 
 ;(add-room (make-room 0 "Virtual" 1000 "Default, Virtual lesson space."))
+
+;;;;------------------------------------------------------------------------
+;;;;Room tests
+;;;;------------------------------------------------------------------------
+
+(defvar *room-names* '("The Library" "Room with the Broken Chair""Guitar Room" "The Chokey" "The Kitchen" "The room where everything works" "The room where nothing works"))
+
+(defun random-room (room-names)
+  (nth (random (length room-names)) room-names))
+
+(defun generate-rooms (number-of-rooms)
+  (loop :for i :from 1 :to number-of-rooms
+	:do (new-room (random-room *room-names*) (random 10) "")))
+		       
+				      

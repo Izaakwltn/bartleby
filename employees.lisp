@@ -77,7 +77,7 @@
 ;;;;------------------------------------------------------------------------
 
 (defmethod backup-unit ((employee employee))
-  (format nil "(add-employee (make-employee ~a ~a ~a ~a ~a ~a ~a))~%"
+  (format nil "(load-saved-item (make-employee ~a ~a ~a ~a ~a ~a ~a))~%"
 	  (id employee)
 	  (write-to-string (first-name employee))
 	  (write-to-string (last-name employee))
@@ -87,7 +87,10 @@
 	  (hourly-rate employee)))
 
 (defun refresh-employee-backup ()
-  (make-backup "employee-backup.lisp" *employees*))
+  (make-backup "employees" *employees*))
+
+(defmethod load-saved-item ((employee employee))
+  (push employee *employees*))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Editing one attribute at a time
@@ -167,7 +170,7 @@
 		 (random-address)
 		 37))
 
-(add-employee izaak)
+;(add-employee izaak)
 
 (defvar last-employee-id (if (first *employees*)
 			     (+ (id (first *employees*)) 1)

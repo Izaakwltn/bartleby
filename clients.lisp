@@ -194,7 +194,7 @@
 ;;;;------------------------------------------------------------------------
 
 (defmethod backup-unit ((client client))
-  (format nil "(add-client (make-client ~a ~a ~a ~a ~a ~a ~a ~a))~%"
+  (format nil "(load-saved-item (make-client ~a ~a ~a ~a ~a ~a ~a ~a))~%"
 	  (write-to-string (first-name client))
 	  (write-to-string (last-name client))
 	  (id client)
@@ -205,14 +205,16 @@
 	  (write-to-string (notes client))))
 
 (defun refresh-client-backup ()
-  (make-backup "client-backup.lisp" *clients*))
+  (make-backup "clients" *clients*))
 
+(defmethod load-saved-item ((client client))
+  (push client *clients*))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for clients
 ;;;;------------------------------------------------------------------------
 ;;;;composite search- return combined list of items that match each search
 
-;(defun item-search 
+;might end up just in search.lisp 
 (defun clients-with-credits ()
   "Returns a list of all clients with makeup credits."
   (loop :for client :in *clients*

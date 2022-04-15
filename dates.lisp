@@ -181,10 +181,21 @@
 
 (defvar firsts-of-january (each-first-of-january 1900 1 2100))
 
-(defmethod day-of-week ((date date))
+(defvar days-of-week '((0 "Sunday")
+		       (1 "Monday")
+		       (2 "Tuesday")
+		       (3 "Wednesday")
+		       (4 "Thursday")
+		       (5 "Friday")
+		       (6 "Saturday")))
+
+(defmethod day-of-week ((date date)) ;;;returns day number
   "Determines the day of the week for a given date."
   (let ((jan1 (second (assoc (y date) firsts-of-january))))
     (day-cycle jan1 (mod (- (day-nth date) 1) 7))))
+
+(defmethod day-of-week-name ((date date)) ;returns the name of the day
+  (second (assoc (day-of-week date) days-of-week)))
 
 (defun number-suffix (n)
   "Given a number, returns the English suffix (st, nd, th)."
@@ -252,6 +263,7 @@
 	    (minutes ct))))
 
 (defmethod add-days ((date-time date-time) days)
+  "Adds a specified number of dates to the given date-time"
   (date-time (add-days (date-o date-time) days) (time-o date-time)))
 
 (defmethod add-time ((date-time date-time) minutes) 
@@ -265,6 +277,16 @@
 	  ((equal (minutes ct) 59)
 	   (add-time (date-time cd (add-time ct 1)) (- minutes 1)))
 	  (t (add-time (date-time cd (add-time ct 1)) (- minutes 1))))))
+
+(defmethod change-date ((date-time date-time) new-date)
+  (date-time new-date
+	     (time-o date-time)))
+
+(defmethod change-time ((date-time date-time) new-time)
+  (date-time (date-o date-time)
+	     new-time))
+
+(defvar *midnight* (set-time 24 0)) 
 
 
 ;;;;------------------------------------------------------------------------
@@ -297,14 +319,21 @@
 (defun this-week ()
   (week (today)))
 
+;::::::::::::::::::::::::::::::
+
 (defgeneric last-week (object)
   (:documentation "Returns the previous week"))
 
 (defmethod last-week ((date date))
   (week (sub-days date 7)))
 
+(defmethod last-week ((date-time date-time))
+  (week (sub-days (date-o date-time) 7)))
+
 (defmethod last-week ((week week))
   (last-week (first (days week))))
+
+;::::::::::::::::::::::::::::::
 
 (defgeneric next-week (object)
   (:documentation "Returns the following week"))
@@ -312,8 +341,13 @@
 (defmethod next-week ((date date))
   (week (add-days date 7)))
 
+(defmethod next-week ((date-time date-time))
+  (week (add-days (date-o date-time) 7)))
+
 (defmethod next-week ((week week))
   (next-week (first (days week))))
+
+
 
 ;;;;------------------------------------------------------------------------
 ;;;;Month Class

@@ -59,6 +59,12 @@
 (defgeneric change-name (object name)
   (:documentation "Changes the name of an object")) ;rooms
 
+(defgeneric change-date (object new-date)
+  (:documentation "Changes the date of an object"))
+
+(defgeneric change-time (object new-time)
+  (:documentation "Changes the time of an object"))
+
 
 ;;;;------------------------------------------------------------------------
 ;;;;Backing Up
