@@ -110,17 +110,6 @@
 				      (address    client)
 				      (notes      client))))
 
-(defmethod change-credits    ((client client) credits)
-  "Changes the credit minutes of a client"
-  (replace-client client (make-client (first-name client)
-				      (last-name client)
-				      (id client)
-				      credits
-				      (phone     client)
-				      (email     client)
-				      (address   client)
-				      (notes     client))))
-
 (defmethod change-phone ((client client) new-phone)
   "Changes the phone number of a client"
   (replace-client client (make-client (first-name     client)
@@ -209,6 +198,28 @@
 
 (defmethod load-saved-item ((client client))
   (push client *clients*))
+
+;;;;------------------------------------------------------------------------
+;;;;Credit Minutes            ----maybe this should be with receipts, or at least used there
+;;;;------------------------------------------------------------------------
+
+(defmethod change-credits    ((client client) credits)
+  "Changes the credit minutes of a client"
+  (replace-client client (make-client (first-name client)
+				      (last-name client)
+				      (id client)
+				      credits
+				      (phone     client)
+				      (email     client)
+				      (address   client)
+				      (notes     client))))
+
+(defmethod add-credits ((client client) new-credits)
+  (change-credits client (+ (credit-minutes client) new-credits)))
+
+(defmethod use-credits ((client client) used-credits)
+  (change-credits client (- (credit-minutes client) used-credits)))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for clients
 ;;;;------------------------------------------------------------------------

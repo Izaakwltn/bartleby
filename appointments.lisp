@@ -7,26 +7,26 @@
 ;;;;------------------------------------------------------------------------
 
 (defclass appointment ()
-  ((app-number   :initarg :app-number
-		 :accessor app-number)
-   (client       :initarg :client
-	         :accessor client)
-   (employee     :initarg :employee
-	         :accessor employee)
-   (meeting-room :initarg :meeting-room
-	         :accessor meeting-room)
-   (date-time    :initarg :dt
-		 :accessor dt)
-   (duration     :initarg :duration
-	         :accessor duration)
-   (notes        :initarg :notes
-	         :accessor notes)))
+  ((app-number    :initarg :app-number
+		  :accessor app-number)
+   (clients       :initarg :clients
+	          :accessor clients)
+   (employees     :initarg :employees
+	          :accessor employees)
+   (meeting-room  :initarg :meeting-room
+	          :accessor meeting-room)
+   (date-time     :initarg :dt
+		  :accessor dt)
+   (duration      :initarg :duration
+	          :accessor duration)
+   (notes         :initarg :notes
+	          :accessor notes)))
 
 (defmethod print-object ((obj appointment) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((app-number    app-number)
-		     (client        client)
-		     (employee      employee)
+		     (clients        clients)
+		     (employees      employees)
 		     (meeting-room  meeting-room)
 		     (dt            dt)
 		     (duration      duration)
@@ -43,7 +43,8 @@
 	      (last-name employee)
 	      duration
 	      notes))))
-	      
+;;;;loop through clients, employees, etc, print list of (id, firstname, lastname) for each
+
 (defun make-appointment (app-number client-id employee-id room-num date-time duration notes)
   (make-instance 'appointment :app-number app-number
 		              :client (client-id-search client-id)
@@ -52,18 +53,6 @@
 		              :dt date-time
 			      :duration duration
 			      :notes notes))
-					   
-;(defun equal-appointments-p (app1 app2)
- ; "Compares two appointments, determines if they are equal."
-  ;;(and (equal (app-number app1) (app-number app2))
-    ;   (equal (id (client app1)) (id (client app2)))
-     ;  (equal (id (employee app1)) (id (employee app2)))
-      ; (equal (id (meeting-room app1)) (id (meeting-room app2)))
-       ;(equal (app-date app1) (app-date app2))
-       ;(equal (start-time app1) (start-time app2))
-       ;(equal (end-time app1) (end-time app2))
-       ;(equal (duration app1) (duration app2))
-       ;(equal (notes app1) (notes app2))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding to, removing from, and editing *appointments*
@@ -132,13 +121,14 @@
   last-app-number)
 
 (defun new-appointment (client-id employee-id room-num date-time duration notes)
-  (add-appointment (make-instance 'appointment :app-number (new-app-number)
-		              :client (id-search client-id)
-		              :employee (employee-search employee-id)
-			      :meeting-room (room-search room-num)
-		              :dt date-time
-			      :duration duration
-			      :notes notes)))
+  (add-appointment (make-appointment (new-app-number) client-id employee-id room-num date-time duration notes)))
+   ;(make-instance 'appointment :app-number (new-app-number)
+;		              :client (id-search client-id)
+;		              :employee (employee-search employee-id)
+;			      :meeting-room (room-search room-num)
+;		              :dt date-time
+;			      :duration duration
+;			      :notes notes)))
 					   
 ;;;;------------------------------------------------------------------------
 ;;;;Backing up Appointments
@@ -173,9 +163,8 @@
 	(notes      (notes appointment)))
     (loop :with current-date := date-time
 	  :for i :from 1 to number-of-appointments
-	  :do (add-appointment
-	       (make-appointment (new-app-number) client employee room current-date duration notes))
-	      (setf current-date (add-days current-date 7)))))
+	  :do (progn (new-appointment client employee room current-date duration notes)
+	             (setf current-date (add-days current-date 7))))))
 
 ;(recurring (make-appointment 1002 2001 (date 1 5 2022) (set-time 10 30) 30 "") 50)
 ;(recurring (make-appointment 1003 2001 (date 1 5 2022) (set-time 17 0) 30 "") 50)
