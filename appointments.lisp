@@ -33,7 +33,7 @@
 		     (notes notes))
 	obj
       (format stream
-	      "~%~a~%~a~% ~a---~a~%Room: ~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
+	      "~%~a~%~a~%~%Room: ~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
 	      app-number
 	      dt
 	      meeting-room
@@ -46,7 +46,7 @@
 	      
 (defun make-appointment (app-number client-id employee-id room-num date-time duration notes)
   (make-instance 'appointment :app-number app-number
-		              :client (id-search client-id)
+		              :client (client-id-search client-id)
 		              :employee (employee-search employee-id)
 			      :meeting-room (room-search room-num)
 		              :dt date-time
@@ -145,7 +145,7 @@
 ;;;;------------------------------------------------------------------------
 
 (defmethod backup-unit ((appointment appointment))
-  (format nil "(load-saved-item (make-appointment ~a ~a ~a ~a ~a ~a ~a ~a))"
+  (format nil "(load-saved-item (make-appointment ~a ~a ~a ~a ~a ~a ~a))"
 	  (app-number appointment)
 	  (id (client appointment))
 	  (id (employee appointment))
@@ -158,24 +158,23 @@
   (make-backup "appointments" *appointments*))
 
 (defmethod load-saved-item ((appointment appointment))
-  (push appointment *appointments*)
-  appointment)
+  (push appointment *appointments*))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments
 ;;;;------------------------------------------------------------------------
 
 (defmethod recurring ((appointment appointment) number-of-appointments); &optional (recurrence-rate 7))
-  (let ((client     (client appointment))
-	(employee   (employee appointment))
-	(room       (meeting-room appointment))
+  (let ((client     (id (client appointment)))
+	(employee   (id (employee appointment)))
+	(room       (id (meeting-room appointment)))
         (date-time  (dt appointment))
         (duration   (duration appointment))
 	(notes      (notes appointment)))
     (loop :with current-date := date-time
 	  :for i :from 1 to number-of-appointments
 	  :do (add-appointment
-	       (make-appointment (new-app-number) (id client) (id employee) (id room) current-date duration notes))
+	       (make-appointment (new-app-number) client employee room current-date duration notes))
 	      (setf current-date (add-days current-date 7)))))
 
 ;(recurring (make-appointment 1002 2001 (date 1 5 2022) (set-time 10 30) 30 "") 50)
