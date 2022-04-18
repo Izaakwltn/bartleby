@@ -226,8 +226,8 @@
 ;;;;------------------------------------------------------------------------
 (defmethod new-date-time ((appointment appointment) new-date-time)
   (make-appointment (new-app-number)
-		    (clients appointment)
-		    (employees appointment)
+		    (client-ids appointment)
+		    (employee-ids appointment)
 		    (id (meeting-room appointment))
 		    new-date-time
 		    (duration appointment)
@@ -240,7 +240,7 @@
   (new-date-time appointment (next-day (dt appointment))))
 
 (defmethod next-week ((appointment appointment))
-  (new-date-time appointment (next-week (dt appointment))))
+  (new-date-time appointment (add-days (dt appointment) 7)))
 
 (defmethod next-month ((appointment appointment))
   (new-date-time appointment (next-month (dt appointment))))

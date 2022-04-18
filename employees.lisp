@@ -181,9 +181,9 @@
   (setq last-employee-id (+ last-employee-id 1))
   last-employee-id)
 
-(defun new-employee (first-name last-name phone email address hourly-rate)
+(defun new-employee (first-name last-name string-phone string-email address hourly-rate)
   "Generates a a new employee with a new employee id."
-  (add-employee (make-employee (new-employee-id) first-name last-name phone email address hourly-rate)))
+  (add-employee (make-employee (new-employee-id) first-name last-name (make-phone-number string-phone) (make-email string-email) address hourly-rate)))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for employees:
 ;;;;------------------------------------------------------------------------

@@ -167,13 +167,13 @@
   (setq last-client-id (+ last-client-id 1))
   last-client-id)
 
-(defun new-client (first-name last-name phone email address notes)
+(defun new-client (first-name last-name string-phone string-email address notes)
   "generates a client with a new id and default makeups"
   (add-client (make-instance 'client :first-name first-name
 		                     :last-name  last-name
 			             :id  (new-client-id)
-			             :phone      phone
-			             :email      email
+			             :phone      (make-phone-number string-phone)
+			             :email      (make-email string-email)
 				     :address    address
 			             :credit-minutes    0
 			             :notes      notes)))
