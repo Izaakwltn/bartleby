@@ -68,6 +68,9 @@
 			   leap-year-numbers
 			   common-year-numbers))))
 
+(defgeneric add-days (object days)
+  (:documentation "Adds days to date, date-time, appointment, etc."))
+
 (defmethod add-days ((date date) days)
   "Returns a date a specified number of days after a particular date."
   (cond ((zerop days) date)
@@ -94,6 +97,14 @@
 	(t (sub-days (date (m date) (- (d date) 1) (y date))
 		     (- days 1)))))
 
+(defgeneric next-year (object)
+  (:documentation "Returns a date one year later"))
+
+(defmethod next-year ((date date))
+  (if (and (equal (m date) 2)
+	   (equal (d date) 29))
+      (date 3 1 (+ (y date) 1))
+      (date (m date) (d date) (+ (y date) 1))))
 ;;;;------------------------------------------------------------------------
 ;;;;Date Calculations
 ;;;;------------------------------------------------------------------------
@@ -291,7 +302,10 @@
   (date-time (date-o date-time)
 	     new-time))
 
-(defvar *midnight* (set-time 24 0)) 
+(defvar *midnight* (set-time 24 0))
+
+(defmethod next-year ((date-time date-time))
+  (date-time (next-year (date-o date-time)) (time-o date-time)))
 
 
 ;;;;------------------------------------------------------------------------
