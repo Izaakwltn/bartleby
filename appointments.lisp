@@ -22,6 +22,18 @@
    (notes         :initarg :notes
 	          :accessor notes)))
 
+;::::::::::::::::::::::::::::::
+;printing appointments
+
+(defun printable-people (people-list)
+  (loop :for p :in people-list
+	:collect (concatenate 'string
+			      (first-name p)
+			      " "
+			      (last-name p)
+			      ", ID: "
+			      (write-to-string (id p)))))
+
 (defmethod print-object ((obj appointment) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((app-number    app-number)
@@ -33,22 +45,28 @@
 		     (notes notes))
 	obj
       (format stream
-	      "~%~a~%~a~%~%Room: ~a~%Client: ~a ~a~%Employee: ~a ~a~%Duration: ~a~%Notes: ~a~%"
+	      "~%~a~%~a~%~%Room: ~a~%Client(s):~%~{~a~%~}~%Employee(s):~%~{~a~}~%Duration: ~a~%Notes: ~a~%"
 	      app-number
 	      dt
 	      meeting-room
-	      (first-name client)
-	      (last-name client)
-	      (first-name employee)
-	      (last-name employee)
+	      (printable-people clients)
+	      (printable-people employees)
 	      duration
 	      notes))))
 ;;;;loop through clients, employees, etc, print list of (id, firstname, lastname) for each
 
-(defun make-appointment (app-number client-id employee-id room-num date-time duration notes)
+(defun client-list (client-ids)
+  (loop :for i :in client-ids
+	:collect (client-id-search i)))
+
+(defun employee-list (employee-ids)
+  (loop :for i :in employee-ids
+	:collect (employee-id-search i)))
+
+(defun make-appointment (app-number clients employees room-num date-time duration notes)
   (make-instance 'appointment :app-number app-number
-		              :client (client-id-search client-id)
-		              :employee (employee-search employee-id)
+		              :clients clients
+		              :employees employees
 			      :meeting-room (room-search room-num)
 		              :dt date-time
 			      :duration duration
@@ -74,10 +92,10 @@
   (refresh-appointment-backup))
 
 (defmethod replace-appointment ((appointment appointment)
-				client-id employee-id room-num app-date start-time duration notes)
+				client-ids employee-ids room-num date-time duration notes)
   "Removes appointment, adds a replacement appointment."
   (remove-appointment appointment)
-  (add-appointment (make-appointment (app-number appointment) client-id employee-id room-num app-date start-time duration notes)))
+  (add-appointment (make-appointment (app-number appointment) client-ids employee-ids room-num date-time duration notes)))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Changing one attribute at a time: 
@@ -120,25 +138,32 @@
   (setq last-app-number (+ last-app-number 1))
   last-app-number)
 
-(defun new-appointment (client-id employee-id room-num date-time duration notes)
-  (add-appointment (make-appointment (new-app-number) client-id employee-id room-num date-time duration notes)))
-   ;(make-instance 'appointment :app-number (new-app-number)
-;		              :client (id-search client-id)
-;		              :employee (employee-search employee-id)
-;			      :meeting-room (room-search room-num)
-;		              :dt date-time
-;			      :duration duration
-;			      :notes notes)))
-					   
+(defun new-appointment (client-ids employee-ids room-num date-time duration notes)
+  (add-appointment (make-appointment (new-app-number) (client-list client-ids) (employee-list employee-ids) room-num date-time duration notes)))
+
+;example (new-appointment (1002 1003) (2002) 2 (moment 4 20 2022 10 30) 60 "violin")
+
 ;;;;------------------------------------------------------------------------
 ;;;;Backing up Appointments
 ;;;;------------------------------------------------------------------------
 
+;;;;figure out backup-units for 
+
+(defmethod client-ids ((appointment appointment))
+  "returns client ids for all clients in an appointment"
+  (loop :for c :in (clients appointment)
+	:collect (id c)))
+
+(defmethod employee-ids ((appointment appointment))
+  "Returns employee ids for all clients in an appointment."
+  (loop :for e :in (employees appointment)
+	:collect (id e)))
+
 (defmethod backup-unit ((appointment appointment))
-  (format nil "(load-saved-item (make-appointment ~a ~a ~a ~a ~a ~a ~a))"
+  (format nil "(load-saved-item (make-appointment ~a '(~{~a ~}) ~a ~a ~a ~a ~a))"
 	  (app-number appointment)
-	  (id (client appointment))
-	  (id (employee appointment))
+	  (client-ids appointment)
+	  (employee-ids appointment)
 	  (id (meeting-room appointment))
 	  (backup-unit (dt appointment))
 	  (duration appointment)

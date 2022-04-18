@@ -252,6 +252,10 @@
   (make-instance 'date-time :date-o date
 		            :time-o time))
 
+(defun moment (m d yyyy hour minutes)
+  "Simple input for a date and time."
+  (date-time (date m d yyyy) (set-time hour minutes)))
+
 (defmethod backup-unit ((date-time date-time))
   (let ((cd (date-o date-time))
 	(ct (time-o date-time)))

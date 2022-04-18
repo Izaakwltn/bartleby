@@ -188,7 +188,7 @@
 ;;;;Searching for employees:
 ;;;;------------------------------------------------------------------------
 
-(defun employee-search (employee-id)
+(defun employee-id-search (employee-id)
   "Searches for an employee by employee-id."
   (loop for employee in *employees*
 	if (equal (write-to-string employee-id)
