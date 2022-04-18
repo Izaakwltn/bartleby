@@ -25,21 +25,8 @@
 	       (:file "backup-of-employees")
 	       (:file "backup-of-rooms")
 	       (:file "backup-of-appointments")
-;	       (:file "backup-of-clients")
-;	       (:file "backup-of-employees")
-;	       (:file "backup-of-rooms")
-;	       (:file "backup-of-appointments")
-	       ;(:file "client-backup")
-	       ;(:file "employee-backup")
-	       ;(:file "room-backup")
-	       ;(:file "appointment-backup")
 	       (:module "tests"
 		:serial t
 		:components ((:file "client-tests")
 			     (:file "employee-tests")
 			     (:file "appointment-tests")))))
-
-
-
-					;add makeups.lisp, printing.lisp,
-

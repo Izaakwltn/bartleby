@@ -43,7 +43,7 @@
 
 (defun draft-invoice (title employee-id receipts)
   (make-instance 'invoice :title title
-		          :employee (employee-search employee-id)
+		          :employee (employee-id-search employee-id)
 			  :receipts receipts))
 
 ;(defvar test-invoice (draft-invoice "Test Invoice" 2001 (month-appointments 2001 1)))
