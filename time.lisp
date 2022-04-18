@@ -33,7 +33,7 @@
 	  (hour set-time)
 	  (minutes set-time)))
 
-(defgeneric add-time (object minutes)
+(defgeneric add-time (object minutes) ;;also used for date-time
   (:documentation "Adds a specified number of minutes to a given object"))
   
 (defmethod add-time ((time set-time) minutes)

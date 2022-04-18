@@ -160,7 +160,7 @@
 	:collect (id e)))
 
 (defmethod backup-unit ((appointment appointment))
-  (format nil "(load-saved-item (make-appointment ~a '(~{~a ~}) ~a ~a ~a ~a ~a))"
+  (format nil "(load-saved-item (make-appointment ~a '(~{~a ~}) '(~{~a~}) ~a ~a ~a ~a))"
 	  (app-number appointment)
 	  (client-ids appointment)
 	  (employee-ids appointment)
@@ -179,6 +179,15 @@
 ;;;;Recurring Appointments
 ;;;;------------------------------------------------------------------------
 
+(defmethod next-day ((appointment appointment))
+  (date-time (add-days (dt appointment) 1)))
+
+(defmethod next-week ((appointment appointment))
+  (date-time (add-days (dt appointment) 7)))
+
+(defmethod next-month ((appointment appointment))
+  "I guess it's convoluted, but do either 30 days or the same day.")
+
 (defmethod recurring ((appointment appointment) number-of-appointments); &optional (recurrence-rate 7))
   (let ((client     (id (client appointment)))
 	(employee   (id (employee appointment)))
@@ -189,7 +198,7 @@
     (loop :with current-date := date-time
 	  :for i :from 1 to number-of-appointments
 	  :do (progn (new-appointment client employee room current-date duration notes)
-	             (setf current-date (add-days current-date 7))))))
+	             (setf current-date (next-week current-date ))))))
 
 ;(recurring (make-appointment 1002 2001 (date 1 5 2022) (set-time 10 30) 30 "") 50)
 ;(recurring (make-appointment 1003 2001 (date 1 5 2022) (set-time 17 0) 30 "") 50)

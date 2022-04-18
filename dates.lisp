@@ -34,6 +34,7 @@
 		       :y y))
 
 (defmethod backup-unit ((date date))
+  "Generates a backup-able unit for a date"
   (format nil "(date ~a ~a ~a)"
 	  (m date)
 	  (d date)
@@ -92,7 +93,6 @@
 		   (- days 1)))
 	(t (sub-days (date (m date) (- (d date) 1) (y date))
 		     (- days 1)))))
-			       
 
 ;;;;------------------------------------------------------------------------
 ;;;;Date Calculations
@@ -136,14 +136,6 @@
 		      (10 "October")
 		      (11 "November")
 		      (12 "December")))
-
-(defvar days-of-week '((0 "Sunday")
-		       (1 "Monday")
-		       (2 "Tuesday")
-		       (3 "Wednesday")
-		       (4 "Thursday")
-		       (5 "Friday")
-		       (6 "Saturday")))
 
 (defun day-cycle (day-value change)
   "Cycles through days of the week as designated."
@@ -194,7 +186,8 @@
   (let ((jan1 (second (assoc (y date) firsts-of-january))))
     (day-cycle jan1 (mod (- (day-nth date) 1) 7))))
 
-(defmethod day-of-week-name ((date date)) ;returns the name of the day
+(defmethod day-of-week-name ((date date))
+  "Returns the name of the day of the week of a date."
   (second (assoc (day-of-week date) days-of-week)))
 
 (defun number-suffix (n)
@@ -224,7 +217,11 @@
         (local-time:timestamp-day   (local-time:now))
 	(local-time:timestamp-year  (local-time:now))))
 
+(defgeneric next-day (object)
+  (:documentation "Returns the following day from an object."))
+
 (defmethod next-day ((date date))
+  "Returns the day after a given date."
   (add-days date 1))
 
 (defun tomorrow ()
@@ -270,7 +267,8 @@
   "Adds a specified number of dates to the given date-time"
   (date-time (add-days (date-o date-time) days) (time-o date-time)))
 
-(defmethod add-time ((date-time date-time) minutes) 
+(defmethod add-time ((date-time date-time) minutes)
+  "Adds minutes to a date-time"
   (let ((ct (time-o date-time))
 	(cd (date-o date-time)))
     (cond ((zerop minutes) date-time)
@@ -281,6 +279,9 @@
 	  ((equal (minutes ct) 59)
 	   (add-time (date-time cd (add-time ct 1)) (- minutes 1)))
 	  (t (add-time (date-time cd (add-time ct 1)) (- minutes 1))))))
+
+(defmethod next-day ((date-time date-time))
+  (date-time (add-days date-time 1)))
 
 (defmethod change-date ((date-time date-time) new-date)
   (date-time new-date

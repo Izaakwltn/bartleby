@@ -20,8 +20,6 @@
   (sort object-list #'(lambda (o1 o2)
 			(< (id o1) (id o2)))))
 
-;sort-by-area-code
-
 ;;;;------------------------------------------------------------------------
 ;;;;Changing attributes
 ;;;;------------------------------------------------------------------------
@@ -65,10 +63,7 @@
 (defgeneric change-time (object new-time)
   (:documentation "Changes the time of an object"))
 
-
 ;;;;------------------------------------------------------------------------
-;;;;Backing Up
+;;;;
 ;;;;------------------------------------------------------------------------
 
-(defgeneric backup-unit (object)
-  (:documentation "Prepares an item to be printed to backup."))

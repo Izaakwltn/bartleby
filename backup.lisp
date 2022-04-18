@@ -43,5 +43,3 @@
 
 ;;;;Eventually SQL- maybe use MITO
 
-;;;;because they'll be git-ignored
-					;check whether the backups exist, write them on load if not
