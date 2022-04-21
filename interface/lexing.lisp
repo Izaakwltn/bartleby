@@ -10,16 +10,21 @@
 		     ("new"    #'new)
 		     ("view"   #'view)))
 
-(defvar *lists*    '(("clients"      bartleby::*clients*)
-		     ("employees"    bartleby::*employees*)
-		     ("rooms"        bartleby::*rooms*)
-		     ("appointments" bartleby::*appointments*)))
+;(defvar *lists*    '(("clients"      bartleby::*clients*)
+;		     ("employees"    bartleby::*employees*)
+;		     ("rooms"        bartleby::*rooms*)
+;		     ("appointments" bartleby::*appointments*)))
+(defvar *lists* (list (list "clients"      *clients*)
+		      (list "employees"    *employees*)
+		      (list "rooms"        *rooms*)
+		      (list "appointments" *appointments*)))
 
 (defvar *objects*   '("client"
 		      "employee"
 		      "room"
 		      "appointment"))
 
+(defvar 
 ;(defvar *attributes* '(
 
 (defun parse-input (input)
@@ -61,11 +66,11 @@
 
 (defun lex-token (token)
   "Generates a lexeme from a given token"
-  (cond ((find-token token *interface-commands*)
+  (cond ((find-token token *commands*)
 	 (make-lexeme "command" (second (find-token token *commands*))))
-	((find-token token *interface-lists*)
+	((find-token token *lists*)
 	 (make-lexeme "list" (second (find-token token *lists*))))
-	((find-token token *types*)
+	((find-token token *objects*)
 	 (make-lexeme "object" token))
 	(t (make-lexeme "keyword" token))))
 

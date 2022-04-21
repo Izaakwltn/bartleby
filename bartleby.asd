@@ -25,6 +25,10 @@
 	       (:file "backup-of-employees")
 	       (:file "backup-of-rooms")
 	       (:file "backup-of-appointments")
+	       (:module "interface"
+		:serial t
+		:components ((:file "lexing")
+	                     (:file "browse")))
 	       (:module "tests"
 		:serial t
 		:components ((:file "client-tests")
