@@ -3,28 +3,32 @@
 
 (in-package :bartleby)
 
-(defvar *commands* '(("help"   #'help)
+(defvar *commands* '(("help"   #'help) ;maybe (help) and then (eval command)
 		     ("edit"   #'edit)
 		     ("browse" #'browse)
 		     ("search" #'search)
 		     ("new"    #'new)
 		     ("view"   #'view)))
 
-;(defvar *lists*    '(("clients"      bartleby::*clients*)
-;		     ("employees"    bartleby::*employees*)
-;		     ("rooms"        bartleby::*rooms*)
-;		     ("appointments" bartleby::*appointments*)))
-(defvar *lists* (list (list "clients"      *clients*)
-		      (list "employees"    *employees*)
-		      (list "rooms"        *rooms*)
-		      (list "appointments" *appointments*)))
+;(setq *lists*    '(("clients"         *clients*)
+;		     ("employees"     *employees*)
+;		     ("rooms"          *rooms*)
+;		      ("appointments"  *appointments*)))
+
+(defvar *lists* '(("clients"      ;#'(lambda ()
+				      (copy-list *clients*))
+		  ("employees"   ; #'(lambda ()
+				      (copy-list *employees*))
+		  ("rooms"        ;#'(lambda ()
+				      (copy-list *rooms*))
+		  ("appointments" ;#'(lambda ()
+				      (copy-list *appointments*))))
 
 (defvar *objects*   '("client"
 		      "employee"
 		      "room"
 		      "appointment"))
 
-(defvar 
 ;(defvar *attributes* '(
 
 (defun parse-input (input)

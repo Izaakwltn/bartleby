@@ -23,11 +23,11 @@
 	  (write-to-string id client)))
 
 (defun browse-prompt ()
-  (browse (token (lex-token (prompt-read (format nil "What would you like to browse?~%clients~%employees~%appointments~%or rooms"))))))
+  (browse (eval (token (lex-token (prompt-read (format nil "What would you like to browse?~%clients~%employees~%appointments~%or rooms")))))))
   
 (defun browse (&optional ls)
   (if ls (loop :for o :in ls
-	       :do (format t "~a~%" (browse-print o)))
+	              :do (format t "~a~%" (browse-print o)))
       (browse-prompt)))
 
 ;;;;;maybe sort lists before browsing them

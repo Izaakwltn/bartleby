@@ -22,22 +22,29 @@
 ;(defun random-email (first-name last-name)
  ; (concatenate 'string last-name "." first-name "@" (nth (random 4) email-domains)))
   
-;(defun random-phone ()
- ; (loop :with number := nil
-  ;      :for i :from 1 :to 10
-;	:do (if (or (equal i 4)
-;	            (equal i 7))
-;		(setf number
-;		      (concatenate 'string number "-" (write-to-string (random 9))))
-;		(setf number
-;	              (concatenate 'string number (write-to-string (random 9)))))
-;	:finally (return number)))
+(defun random-phone-digits ()
+  (loop :with number := nil
+        :for i :from 1 :to 10
+	:do (if (or (equal i 4)
+	            (equal i 7))
+		(setf number
+		      (concatenate 'string number "-" (write-to-string (random 9))))
+		(setf number
+	              (concatenate 'string number (write-to-string (random 9)))))
+	:finally (return number)))
 		       
 (defun generate-clients (number-of-clients)
   (loop :for i :from 1 :to number-of-clients
 	:do (let ((fn (random-first))
 		  (ln (random-last)))
-	      (new-client fn ln (random-phone) (auto-email fn ln) (random-address) "n/a"))))
+	      (new-client fn
+			  ln
+			  (random-phone-digits)
+			  (concatenate 'string
+				       (username (auto-email fn ln))
+				       "@"
+				       (domain (auto-email fn ln)))
+			  (random-address) "n/a"))))
 
 (setq first-names '(Michael Christopher Jessica Matthew Ashley Jennifer Joshua Amanda Daniel David James Robert John Joseph Andrew Ryan Brandon Jason Justin Sarah William Jonathan Stephanie Brian Nicole Nicholas Anthony Heather Eric Elizabeth Adam Megan
 Melissa
