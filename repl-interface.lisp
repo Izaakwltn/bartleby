@@ -1,5 +1,5 @@
 ;;;;repl-interface.lisp
-;;;;
+;;;;   maybe interface folder- lexing.lisp, prompts.lisp
 
 (in-package :bartleby)
 
@@ -19,6 +19,11 @@
 			    ("employees" *employees*)
 			    ("appointments" *appointments*)
 			    ("rooms" *rooms*)))
+
+(defvar *interface-types* '("client"
+			    "employee"
+			    "room"
+			    "appointment"))
   
 (defun bartleby-error ()
   (format nil "I would prefer not to"))
@@ -29,6 +34,7 @@
   (read-line *query-io*))
 
 (defun parse-input (input)
+  "Parses each token separated by spaces"
   (loop :with current-token := ""
 	:with parsed := nil
 	
@@ -52,7 +58,7 @@
     (with-accessors ((tok-type tok-type)
 		     (token      token))
 	obj
-      (format stream "~a | ~a" unit-type token))))
+      (format stream "~a | ~a" tok-type token))))
 
 (defun make-lexeme (tok-type token)
   (make-instance 'lexeme :tok-type tok-type
@@ -79,23 +85,24 @@
 ;(defun interpret (input)
  ; (
 
+;;;;browse-prompt new-prompt 
 ;;;;;optional prompt-interface
-(defun browse-prompt ()
-  (format nil "What would you like to browse?~%appointments~%clients~%employees~%rooms~%?")
-  (interpret (prompt-read "> ")))
+;(defun browse-prompt ()
+ ; (format nil "What would you like to browse?~%appointments~%clients~%employees~%rooms~%?")
+  ;(interpret (prompt-read "> ")))
 
-(defun interface-browse (&optional category)
-  "Browses items, if not prompts with categories."
-  (if category
-      (browse category)
-      (browse-prompt)))
+;(defun interface-browse (&optional category)
+ ; "Browses items, if not prompts with categories."
+  ;(if category
+   ;   (browse category)
+ ;     (browse-prompt)))
+;
+;(defun main-screen ()
+ ; (format nil "Welcome to Bartleby the Scheduler.")
+  ;(format nil "type \"help\" for help"))
 
-(defun main-screen ()
-  (format nil "Welcome to Bartleby the Scheduler.")
-  (format nil "type \"help\" for help"))
-
-(defun help-sheet ()
-  (format nil "Bartleby Help Menu: "))
+;(defun help-sheet ()
+ ; (format nil "Bartleby Help Menu: "))
 
   ;edit...
    ;     ...clients
@@ -109,16 +116,16 @@
 ;search.... .....
 ;
 
-(defgeneric interface-add (object)
-  (:documentation "Prompt for adding an object through the interface"))
+;(defgeneric interface-add (object)
+ ; (:documentation "Prompt for adding an object through the interface"))
 
-(defgeneric interface-edit (object))
+;(defgeneric interface-edit (object))
+;
+;(defun interface-browse (object-list))
 
-(defun interface-browse (object-list))
-
-(defgeneric 
+;(defgeneric 
 ;;;search functions
-(defvar *search-results* "The current list of search results, for ease of access."
+;(defvar *search-results* "The current list of search results, for ease of access."
 ;(defun client-interface ()
   
 

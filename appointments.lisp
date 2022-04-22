@@ -213,7 +213,7 @@
 	  (id (meeting-room appointment))
 	  (backup-unit (dt appointment))
 	  (duration appointment)
-	  (notes appointment)))
+	  (write-to-string (notes appointment))))
 
 (defun refresh-appointment-backup ()
   (make-backup "appointments" *appointments*))

@@ -29,4 +29,8 @@
 		:serial t
 		:components ((:file "client-tests")
 			     (:file "employee-tests")
-			     (:file "appointment-tests")))))
+			     (:file "appointment-tests")))
+	       (:module "interface"
+		:serial t
+		:components ((:file "lexing")
+			     (:file "browse")))))
