@@ -27,5 +27,7 @@
   
 (defun browse (&optional ls)
   (if ls (loop :for o :in ls
-	       :do (format t "~a" (browse-print o)))
+	       :do (format t "~a~%" (browse-print o)))
       (browse-prompt)))
+
+;;;;;maybe sort lists before browsing them
