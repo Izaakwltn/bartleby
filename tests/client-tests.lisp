@@ -25,12 +25,7 @@
 (defun random-phone-digits ()
   (loop :with number := nil
         :for i :from 1 :to 10
-	:do (if (or (equal i 4)
-	            (equal i 7))
-		(setf number
-		      (concatenate 'string number "-" (write-to-string (random 9))))
-		(setf number
-	              (concatenate 'string number (write-to-string (random 9)))))
+	:do (setf number (concatenate 'string number (write-to-string (random 9))))
 	:finally (return number)))
 		       
 (defun generate-clients (number-of-clients)

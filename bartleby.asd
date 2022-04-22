@@ -28,7 +28,8 @@
 	       (:module "interface"
 		:serial t
 		:components ((:file "lexing")
-	                     (:file "browse")))
+	                     (:file "browse")
+			     (:file "bartleby")))
 	       (:module "tests"
 		:serial t
 		:components ((:file "client-tests")

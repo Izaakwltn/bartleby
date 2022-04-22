@@ -10,19 +10,20 @@
 		     ("new"    #'new)
 		     ("view"   #'view)))
 
-;(setq *lists*    '(("clients"         *clients*)
-;		     ("employees"     *employees*)
-;		     ("rooms"          *rooms*)
-;		      ("appointments"  *appointments*)))
+(defvar *lists*    '(("clients"         *clients*)
+		     ("employees"     *employees*)
+		     ("rooms"          *rooms*)
+		     ("appointments"  *appointments*)))
 
-(defvar *lists* '(("clients"      ;#'(lambda ()
-				      (copy-list *clients*))
-		  ("employees"   ; #'(lambda ()
-				      (copy-list *employees*))
-		  ("rooms"        ;#'(lambda ()
-				      (copy-list *rooms*))
-		  ("appointments" ;#'(lambda ()
-				      (copy-list *appointments*))))
+;(defvar *lists* '(("clients"      ;#'(lambda ()
+;		   (copy-list
+;		    ;*clients*))
+;		  ("employees"   ; #'(lambda ()
+;				      (copy-list *employees*))
+;		  ("rooms"        ;#'(lambda ()
+;				      (copy-list *rooms*))
+;		  ("appointments" ;#'(lambda ()
+;				      (copy-list *appointments*))))
 
 (defvar *objects*   '("client"
 		      "employee"
@@ -74,8 +75,12 @@
 	 (make-lexeme "command" (second (find-token token *commands*))))
 	((find-token token *lists*)
 	 (make-lexeme "list" (second (find-token token *lists*))))
-	((find-token token *objects*)
-	 (make-lexeme "object" token))
+	((find-if #'(lambda (tok)
+		     (string-equal token tok))
+		  *objects*)
+	 (make-lexeme "object" (find-if #'(lambda (tok)
+		     (string-equal token tok))
+		  *objects*)))
 	(t (make-lexeme "keyword" token))))
 
 (defun lex-list (parsed-list)
@@ -90,5 +95,3 @@
   (format *query-io* "~a: " prompt)
   (force-output *query-io*)
   (read-line *query-io*))
-
-
