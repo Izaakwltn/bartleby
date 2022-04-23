@@ -33,7 +33,7 @@
 	 ((string-equal (tok-type (first lexed-input))
 		       "list")
 	  (browse (eval (token (first lexed-input)))))
-	;((string-equal (tok-type (first lexed-inputif it's an object, 
+	 ;((string-equal (tok-type (first lexed-inputif it's an object, 
 	 (t (write-line "I would prefer not to."))))
 	 
 

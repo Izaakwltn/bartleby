@@ -8,7 +8,7 @@
 		     ("browse" #'browse)
 		     ("search" #'search)
 		     ("new"    #'new)
-		     ("view"   #'view)))
+		     ("view"   #'view))) ;delete
 
 (defvar *lists*    '(("clients"         *clients*)
 		     ("employees"     *employees*)
