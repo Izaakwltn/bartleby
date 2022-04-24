@@ -44,6 +44,8 @@
 	    (prompt-read "Capacity")
 	    (prompt-read "Notes")))
 
+;;;;new appointment- recurring option
+
 (defun parse-date (date-string) ;dd/mm/yyyy
   "parse date given as dd/mm/yyyy")
 ;(defun new-appointment-prompt ()

@@ -29,6 +29,7 @@
 		:serial t
 		:components ((:file "lexing")
 	                     (:file "browse")
+			     (:file "new")
 			     (:file "bartleby")))
 	       (:module "tests"
 		:serial t

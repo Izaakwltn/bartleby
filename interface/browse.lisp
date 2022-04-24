@@ -20,7 +20,7 @@
   (format nil "~a ~a: ID ~a"
 	  (first-name employee)
 	  (last-name employee)
-	  (write-to-string (id client))))
+	  (write-to-string (id employee))))
 
 (defmethod browse-print ((meeting-room meeting-room))
   (format nil "Room ~a, ~a~%Capacity: ~a~%Notes: ~a"
