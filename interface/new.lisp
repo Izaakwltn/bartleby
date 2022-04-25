@@ -45,7 +45,7 @@
 	    (prompt-read "Capacity")
 	    (prompt-read "Notes")))
 
-(defun parse-time (time-string) ;hh:mm
+(defun parse-time (time-string) ;hh:mm     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;move to time, parse-date to date
   (loop :with hh := ""
 	:with mm := ""
 
@@ -80,12 +80,15 @@
 (defun new-appointment-prompt ()
   (new-appointment (mapcar #'parse-integer (parse-input (prompt-read "Enter client IDs, separated by spaces")))
 		   (mapcar #'parse-integer (parse-input (prompt-read "Enter employee IDs, separated by spaces")))
-		   (prompt-read "Room Number")
+	           (prompt-read "Room Number")
 		   (date-time (parse-date (prompt-read "Date (mm/dd/yyyy)"))
 			      (parse-time (prompt-read "Time (hh:mm) 24 hour time")))
 		   (prompt-read "Duration (minutes)")
-		   (prompt-read "Notes")))
-
+	           (prompt-read "Notes"))
+  (if (string-equal (prompt-read "Recurring? y/n") "y")
+      (weekly (first *appointments*))))
+      
+ 
 (defun new (&optional object)
   (if object
       (funcall (eval (second (find-if #'(lambda (i)
