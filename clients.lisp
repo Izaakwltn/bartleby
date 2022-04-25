@@ -68,6 +68,9 @@
 		   *clients*))
   (refresh-client-backup))
 
+(defun probably-do-not-remove-all-clients ()
+  (mapcar #'remove-client *clients*))
+
 (defmethod replace-client ((client client) new-client)
   "Removes the client, adds a new client in its place."
   (remove-client client)
@@ -160,7 +163,7 @@
 
 (defvar last-client-id (if (first *clients*)
 			   (id (first *clients*))
-			   1001))
+			   1000))
 
 (defun new-client-id ()
   "Generates a new client-id, takes note of the most recent id."
@@ -194,10 +197,14 @@
 	  (write-to-string (notes client))))
 
 (defun refresh-client-backup ()
-  (make-backup "clients" *clients*))
+  (make-backup "clients" (sort (copy-list *clients*) #'(lambda (client1 client2)
+				   (< (id client1) (id client2))))))
 
 (defmethod load-saved-item ((client client))
   (push client *clients*))
+
+(defun update-last-client-id ()
+  (setq last-client-id (id (first *clients*))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Credit Minutes            ----maybe this should be with receipts, or at least used there
