@@ -2,7 +2,6 @@
 ;;;;
 ;;;;
 
-
 (in-package :bartleby)
 
 ;;;;browse functions

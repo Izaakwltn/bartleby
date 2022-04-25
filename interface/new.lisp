@@ -80,7 +80,7 @@
 (defun new-appointment-prompt ()
   (new-appointment (mapcar #'parse-integer (parse-input (prompt-read "Enter client IDs, separated by spaces")))
 		   (mapcar #'parse-integer (parse-input (prompt-read "Enter employee IDs, separated by spaces")))
-	           (prompt-read "Room Number")
+	           (parse-integer (prompt-read "Room Number"))
 		   (date-time (parse-date (prompt-read "Date (mm/dd/yyyy)"))
 			      (parse-time (prompt-read "Time (hh:mm) 24 hour time")))
 		   (prompt-read "Duration (minutes)")

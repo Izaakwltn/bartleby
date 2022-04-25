@@ -10,10 +10,12 @@
 		     ("new"    #'new)
 		     ("view"   #'view))) ;delete
 
-(defvar *lists*    '(("clients"         *clients*)
+(defvar *lists*    '(("clients"       *clients*)
 		     ("employees"     *employees*)
-		     ("rooms"          *rooms*)
-		     ("appointments"  *appointments*)))
+		     ("rooms"         *rooms*)
+		     ("appointments"  (sort #'(lambda (dt1 dt2)
+						(later dt1 dt2))
+				       *appointments*))))
 
 ;(defvar *lists* '(("clients"      ;#'(lambda ()
 ;		   (copy-list
