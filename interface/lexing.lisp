@@ -3,34 +3,26 @@
 
 (in-package :bartleby)
 
-(defvar *commands* '(("help"   #'help) ;maybe (help) and then (eval command)
-		     ("edit"   #'edit)
+(defvar *commands* '(("help"   #'help)
 		     ("browse" #'browse)
-		     ("search" #'search)
 		     ("new"    #'new)
-		     ("view"   #'view))) ;delete
+		     ("edit"   #'edit)
+		     ("search" #'search)
+		     ("view"   #'view))) ;delete, check-out
 
 (defvar *lists*    '(("clients"       *clients*)
 		     ("employees"     *employees*)
 		     ("rooms"         *rooms*)
-		     ("appointments"  (sort #'(lambda (dt1 dt2)
-						(later dt1 dt2))
-				       *appointments*))))
+		     ("appointments"  (sort (copy-list *appointments*)
+				       #'(lambda (a1 a2)
+					   (later-date-time-p (dt a1)
+							      (dt a2)))))));;;;fix appointments sort
 
-;(defvar *lists* '(("clients"      ;#'(lambda ()
-;		   (copy-list
-;		    ;*clients*))
-;		  ("employees"   ; #'(lambda ()
-;				      (copy-list *employees*))
-;		  ("rooms"        ;#'(lambda ()
-;				      (copy-list *rooms*))
-;		  ("appointments" ;#'(lambda ()
-;				      (copy-list *appointments*))))
 
 (defvar *objects*   '("client"
 		      "employee"
 		      "room"
-		      "appointment"))
+		      "appointment")) ;receipt, invoice?
 
 ;(defvar *attributes* '(
 
@@ -80,9 +72,10 @@
 	((find-if #'(lambda (tok)
 		     (string-equal token tok))
 		  *objects*)
-	 (make-lexeme "object" (find-if #'(lambda (tok)
-		     (string-equal token tok))
-		  *objects*)))
+	 (make-lexeme "object"
+		      (find-if #'(lambda (tok)
+				   (string-equal token tok))
+			       *objects*)))
 	(t (make-lexeme "keyword" token))))
 
 (defun lex-list (parsed-list)
@@ -91,6 +84,7 @@
 	:collect (lex-token token)))
 
 (defun lex-input (input)
+  "Parses then lexes the input."
   (lex-list (parse-input input)))
 
 (defun prompt-read (prompt)

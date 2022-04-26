@@ -44,6 +44,16 @@
 ;;;;Date Functions
 ;;;;------------------------------------------------------------------------
 
+(defun later-date-p (date1 date2)
+  "Returns t if date1 is later than date2."
+  (cond ((> (y date1) (y date2)) t)
+	((> (y date2) (y date1)) nil)
+	((> (m date1) (m date2)) t)
+	((> (m date2) (m date1)) nil)
+	((> (d date1) (d date2)) t)
+	((> (d date2) (d date1)) nil)
+	(t t)))
+
 (defun later-date (date1 date2)
   "Compares two dates, returns the later date."
   (cond ((> (y date1) (y date2)) date1)
@@ -307,6 +317,14 @@
 (defmethod next-year ((date-time date-time))
   (date-time (next-year (date-o date-time)) (time-o date-time)))
 
+(defun later-date-time-p (dt1 dt2)
+  "Compares two date-times, returns t if the first is later"
+  (if (and (later-date-p (date-o dt1)
+		         (date-o dt2))
+	   (later-time-p (time-o dt1)
+			 (time-o dt2)))
+      t
+      nil))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Week Class

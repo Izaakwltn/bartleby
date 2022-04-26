@@ -31,6 +31,8 @@
 		:components ((:file "lexing")
 	                     (:file "browse")
 			     (:file "new")
+			     (:file "check-out")
+			     (:file "help")
 			     (:file "bartleby")))
 	       (:module "tests"
 		:serial t

@@ -87,11 +87,14 @@
 	  (hourly-rate employee)))
 
 (defun refresh-employee-backup ()
-  (make-backup "employees" *employees*))
+  (make-backup "employees" (sort (copy-list *employees*) #'(lambda (employee1 employee2)
+							     (< (id employee1) (id employee2))))))
 
 (defmethod load-saved-item ((employee employee))
   (push employee *employees*))
 
+(defun update-last-employee-id ()
+  (setq last-client-id (id (first *employees*))))
 ;;;;------------------------------------------------------------------------
 ;;;;Editing one attribute at a time
 ;;;;------------------------------------------------------------------------
@@ -174,7 +177,7 @@
 
 (defvar last-employee-id (if (first *employees*)
 			     (+ (id (first *employees*)) 1)
-			     2001))
+			     2000))
 
 (defun new-employee-id ()
   "Generates a new employee id, updates last-employee-id."
@@ -184,6 +187,7 @@
 (defun new-employee (first-name last-name string-phone string-email address hourly-rate)
   "Generates a a new employee with a new employee id."
   (add-employee (make-employee (new-employee-id) first-name last-name (make-phone-number string-phone) (make-email string-email) address hourly-rate)))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for employees:
 ;;;;------------------------------------------------------------------------

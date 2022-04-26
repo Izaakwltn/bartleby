@@ -172,17 +172,17 @@
 ;;;;Adding new appointments
 ;;;;------------------------------------------------------------------------
 
-(defvar last-app-number (if (first *appointments*)
-				(app-number (first *appointments*))
-				10001))
+(defvar last-app-id (if (first *appointments*)
+			(id (first *appointments*))
+			10000))
 
-(defun new-app-number ()
+(defun new-app-id ()
   "Generates a new appointment number."
-  (setq last-app-number (+ last-app-number 1))
-  last-app-number)
+  (setq last-app-id (+ last-app-id 1))
+  last-app-id)
 
 (defun new-appointment (client-ids employee-ids room-num date-time duration notes)
-  (add-appointment (make-appointment (new-app-number) client-ids employee-ids room-num date-time duration notes)))
+  (add-appointment (make-appointment (new-app-id) client-ids employee-ids room-num date-time duration notes)))
 
 ;example (new-appointment (1002 1003) (2002) 2 (moment 4 20 2022 10 30) 60 "violin")
 
@@ -216,11 +216,14 @@
 	  (write-to-string (notes appointment))))
 
 (defun refresh-appointment-backup ()
-  (make-backup "appointments" *appointments*))
+  (make-backup "appointments" (sort (copy-list *appointments*) #'(lambda (app1 app2)
+								  (< (id app1) (id app2))))))
 
 (defmethod load-saved-item ((appointment appointment))
   (push appointment *appointments*))
 
+(defun update-last-app-number ()
+  (setq last-app-number (id (first *appointments*))))
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments
 ;;;;------------------------------------------------------------------------
@@ -257,8 +260,8 @@
 (defmethod weekly ((appointment appointment) &optional (cut-off 52))
   (loop :with a := appointment
 	  :for i :from 1 :to cut-off
-	  :do (progn (add-appointment (next-week appointment))
-		     (setf a (next-week appointment)))))
+	  :do (progn (add-appointment (next-week a))
+		     (setq a (next-week a)))))
 
 (defmethod monthly ((appointment appointment) &optional (cut-off 12))
   (loop :with a := appointment

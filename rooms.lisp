@@ -120,10 +120,14 @@
 	  (write-to-string (notes meeting-room))))
 
 (defun refresh-room-backup ()
-  (make-backup "rooms" *rooms*))
+  (make-backup "rooms" (sort (copy-list *rooms*) #'(lambda (room1 room2)
+						     (< (id room1) (id room2))))))
 
 (defmethod load-saved-item ((meeting-room meeting-room))
   (push meeting-room *rooms*))
+
+(defun update-last-room-num ()
+  (setq last-room-num (id (first *rooms*))))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for rooms
 ;;;;------------------------------------------------------------------------

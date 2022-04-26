@@ -51,6 +51,14 @@
   (set-time (local-time:timestamp-hour (local-time:now))
 	    (local-time:timestamp-minute (local-time:now))))
 
+(defun later-time-p (time1 time2)
+  "Returns t if time1 is later than time2"
+  (cond ((> (hour time1) (hour time2)) t)
+	((> (hour time2) (hour time1)) nil)
+	((> (minutes time1) (minutes time2)) t)
+	((> (minutes time2) (minutes time1)) nil)
+	(t t)))
+
 (defun later-time (time1 time2)
   "Returns the later of two times."
   (cond ((> (hour time1) (hour time2)) time1)
