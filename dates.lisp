@@ -271,6 +271,9 @@
   (make-instance 'date-time :date-o date
 		            :time-o time))
 
+(defun current-date-time ()
+  (date-time (today) (current-time)))
+
 (defun moment (m d yyyy hour minutes)
   "Simple input for a date and time."
   (date-time (date m d yyyy) (set-time hour minutes)))

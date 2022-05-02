@@ -25,6 +25,7 @@
 	       (:file "backup-of-employees")
 	       (:file "backup-of-rooms")
 	       (:file "backup-of-appointments")
+	       (:file "backup-of-receipts")
 	       (:file "backup-tweaks")
 	       (:module "interface"
 		:serial t

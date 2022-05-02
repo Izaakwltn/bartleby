@@ -97,6 +97,10 @@
   (remove-appointment appointment)
   (add-appointment (make-appointment (id appointment) client-ids employee-ids meeting-room date-time duration notes)))
 
+(defun appointment-id-search (app-id)
+  (find-if #'(lambda (a)
+	       (equal (id a) app-id))
+	   *appointments*))
 ;;;;------------------------------------------------------------------------
 ;;;;Changing one attribute at a time: 
 ;;;;------------------------------------------------------------------------
@@ -228,7 +232,7 @@
 ;;;;Recurring Appointments
 ;;;;------------------------------------------------------------------------
 (defmethod new-date-time ((appointment appointment) new-date-time)
-  (make-appointment (new-app-number)
+  (make-appointment (new-app-id)
 		    (client-ids appointment)
 		    (employee-ids appointment)
 		    (id (meeting-room appointment))
