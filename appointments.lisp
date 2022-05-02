@@ -222,8 +222,8 @@
 (defmethod load-saved-item ((appointment appointment))
   (push appointment *appointments*))
 
-(defun update-last-app-number ()
-  (setq last-app-number (id (first *appointments*))))
+(defun update-last-app-id ()
+  (setq last-app-id (id (first *appointments*))))
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments
 ;;;;------------------------------------------------------------------------

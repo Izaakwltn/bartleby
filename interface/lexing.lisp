@@ -3,12 +3,13 @@
 
 (in-package :bartleby)
 
-(defvar *commands* '(("help"   #'help)
-		     ("browse" #'browse)
-		     ("new"    #'new)
-		     ("edit"   #'edit)
-		     ("search" #'search)
-		     ("view"   #'view))) ;delete, check-out
+(defvar *commands* '(("help"      #'help)
+		     ("browse"    #'browse)
+		     ("new"       #'new)
+		     ("check-out" #'check-out)
+		     ("edit"      #'edit)
+		     ("search"    #'search)
+		     ("view"      #'view))) ;delete, check-out
 
 (defvar *lists*    '(("clients"       *clients*)
 		     ("employees"     *employees*)

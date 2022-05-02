@@ -11,13 +11,21 @@
 ;(defgeneric check-out (object attendance )
  ; (:documentation "Checks out an appointment or an object's appointments"))
 
-(defmethod check-out ((appointment appointment) attendance duration makeup-change notes)
+(defun check-out (&optional appointment)
+  (if appointment
+      (check-out-prompt appointment)
+      (check-out-cycle (let ((id-number (prompt-read "Enter a client or employee-id to check out")))
+	(if (client-id-search id-number)
+	    (client-id-search id-number)
+	    (employee-id-search id-number))))))
+
+(defmethod check-it-out ((appointment appointment) attendance duration makeup-change notes)
   (new-receipt appointment attendance duration makeup-change notes)
   (remove-appointment appointment))
 
 (defmethod check-out-prompt ((appointment appointment))
   (browse-print appointment)
-  (check-out appointment
+  (check-it-out appointment
 	     (parse-integer
 	      (prompt-read
 	       (format nil "Attendance:~%0 Arrived~%1 No Show~%2 Cancelled, Makeup Added~%3 Makeup appointment~%4 Appointment + Makeup")))
@@ -35,5 +43,9 @@
 
 (defmethod check-out-cycle ((client client))
   (loop :for a :in (ready-appointments client)
+	:do (check-out-prompt a)))
+
+(defmethod check-out-cycle ((employee employee))
+  (loop :for a :in (ready-appointments employee)
 	:do (check-out-prompt a)))
 
