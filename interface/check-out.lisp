@@ -35,7 +35,7 @@
 	     (parse-integer (prompt-read "+/- makeup minutes"))
 	     (prompt-read "Notes")))
 
-;;;;;also
+                                                          ;;;;;maybe move to receipts.lisp
 (defmethod undo-receipt ((receipt receipt))
   (add-appointment (appointment receipt))
   (remove-receipt receipt))
