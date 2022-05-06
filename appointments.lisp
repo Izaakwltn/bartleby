@@ -53,7 +53,6 @@
 	      (printable-people employees)
 	      duration
 	      notes))))
-;;;;loop through clients, employees, etc, print list of (id, firstname, lastname) for each
 
 (defun client-list (client-ids)
   (loop :for i :in client-ids
@@ -101,6 +100,7 @@
   (find-if #'(lambda (a)
 	       (equal (id a) app-id))
 	   *appointments*))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Changing one attribute at a time: 
 ;;;;------------------------------------------------------------------------
@@ -188,27 +188,10 @@
 (defun new-appointment (client-ids employee-ids room-num date-time duration notes)
   (add-appointment (make-appointment (new-app-id) client-ids employee-ids room-num date-time duration notes)))
 
-;example (new-appointment (1002 1003) (2002) 2 (moment 4 20 2022 10 30) 60 "violin")
-
 ;;;;------------------------------------------------------------------------
 ;;;;Backing up Appointments
 ;;;;------------------------------------------------------------------------
 
-;;;;figure out backup-units for 
-
-;(defmethod client-ids ((appointment appointment))
- ; "returns client ids for all clients in an appointment"
-  ;(loop :for c :in (clients appointment)
-;	:collect (id c)))
-
-;(defmethod employee-ids ((appointment appointment))
- ; "Returns employee ids for all clients in an appointment."
- ; (loop :for e :in (employees appointment)
-;	:collect (id e)))
-
-;;(defun backup-client-ids (client-ids)
- ; (format nil
-    
 (defmethod backup-unit ((appointment appointment))
   (format nil "(load-saved-item (make-appointment ~a '(~{~a ~}) '(~{~a~}) ~a ~a ~a ~a))"
 	  (id appointment)
@@ -228,6 +211,7 @@
 
 (defun update-last-app-id ()
   (setq last-app-id (id (first *appointments*))))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments
 ;;;;------------------------------------------------------------------------
@@ -285,21 +269,3 @@
 ;;;;
 ;;;;------------------------------------------------------------------------
 
-
-;;;;------------------------------------------------------------------------
-;;;;Checking out Appointments
-;;;;------------------------------------------------------------------------
-
-;(defmethod past-p ((appointment appointment))
- ; "Checks whether an appointment has passed."
-  ;(let ((today (today))
-;	(ct    (current-time)))
- ;   (and (equal-date today (later-date (app-date appointment) today))
-;	 (equal-time ct    (later-time (start-time appointment) ct)))))
-   
-;(defun ready-appointments (employee-id)
- ;   (loop :for a in *appointments*
-  ;        :if (and (equal (employee-id (employee a)) employee-id)
-;		   (past-p a))
-;	    :collect a into apts
-;	  :finally (return apts)))

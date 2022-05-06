@@ -63,6 +63,9 @@
 (defgeneric change-time (object new-time)
   (:documentation "Changes the time of an object"))
 
+(defgeneric change-date-time (object new-date-time)
+  (:documentation "Changes the date-time of an object."))
+
 ;;;;------------------------------------------------------------------------
 ;;;;
 ;;;;------------------------------------------------------------------------

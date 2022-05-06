@@ -27,14 +27,14 @@
 	       (:file "backup-of-appointments")
 	       (:file "backup-of-receipts")
 	       (:file "backup-tweaks")
-	       (:module "interface"
-		:serial t
-		:components ((:file "lexing")
-	                     (:file "browse")
-			     (:file "new")
-			     (:file "check-out")
-			     (:file "help")
-			     (:file "bartleby")))
+	       ;(:module "interface"
+		;:serial t
+		;:components ((:file "lexing")
+	         ;            (:file "browse")
+		;	     (:file "new")
+		;;	     (:file "check-out")
+		;	     (:file "help")
+		;	     (:file "bartleby")))
 	       (:module "tests"
 		:serial t
 		:components ((:file "client-tests")
