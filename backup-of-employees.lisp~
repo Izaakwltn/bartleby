@@ -1,4 +1,0 @@
-;;;;employees
-(in-package :bartleby)
-(load-saved-item (make-employee Joho "Walton" 2002 (make-instance 'phone-number :country 1 :area 404 :middle 387 :end 2185) (make-instance 'email-address :username "izaakviolin" :domain "gmail.com") (make-address 2022 "Johnson Street" " Denver" "Kansas" 90000) 37))
-
