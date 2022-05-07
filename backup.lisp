@@ -23,6 +23,7 @@
 	  :do (format out "~a~%" (backup-unit o)))))
 
 (defun blank-backup (backup-name)
+  "Generates a blank backup to make sure it's there for the .asd"
   (with-open-file (out (asdf:system-relative-pathname "bartleby"
 						      (concatenate 'string
 								   "backup-of-" backup-name ".lisp"))

@@ -9,10 +9,11 @@
   :serial t
   :components ((:file "package")
 	       (:file "system-generics")
+	       (:file "sort")
 	       (:file "backup")
 	       (:file "time")
 	       (:file "dates")
-	       ;(:file "calendar")
+	       ;(:file "calendar") ;;;;maybe later
 	       (:file "contact")
 	       (:file "clients")
 	       (:file "rooms")
@@ -25,15 +26,16 @@
 	       (:file "backup-of-employees")
 	       (:file "backup-of-rooms")
 	       (:file "backup-of-appointments")
+	       (:file "backup-of-receipts")
 	       (:file "backup-tweaks")
-	       (:module "interface"
-		:serial t
-		:components ((:file "lexing")
-	                     (:file "browse")
-			     (:file "new")
-			     (:file "check-out")
-			     (:file "help")
-			     (:file "bartleby")))
+	       ;(:module "interface"
+		;:serial t
+		;:components ((:file "lexing")
+	         ;            (:file "browse")
+		;	     (:file "new")
+		;;	     (:file "check-out")
+		;	     (:file "help")
+		;	     (:file "bartleby")))
 	       (:module "tests"
 		:serial t
 		:components ((:file "client-tests")

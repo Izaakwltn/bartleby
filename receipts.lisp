@@ -74,8 +74,31 @@
 ;;;;------------------------------------------------------------------------
 ;;;;Backing up receipts                                                          ;;;;;like clients, employees etc
 ;;;;------------------------------------------------------------------------
+(defmethod backup-unit ((receipt receipt))
+  (let ((app (appointment receipt)))
+    (format nil "(load-saved-item (make-receipt (make-appointment ~a (quote ~a) (quote ~a) ~a ~a ~a ~a) ~a ~a ~a ~a ~a~%))"
+	    (id            app)
+	    (client-ids    app)
+	    (employee-ids  app)
+	    (id            (meeting-room app))
+	    (backup-unit   (dt app))
+	    (duration      app)
+	    (write-to-string (notes app))
+	    (id            receipt)
+	    (attendance    receipt)
+	    (duration      receipt)
+	    (makeup-change receipt)
+	    (write-to-string (notes         receipt)))))
+
 (defun refresh-receipt-backup ()
-  "Refreshes the receipt backup")
+  (make-backup "receipts" (sort (copy-list *receipts*) #'(lambda (r1 r2)
+							   (< (id r1) (id r2))))))
+
+(defmethod load-saved-item ((receipt receipt))
+  (push receipt *receipts*))
+
+(defun update-last-receipt-id ()
+  (setq last-receipt-id (id (first *receipts*))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;New Receipts
@@ -90,12 +113,18 @@
   last-receipt-id)
 
 (defmethod new-receipt ((appointment appointment) attendance duration makeup-change notes)
-  (add-receipt (make-receipt (new-receipt-id) appointment attendance duration makeup-change notes)))
+  (add-receipt (make-receipt appointment (new-receipt-id) attendance duration makeup-change notes)))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Finding appointments ready for check-out
 ;;;;------------------------------------------------------------------------
 
+(defmethod past-p ((appointment appointment))
+  (if (later-date-time-p (current-date-time)
+			 (dt appointment))
+      t
+      nil))
+			 
 (defgeneric ready-appointments (object)
   (:documentation "Finds all past, unchecked appointments for the given object"))
 
@@ -105,7 +134,7 @@
           :if (and (find-if #'(lambda (e)
 				(equal (id e) (id employee)))
 			    (employees a))
-		   (past-appointment-p a))
+		   (past-p a))
 	    :collect a into apts
 	  :finally (return apts)))
 
@@ -115,14 +144,14 @@
 	:if (and (find-if #'(lambda (c)
 			      (equal (id c) (id client)))
 			  (clients a))
-		 (past-appointment-p a))
+		 (past-p a))
 	  :collect a into apts
 	:finally (return apts)))
 
 (defmethod ready-appointments ((meeting-room meeting-room))
   (loop :for a in *appointments*
 	:if (and (equal (id meeting-room) (id (meeting-room a)))
-		 (past-appointment-p a))
+		 (past-p a))
 	  :collect a into apts
 	:finally (return apts)))
 

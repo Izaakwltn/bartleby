@@ -1,14 +1,16 @@
 ;;;;lexing.lisp
 ;;;;
 
-(in-package :bartleby)
+(in-package :bart)
 
-(defvar *commands* '(("help"   #'help)
-		     ("browse" #'browse)
-		     ("new"    #'new)
-		     ("edit"   #'edit)
-		     ("search" #'search)
-		     ("view"   #'view))) ;delete, check-out
+(defvar *commands* '(("help"      #'help)
+		     ("browse"    #'browse)
+		     ("view"      #'view)
+		     ("new"       #'new)
+		     ("edit"      #'edit)
+		     ("check-out" #'check-out)
+		     ("invoice"   #'invoice)
+		     ("search"    #'search))) ;delete
 
 (defvar *lists*    '(("clients"       *clients*)
 		     ("employees"     *employees*)
@@ -18,13 +20,10 @@
 					   (later-date-time-p (dt a1)
 							      (dt a2)))))));;;;fix appointments sort
 
-
 (defvar *objects*   '("client"
 		      "employee"
 		      "room"
 		      "appointment")) ;receipt, invoice?
-
-;(defvar *attributes* '(
 
 (defun parse-input (input)
   "Parses each token separated by spaces"

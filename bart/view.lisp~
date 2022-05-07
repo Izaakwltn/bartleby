@@ -1,0 +1,13 @@
+;;;;bart/view.lisp
+;;;;
+
+(in-package :bart)
+
+(defun view-prompt ()
+  (write-line "Please enter a client, employee, or appointment ID.")
+  (view (prompt-read "ID")))
+
+(defun view (&optional id)
+  (if id
+      (browse-print (bartleby::id-search id))
+      (view-prompt)))

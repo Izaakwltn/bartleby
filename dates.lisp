@@ -115,6 +115,7 @@
 	   (equal (d date) 29))
       (date 3 1 (+ (y date) 1))
       (date (m date) (d date) (+ (y date) 1))))
+
 ;;;;------------------------------------------------------------------------
 ;;;;Date Calculations
 ;;;;------------------------------------------------------------------------
@@ -269,6 +270,9 @@
 (defun date-time (date time)
   (make-instance 'date-time :date-o date
 		            :time-o time))
+
+(defun current-date-time ()
+  (date-time (today) (current-time)))
 
 (defun moment (m d yyyy hour minutes)
   "Simple input for a date and time."

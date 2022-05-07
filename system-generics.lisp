@@ -5,22 +5,6 @@
 (in-package :bartleby)
 
 ;;;;------------------------------------------------------------------------
-;;;;Sorting
-;;;;------------------------------------------------------------------------
-
-(defun sort-by-first-name (object-list)
-  (sort object-list #'(lambda (o1 o2)
-			(string< (first-name o1) (first-name o2)))))
-
-(defun sort-by-last-name (object-list)
-  (sort object-list #'(lambda (o1 o2)
-			(string< (last-name o1) (last-name o2)))))
-
-(defun sort-by-id (object-list)
-  (sort object-list #'(lambda (o1 o2)
-			(< (id o1) (id o2)))))
-
-;;;;------------------------------------------------------------------------
 ;;;;Changing attributes
 ;;;;------------------------------------------------------------------------
 
@@ -62,6 +46,9 @@
 
 (defgeneric change-time (object new-time)
   (:documentation "Changes the time of an object"))
+
+(defgeneric change-date-time (object new-date-time)
+  (:documentation "Changes the date-time of an object."))
 
 ;;;;------------------------------------------------------------------------
 ;;;;

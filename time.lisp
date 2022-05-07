@@ -59,7 +59,7 @@
 	((> (minutes time2) (minutes time1)) nil)
 	(t t)))
 
-(defun later-time (time1 time2)
+(defun later-time (time1 time2)                  ;;;;maybe remove
   "Returns the later of two times."
   (cond ((> (hour time1) (hour time2)) time1)
 	((> (hour time2) (hour time1)) time2)
@@ -75,10 +75,10 @@
 (defun time-conflict-p (newtime earlytime latetime)
   "Checks whether a new time falls between two other times."
   (cond ((equal-time newtime earlytime) t)
-	((equal-time newtime (later-time newtime latetime)) nil)
-	((equal-time earlytime (later-time newtime earlytime)) nil)
-	((and (equal-time newtime (later-time newtime earlytime))
-	      (equal-time latetime (later-time newtime latetime)))
+	((later-time-p newtime latetime) nil)
+	((later-time-p earlytime newtime) nil)
+	((and (later-time-p newtime earlytime)
+	      (later-time-p latetime newtime))
 	 t)))
 
 ;;;;------------------------------------------------------------------------
