@@ -12,6 +12,7 @@
 	       :components ((:file "package")
 			    (:file "lexing")
 	                    (:file "browse")
+			    (:file "view")
 	                    (:file "new")
 	                    (:file "check-out")
 	                    (:file "help")

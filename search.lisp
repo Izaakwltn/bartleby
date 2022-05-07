@@ -9,18 +9,30 @@
 ;;;one option- parse search input,
 ;;;;if one of the words is "client" "employee" or "appointment" it will only search one of those categories
 
-(defun parse-query (input)
-  "Parses a search query into words."
-  (loop :with parsed       := nil
-	:with current-word := ""
-	
-	:for i :from 1 :to (length input)
-	:if (string-equal (subseq input (- i 1) i) " ")
-	  :do (progn (setq parsed (cons current-word parsed))
-		     (setq current-word ""))
-	:else
-	  :do (setq current-word (concatenate 'string current-word (subseq input (- i 1) i)))
-	:finally (return (reverse parsed))))
+(defun id-search (id)
+  (cond ((client-id-search id)
+	 (client-id-search id))
+	((employee-id-search id)
+	 (employee-id-search id))
+	((appointment-id-search id)
+	 (appointment-id-search id))
+	(t nil)))
+
+
+
+
+;(defun parse-query (input)
+ ; "Parses a search query into words."
+  ;(loop :with parsed       := nil
+;	:with current-word := ""
+;	
+;	:for i :from 1 :to (length input)
+;	:if (string-equal (subseq input (- i 1) i) " ")
+;	  :do (progn (setq parsed (cons current-word parsed))
+;		     (setq current-word ""))
+;	:else
+;	  :do (setq current-word (concatenate 'string current-word (subseq input (- i 1) i)))
+;	:finally (return (reverse parsed))))
 
 
 (defun client-search (input) ;taken as string
