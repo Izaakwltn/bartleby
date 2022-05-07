@@ -14,6 +14,7 @@
 	                    (:file "browse")
 			    (:file "view")
 	                    (:file "new")
+			    (:file "edit")
 	                    (:file "check-out")
 	                    (:file "help")
 	                    (:file "bart")))))

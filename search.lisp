@@ -35,22 +35,22 @@
 ;	:finally (return (reverse parsed))))
 
 
-(defun client-search (input) ;taken as string
-  (loop :for c :in *clients*
-	:if (or (string-equal input (first-name c))
-		(string-equal input (last-name c))
-		(equal (parse-integer input) (id c))
-		(string-equal input (concatenate 'string (area (phone c)) (middle (phone c)) (end (phone c))))
-		(string-equal input (concatenate 'string (username (email c)) (domain (email c))))
-		(equal input (address c))
-		(equal input (credit-minutes c))
-		(string-equal input (notes c)))
-	  :collect c :into results
-	:finally (return results)))
+;(defun client-search (input) ;taken as string
+ ; (loop :for c :in *clients*
+;	:if (or (string-equal input (first-name c))
+;		(string-equal input (last-name c))
+;		(equal (parse-integer input) (id c))
+;		(string-equal input (concatenate 'string (area (phone c)) (middle (phone c)) (end (phone c))));
+;		(string-equal input (concatenate 'string (username (email c)) (domain (email c))))
+;		(equal input (address c))
+;;		(equal input (credit-minutes c))
+;		(string-equal input (notes c)))
+;	  :collect c :into results
+;	:finally (return results)))
 
 (defun date-search (date-string)
   "Searches for a date input as mm/dd/yyyy") ;also make functions for converting Dates to dates
 
 (defun system-search ()
-  "Searches through clients, employees, and relevant appointments."
+  "Searches through clients, employees, and relevant appointments.")
 ;;;;return clients top, employees next, then appointments

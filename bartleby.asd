@@ -10,6 +10,7 @@
   :components ((:file "package")
 	       (:file "system-generics")
 	       (:file "sort")
+	       (:file "search")
 	       (:file "backup")
 	       (:file "time")
 	       (:file "dates")
