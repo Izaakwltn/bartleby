@@ -3,7 +3,16 @@
 
 A scheduling system written in Common Lisp
 
-After loading Bartleby, use (bartleby) to start up the interface.
+Current Features:
+Client/Employee/Room/Appointment generation with backups
+Invoice generation
+Scheduling interface with limited commands (currently BROWSE, VIEW, NEW, EDIT, and CHECKOUT)
+In progress: Availability checking for safe scheduling
+
+## BART Interface
+To use the BART interface, load :bart, otherwise load :bartleby.
+
+In bart, type HELP to see an explanation of commands, and to exit type either QUIT or EXIT.
 
 
 ### Testing
