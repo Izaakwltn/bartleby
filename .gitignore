@@ -7,3 +7,5 @@ backup-of-rooms.lisp
 backup-of-appointments.lisp
 
 *.txt
+
+*~
