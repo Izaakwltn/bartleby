@@ -94,7 +94,9 @@
   (push employee *employees*))
 
 (defun update-last-employee-id ()
-  (setq last-client-id (id (first *employees*))))
+  (if (null *employees*)
+      nil
+      (setq last-client-id (id (first *employees*)))))
 ;;;;------------------------------------------------------------------------
 ;;;;Editing one attribute at a time
 ;;;;------------------------------------------------------------------------

@@ -210,7 +210,8 @@
   (push appointment *appointments*))
 
 (defun update-last-app-id ()
-  (setq last-app-id (id (first *appointments*))))
+  (if (null *appointments*)
+      (setq last-app-id (id (first *appointments*)))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments

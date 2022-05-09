@@ -35,7 +35,7 @@
 		          :street-name   street-name
 			  :city          city
 			  :state         state
-			  :zip-code      zip-code))    
+			  :zip-code      zip-code))    ;this will only be effective with a proper string-reading function
 
 (defmethod backup-unit ((address address))
   (format nil "(make-address ~a ~a ~a ~a ~a)"

@@ -127,7 +127,9 @@
   (push meeting-room *rooms*))
 
 (defun update-last-room-num ()
-  (setq last-room-num (id (first *rooms*))))
+  (if (null *rooms*)
+      nil
+      (setq last-room-num (id (first *rooms*)))))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for rooms
 ;;;;------------------------------------------------------------------------
