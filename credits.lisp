@@ -38,22 +38,38 @@
 			 :orig-appointment orig-appointment
 			 :minutes          minutes))
 
-(defmethod total-credit-minutes ((client client))
-  (loop :for c :in (credits client)
-	:sum (minutes c)))
+
+;(defmethod backup-unit ((credit credit))
+ ; (format nil "(make-credit ~a ~a (client-id-search ~a) (appointment-id-search ~a) ~a ~a)"
+;	  (backup-unit (date-added credit))
+;	  (backup-unit (expiration-date credit))
+;	  (id (client credit))
+;	  (id (orig-appointment credit))
+;	  (minutes credit)))
+  
+;(defmethod total-credit-minutes ((client client))
+ ; (loop :for c :in (credits client)
+;	:sum (minutes c)))
 
 (defvar *standard-expiration-days* 180)
 
-(defmethod add-credit ((client client) date-added minutes &optional expiration-days)
-  (make-credit date-added
-	       client
-               nil
-	       minutes
-	       (if expiration-days
-		   expiration-days
-		   nil)))
+;(defmethod add-credit ((client client) date-added minutes &optional; expiration-days)
+  ;(make-credit date-added
+;	       client
+ ;              nil
+;	       minutes
+;	       (if expiration-days
+;		   expiration-days
+;		   nil)))
 
-(defmethod credit-appointment ((appointment appointment)))
+;(defmethod credit-appointment ((appointment appointment))
+ ; (make-credit (date-o (dt appointment))
+;	       (client appointment)
+;	       appointment
+;	       (duration appointment)
+;	       nil))
+
+
 		 
 			  
 (defvar *all-credits* nil)

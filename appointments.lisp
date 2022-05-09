@@ -96,6 +96,13 @@
   (remove-appointment appointment)
   (add-appointment (make-appointment (id appointment) client-ids employee-ids meeting-room date-time duration notes)))
 
+(defmethod credit-appointment ((appointment appointment))
+  (make-credit (date-o (dt appointment))
+	       (client appointment)
+	       appointment
+	       (duration appointment)
+	       nil))
+
 (defun appointment-id-search (app-id)
   (find-if #'(lambda (a)
 	       (equal (id a) app-id))
@@ -185,6 +192,11 @@
   (setq last-app-id (+ last-app-id 1))
   last-app-id)
 
+(defun update-last-app-id ()
+  (if (null *appointments*)
+      (setq last-app-id 10000)
+      (setq last-app-id (id (first *appointments*)))))
+
 (defun new-appointment (client-ids employee-ids room-num date-time duration notes)
   (add-appointment (make-appointment (new-app-id) client-ids employee-ids room-num date-time duration notes)))
 
@@ -208,10 +220,6 @@
 
 (defmethod load-saved-item ((appointment appointment))
   (push appointment *appointments*))
-
-(defun update-last-app-id ()
-  (if (null *appointments*)
-      (setq last-app-id (id (first *appointments*)))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Recurring Appointments

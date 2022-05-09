@@ -16,6 +16,7 @@
 	       (:file "dates")
 	       ;(:file "calendar") ;;;;maybe later
 	       (:file "contact")
+	       (:file "credits")
 	       (:file "clients")
 	       (:file "rooms")
 	       (:file "employees")

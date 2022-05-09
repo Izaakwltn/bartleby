@@ -184,15 +184,24 @@
 ;;;;------------------------------------------------------------------------
 					;offer sql option asap
 
+(defmethod backup-unit ((credit credit))
+  (format nil "(make-credit ~a ~a (client-id-search ~a) (appointment-id-search ~a) ~a ~a)"
+	  (backup-unit (date-added credit))
+	  (backup-unit (expiration-date credit))
+	  (id (client credit))
+	  (id (orig-appointment credit))
+	  (minutes credit)))
+
 (defmethod backup-unit ((client client))
   (format nil "(load-saved-item (make-client ~a ~a ~a ~a ~a ~a ~a ~a))~%"
+	  (id client)
 	  (write-to-string (first-name client))
 	  (write-to-string (last-name client))
 	  (id client)
 	  (credit-minutes client)
 	  (backup-unit (phone client))
 	  (backup-unit (email client))
-	  (backup-unit (address client))
+	  (backup-unit (credits client))
 	  (write-to-string (notes client))))
 
 (defun refresh-client-backup ()
@@ -210,6 +219,22 @@
 ;;;;------------------------------------------------------------------------
 ;;;;Credit Minutes            ----maybe this should be with receipts, or at least used there
 ;;;;------------------------------------------------------------------------
+
+(defmethod total-credit-minutes ((client client))
+  (loop :for c :in (credits client)
+	:sum (minutes c)))
+
+
+(defmethod add-credit ((client client) date-added minutes &optional expiration-days)
+  (make-credit date-added
+	       client
+               nil
+	       minutes
+	       (if expiration-days
+		   expiration-days
+		   nil)))
+
+
 
 (defmethod change-credits    ((client client) credits)
   "Changes the credit minutes of a client"
