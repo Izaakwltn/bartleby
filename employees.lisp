@@ -18,10 +18,12 @@
 		:accessor phone)
    (email       :initarg :email
 		:accessor email)
-   (address     :initarg :address
-		:accessor address)
+   ;(address     :initarg :address
+;		:accessor address)
    (hourly-rate :initarg :hourly-rate
-		:accessor hourly-rate)))
+		:accessor hourly-rate)
+   (notes       :initarg :notes
+		:accessor notes)))
 					;maybe assigned room, can be nil
 ;add notes
 
@@ -32,20 +34,20 @@
 		     (last-name last-name)
 		     (phone phone)
 		     (email email)
-		     (address   address)
-		     (hourly-rate hourly-rate))
+		     (hourly-rate hourly-rate)
+		     (notes notes))
 	obj
       (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%~a~%~a~%~a~%Rate: $~a/hr~%"
-	      id first-name last-name phone email address hourly-rate))))
+	      id first-name last-name phone email hourly-rate notes))))
 
-(defun make-employee (id first-name last-name phone email address hourly-rate)
+(defun make-employee (id first-name last-name phone email hourly-rate notes)
   (make-instance 'employee :id          id
 		           :first-name  first-name
          		   :last-name   last-name
 			   :phone       phone
 			   :email       email
-			   :address     address
-			   :hourly-rate hourly-rate))
+			   :hourly-rate hourly-rate
+			   :notes       notes))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding to, removing from, and editing *clients*
@@ -83,8 +85,8 @@
 	  (write-to-string (last-name employee))
 	  (backup-unit (phone employee))
 	  (backup-unit (email employee))
-	  (backup-unit (address employee))
-	  (hourly-rate employee)))
+	  (hourly-rate employee)
+	  (write-to-string (notes employee))))
 
 (defun refresh-employee-backup ()
   (make-backup "employees" (sort (copy-list *employees*) #'(lambda (employee1 employee2)
@@ -102,67 +104,76 @@
 ;;;;------------------------------------------------------------------------
 
 (defmethod change-first-name ((employee employee) first-name)
-  (replace-employee employee (make-employee first-name
+  (replace-employee employee (make-employee (id employee)
+					    first-name
 					    (last-name employee)
-					    (id employee)
 					    (phone employee)
 					    (email employee)
-					    (address employee)
-					    (hourly-rate employee))))
+					    (hourly-rate employee)
+					    (notes employee))))
 
 (defmethod change-last-name ((employee employee) last-name)
-  (replace-employee employee (make-employee (first-name employee)
+  (replace-employee employee (make-employee (id employee)
+					    (first-name employee)
 					    last-name
-					    (id employee)
 					    (phone employee)
 					    (email employee)
-					    (address employee)
-					    (hourly-rate employee))))
+					    (hourly-rate employee)
+					    (notes       employee))))
 
 (defmethod change-id ((employee employee) id)
-  (replace-employee employee (make-employee (first-name employee)
+  (replace-employee employee (make-employee id
+					    (first-name employee)
 					    (last-name employee)
-					    id
 					    (phone employee)
 					    (email employee)
-					    (address employee)
-					    (hourly-rate employee))))
+					    (hourly-rate employee)
+					    (notes       employee))))
 
 (defmethod change-phone ((employee employee) phone)
-  (replace-employee employee (make-employee (first-name employee)
+  (replace-employee employee (make-employee (id employee)
+					    (first-name employee)
 					    (last-name employee)
-					    (id employee)
 					    phone
 					    (email employee)
-					    (address employee)
-					    (hourly-rate employee))))
+					    (hourly-rate employee)
+					    (notes employee))))
 
 (defmethod change-email ((employee employee) email)
-  (replace-employee employee (make-employee (first-name employee)
+  (replace-employee employee (make-employee (id employee)
+					    (first-name employee)
 					    (last-name employee)
-					    (id employee)
 					    (phone employee)
 					    email
-					    (address employee)
-					    (hourly-rate employee))))
+					    (hourly-rate employee)
+					    (notes       employee))))
 
-(defmethod change-address ((employee employee) address)
-  (replace-employee employee (make-employee (first-name employee)
-					    (last-name employee)
-					    (id employee)
-					    (phone employee)
-					    (email employee)
-					    address
-					    (hourly-rate employee))))
+;(defmethod change-address ((employee employee) address)
+ ; (replace-employee employee (make-employee (first-name employee)
+;					    (last-name employee)
+;					    (id employee)
+;					    (phone employee)
+;					    (email employee)
+;					    address
+;					    (hourly-rate employee))))
 
 (defmethod change-hourly ((employee employee) hourly-rate)
-  (replace-employee employee (make-employee (first-name employee)
+  (replace-employee employee (make-employee (id employee)
+					    (first-name employee)
 					    (last-name employee)
-					    (id employee)
 					    (phone employee)
 					    (email employee)
-					    (address employee)
-					    hourly-rate)))
+					    hourly-rate
+					    (notes employee))))
+
+(defmethod change-notes ((employee employee) notes)
+  (replace-employee employee (make-employee (id employee)
+					    (first-name employee)
+					    (last-name employee)
+					    (phone employee)
+					    (email employee)
+					    (hourly-rate employee)
+					    notes)))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding New Employees
@@ -172,8 +183,8 @@
   (make-employee 2001 "Izaak" "Walton"
 		 (make-phone-number "4043872185")
 		 (make-email "izaakviolin@gmail.com")
-		 (random-address)
-		 37))
+		 37
+		 "A Teacher"))
 
 ;(add-employee izaak)
 
@@ -186,9 +197,9 @@
   (setq last-employee-id (+ last-employee-id 1))
   last-employee-id)
 
-(defun new-employee (first-name last-name string-phone string-email address hourly-rate)
+(defun new-employee (first-name last-name string-phone string-email hourly-rate notes)
   "Generates a a new employee with a new employee id."
-  (add-employee (make-employee (new-employee-id) first-name last-name (make-phone-number string-phone) (make-email string-email) address hourly-rate)))
+  (add-employee (make-employee (new-employee-id) first-name last-name (make-phone-number string-phone) (make-email string-email) hourly-rate notes)))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for employees:

@@ -23,7 +23,7 @@
 	       (:file "appointments")
 	       (:file "availability") 
 	       (:file "receipts")
-	       (:file "invoices")
+	       (:file "invoices") ;add check-out.lisp
 	       (:file "backup-of-clients")
 	       (:file "backup-of-employees")
 	       (:file "backup-of-rooms")

@@ -18,7 +18,7 @@
    (email          :initarg :email
 		   :accessor email)
    ;(address        :initarg :address
-;		   :accessor address) ;;;;to be added back when brave
+;		   :accessor address) ;;;;to be added back when brave, or figure out ways to accomodate nil
    (credits        :initarg :credits
 		   :accessor credits)
    (notes          :initarg :notes
@@ -82,9 +82,9 @@
   (replace-client client (make-client (id client)
 				      first-name
 				      (last-name client)
-       				      (credits client)
 				      (phone     client)
 				      (email     client)
+				      (credits client)
 	    			      (notes     client))))
 
 (defmethod change-last-name ((client client) last-name)
@@ -92,19 +92,19 @@
   (replace-client client (make-client (id client)
 				      (first-name client)
 				      last-name
-				      (credits    client)
 				      (phone      client)
 				      (email      client)
+				      (credits client)
 				      (notes      client))))
 
 (defmethod change-id ((client client) client-id)
   "Changes the client ID of a client"
   (replace-client client (make-client id
 				      (first-name client)
-				      (last-name  client) 
-				      (credits    client)
+				      (last-name  client)
 				      (phone      client)
 				      (email      client)
+				      (credits client)
 				      (notes      client))))
 
 (defmethod change-phone ((client client) new-phone)
@@ -112,9 +112,9 @@
   (replace-client client (make-client (id         client)
 				      (first-name client)
  				      (last-name  client)
-				      (credits    client)
 				      new-phone
 				      (email      client)
+				      (credits client)
 				      (notes      client))))
 
 (defmethod change-email ((client client) email)
@@ -125,6 +125,7 @@
 				      (credits    client)
 				      (phone      client)
 				      email
+				      (credits client)
 				      (notes      client))))
 
 ;(defmethod change-address ((client client) address)
@@ -143,9 +144,9 @@
   (replace-client client (make-client (id             client)
 				      (first-name     client)
  				      (last-name      client)
-				      (credits client)
 				      (phone          client)
 				      (email          client)
+				      (credits client)
 				      notes)))
 
 ;;;;------------------------------------------------------------------------
@@ -238,13 +239,12 @@
 
 (defmethod change-credits    ((client client) credits)
   "Changes the credit minutes of a client"
-  (replace-client client (make-client (first-name client)
+  (replace-client client (make-client (id client)
+				      (first-name client)
 				      (last-name client)
-				      (id client)
-				      credits
 				      (phone     client)
 				      (email     client)
-				      (address   client)
+				      (credits client)
 				      (notes     client))))
 
 (defmethod add-credits ((client client) new-credits)
