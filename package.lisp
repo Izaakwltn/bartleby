@@ -4,10 +4,7 @@
   (:use #:cl)
 
   ;system-generics.lisp
-  (:export #:sort-by-first-name
-	   #:sort-by-last-name
-	   #:sort-by-id
-	   #:change-first-name
+  (:export #:change-first-name
 	   #:change-last-name
 	   #:change-id
 	   #:change-credits
