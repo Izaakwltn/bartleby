@@ -1,10 +1,10 @@
-;;;;time.lisp
+;;;; time.lisp
+;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Set-time class
-;;;;------------------------------------------------------------------------
+;;; Set-time class
 
 (defclass set-time ()
   ((hour    :initarg :hour
@@ -59,7 +59,7 @@
 	((> (minutes time2) (minutes time1)) nil)
 	(t t)))
 
-(defun later-time (time1 time2)                  ;;;;maybe remove
+(defun later-time (time1 time2)                
   "Returns the later of two times."
   (cond ((> (hour time1) (hour time2)) time1)
 	((> (hour time2) (hour time1)) time2)
@@ -80,7 +80,3 @@
 	((and (later-time-p newtime earlytime)
 	      (later-time-p latetime newtime))
 	 t)))
-
-;;;;------------------------------------------------------------------------
-;;;;
-;;;;------------------------------------------------------------------------

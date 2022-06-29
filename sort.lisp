@@ -1,11 +1,8 @@
-;;;;sort.lisp
+;;;; sort.lisp
 ;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
-
-;;;;------------------------------------------------------------------------
-;;;;
-;;;;------------------------------------------------------------------------
 
 (defun first-name-sort (object-list)
   (sort (copy-list object-list) #'(lambda (o1 o2)

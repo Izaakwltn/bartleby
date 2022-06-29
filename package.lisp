@@ -1,9 +1,11 @@
-;;;;package.lisp
+;;;; package.lisp
+;;;;
+;;;; Copyright (c) Izaak Walton 2022
 
 (defpackage #:bartleby
   (:use #:cl)
 
-  ;system-generics.lisp
+  ;;; system-generics.lisp
   (:export #:change-first-name
 	   #:change-last-name
 	   #:change-id
@@ -20,13 +22,13 @@
 	   #:change-date-time
 	   #:backup-unit)
 
-  ;backup.lisp
+  ;;; backup.lisp
   (:export #:backup-unit
 	   #:make-backup
 	   #:blank-backup
 	   #:load-saved-item)
 	   
-  ;time.lisp
+  ;;; time.lisp
   (:export #:set-time 
 	   #:add-time
 	   #:current-time
@@ -34,7 +36,7 @@
 	   #:equal-time
 	   #:time-conflict-p)
   
-  ;dates.lisp
+  ;;; dates.lisp
   (:export #:date ;class and function
 	   #:later-date-p
 	   #:equal-date
@@ -64,7 +66,7 @@
 	   #:last-month
 	   #:next-month)
 
-  ;contact.lisp
+  ;;; contact.lisp
   (:export #:address
 	   #:make-address
 	   #:random-address
@@ -78,7 +80,7 @@
 	   #:make-email
 	   #:auto-email)
 
-  ;clients.lisp
+  ;;; clients.lisp
   (:export #:client
 	   #:make-client
 	   #:*clients*
@@ -101,7 +103,7 @@
 	   #:first-name-search
 	   #:full-name-search)
 
-  ;rooms.lisp
+  ;;; rooms.lisp
   (:export #:meeting-room
 	   #:make-room
 	   #:*rooms*
@@ -119,7 +121,7 @@
 	   #:random-room
 	   #:generate-rooms)
   
-  ;employees.lisp
+  ;;; employees.lisp
   (:export #:employee
 	   #:make-employee
 	   #:*employees*
@@ -132,7 +134,7 @@
 	   
 	   #:employee-id-search) ;;;;move to search.lisp
   
-  ;appointments.lisp
+  ;;; appointments.lisp
   (:export #:appointment
 	   #:printable-people
 	   #:make-appointment
@@ -152,7 +154,7 @@
 	   )
 	   ;#:past-p)
 
-  ;availability.lisp
+  ;;; availability.lisp
   (:export #:appointments
 	   #:block-off
 	   #:overlap-p
@@ -160,7 +162,7 @@
 	   #:availability-cycle
 	   #:available-slots)
 
-  ;receipts.lisp
+  ;;; receipts.lisp
   (:export #:*receipts*
 	   #:receipt
 	   #:make-receipt
@@ -176,7 +178,7 @@
 	   #:ready-appointments
 	   #:month-appointments)
 
-  ;invoices.lisp
+  ;;; invoices.lisp
   (:export #:invoice
 	   #:draft-invoice
 	   

@@ -1,11 +1,13 @@
-;;;bartleby.asd
+;;;; bartleby.asd
+;;;;
+;;;;Copyright Izaak Walton (c) 2022
 
 (asdf:defsystem #:bartleby
   :version "0.0.1"
   :author "Izaak Walton <izaakw@protonmail.com>"
   :license "GNU General Purpose License"
   :description "Scheduling System"
-  :depends-on ("local-time")
+  :depends-on ("local-time" "mito")
   :serial t
   :components ((:file "package")
 	       (:file "system-generics")

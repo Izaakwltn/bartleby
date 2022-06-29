@@ -24,6 +24,12 @@
    (notes          :initarg :notes
 		   :accessor notes)))
 
+(mito:deftable client ()
+  ((id :col-type (:int))
+   (first-name :col-type (:varchar 64))
+   (last-name :col-type (:varchar 64))
+   (phone     :col-type (:int 64) ;;;;can I make a special type?
+
 (defmethod print-object ((obj client) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((first-name first-name)

@@ -1,10 +1,15 @@
-;;;;backup.lisp
+;;;; backup.lisp
+;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Functions for backing up
-;;;;------------------------------------------------------------------------
+;;; Functions for backing up
+
+(defvar *use-mito* nil) ;options for (if *use-mito* (mito-process...))
+
+(defun connect-mysql (database-name username password)
+  (mito:connect-toplevel :mysql :database-name database-name :username username :password password))
 
 (defgeneric backup-unit (object)
   (:documentation "Prepares an object for backup."))

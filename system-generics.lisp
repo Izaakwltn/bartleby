@@ -1,12 +1,10 @@
-;;;;system-generics.lisp
+;;;; system-generics.lisp
 ;;;;
-;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Changing attributes
-;;;;------------------------------------------------------------------------
+;;;Changing attributes
 
 (defgeneric change-first-name (object first-name)
   (:documentation "Change the first name of the object"))
@@ -49,8 +47,3 @@
 
 (defgeneric change-date-time (object new-date-time)
   (:documentation "Changes the date-time of an object."))
-
-;;;;------------------------------------------------------------------------
-;;;;
-;;;;------------------------------------------------------------------------
-

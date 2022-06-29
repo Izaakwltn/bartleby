@@ -1,13 +1,13 @@
-;;;;search.lisp
+;;;; search.lisp
+;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Search methods
-;;;;------------------------------------------------------------------------
+;;;Search methods
 
-;;;one option- parse search input,
-;;;;if one of the words is "client" "employee" or "appointment" it will only search one of those categories
+;;; one option- parse search input,
+;;; if one of the words is "client" "employee" or "appointment" it will only search one of those categories
 
 (defun id-search (id)
   (cond ((client-id-search id)
