@@ -1,116 +1,66 @@
-;;;;employees.lisp
+;;;; employees.lisp
 ;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Employee class
-;;;;------------------------------------------------------------------------
+;;; Employee class/sql object
 
-(defclass employee ()
-  ((id          :initarg :id
-		:accessor id)
-   (first-name  :initarg :first-name
-		:accessor first-name)
-   (last-name   :initarg :last-name
-		:accessor last-name)
-   (phone       :initarg :phone
-		:accessor phone)
-   (email       :initarg :email
-		:accessor email)
-   ;(address     :initarg :address
-;		:accessor address)
-   (hourly-rate :initarg :hourly-rate
-		:accessor hourly-rate)
-   (notes       :initarg :notes
-		:accessor notes)))
-					;maybe assigned room, can be nil
-;add notes
+(mito:deftable employee ()
+  ((first-name  :col-type (:varchar 64))
+   (last-name   :col-type (:varchar 64))
+   (phone       :col-type (or (:char 10) :null))
+   (email       :col-type (or (:varchar 64) :null))
+   (address     :col-type (or (:varchar 100) :null))
+   (hourly-rate :col-type (:int))
+   (notes       :col-type (or (:varchar 128) :null))))
+
+(mito:ensure-table-exists 'employee)
 
 (defmethod print-object ((obj employee) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((id id)
-		     (first-name first-name)
+    (with-accessors ((first-name first-name)
 		     (last-name last-name)
 		     (phone phone)
 		     (email email)
+		     (address address)
 		     (hourly-rate hourly-rate)
 		     (notes notes))
 	obj
       (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%~a~%~a~%~a~%Rate: $~a/hr~%"
-	      id first-name last-name phone email hourly-rate notes))))
+	      first-name last-name phone email address hourly-rate notes))))
 
-(defun make-employee (id first-name last-name phone email hourly-rate notes)
-  (make-instance 'employee :id          id
-		           :first-name  first-name
+(defun make-employee (first-name last-name phone email hourly-rate notes)
+  (make-instance 'employee :first-name  first-name
          		   :last-name   last-name
 			   :phone       phone
 			   :email       email
+			   :address     address
 			   :hourly-rate hourly-rate
 			   :notes       notes))
 
-;;;;------------------------------------------------------------------------
-;;;;Adding to, removing from, and editing *clients*
-;;;;------------------------------------------------------------------------
-
-(defvar *employees* nil)
-
-(defvar *employee-backup* nil)
+;;; Adding and removing employees
 
 (defmethod add-employee ((employee employee))
-  "Adds an employee to *employees*"
-  (push employee *employees*)
-  (refresh-employee-backup))
+  (mito:insert-dao employee))
+
+;(defmethod new-employee (first-name last-name phone email address hourly-rate notes)
+ ; (mito:create-dao (make-employee first-name last-name phone email address hourly-rate notes)))
 
 (defmethod remove-employee ((employee employee))
-  "Removes an employee from *employees*"
-  (setq *employees* (remove-if #'(lambda (e)
-		 (equal (id employee) (id e)))
-			       *employees*))
-  (refresh-employee-backup))
+  "Removes the employee from the Employee sql table"
+  (mito:delete-dao employee))
 
 (defmethod replace-employee ((employee employee) new-employee)
   "Replaces an existing employee with a new-employee in its place."
   (remove-employee employee)
   (add-employee new-employee))
 
-;;;;------------------------------------------------------------------------
-;;;;Backing up employees
-;;;;------------------------------------------------------------------------
-
-(defmethod backup-unit ((employee employee))
-  (format nil "(load-saved-item (make-employee ~a ~a ~a ~a ~a ~a ~a))~%"
-	  (id employee)
-	  (write-to-string (first-name employee))
-	  (write-to-string (last-name employee))
-	  (backup-unit (phone employee))
-	  (backup-unit (email employee))
-	  (hourly-rate employee)
-	  (write-to-string (notes employee))))
-
-(defun refresh-employee-backup ()
-  (make-backup "employees" (sort (copy-list *employees*) #'(lambda (employee1 employee2)
-							     (< (id employee1) (id employee2))))))
-
-(defmethod load-saved-item ((employee employee))
-  (push employee *employees*))
-
-(defun update-last-employee-id ()
-  (if (null *employees*)
-      nil
-      (setq last-client-id (id (first *employees*)))))
-;;;;------------------------------------------------------------------------
-;;;;Editing one attribute at a time
-;;;;------------------------------------------------------------------------
+;;; Editing one attribute at a time
 
 (defmethod change-first-name ((employee employee) first-name)
-  (replace-employee employee (make-employee (id employee)
-					    first-name
-					    (last-name employee)
-					    (phone employee)
-					    (email employee)
-					    (hourly-rate employee)
-					    (notes employee))))
+  (setf (slot-value employee 'first-name) first-name)
+  (mito:save-dao employee))
 
 (defmethod change-last-name ((employee employee) last-name)
   (replace-employee employee (make-employee (id employee)

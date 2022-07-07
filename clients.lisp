@@ -14,6 +14,8 @@
    (notes      :col-type (or (:varchar 128) :null)))
   (:conc-name client-))
 
+(mito:ensure-table-exists 'client)
+
 (defmethod print-object ((obj client) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((first-name client-first-name)
@@ -28,8 +30,6 @@
 	      "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Credit Minutes: ~a~%Notes: ~a~%"
 	      first-name last-name phone email address credits notes))))
 
-(mito:ensure-table-exists 'client)
-
 (defun make-client (first-name last-name phone email address credits notes)
   (make-instance 'client :first-name first-name
                          :last-name  last-name
@@ -39,22 +39,14 @@
                          :credits    credits
                          :notes      notes))
 
-(defun new-client (first-name last-name phone email address notes)
-  (mito:create-dao (make-client first-name last-name phone email address 0 notes)))
+;;; Adding and removing clients
 
 (defmethod add-client ((client client))
   (mito:insert-dao client))
 
-;;;;------------------------------------------------------------------------
-;;;Adding to, removing from, and editing *clients*
-;;;;------------------------------------------------------------------------
+(defun new-client (first-name last-name phone email address notes)
+  (mito:create-dao (make-client first-name last-name phone email address 0 notes)))
 
-(defvar *clients* nil)
-
-;(defmethod add-client ((client client))
- ; "Add a client to *clients*"
-  ;(push client *clients*)
- ; (refresh-client-backup))
 
 (defmethod remove-client ((client client))
   "Removes the client from the Client sql table"

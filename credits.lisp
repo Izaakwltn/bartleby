@@ -3,18 +3,19 @@
 (in-package :bartleby)
 
 (mito:deftable credit ()
-  ((date :col-type (:date)
-(defclass credit ()
-  ((date-added       :initarg :date-added
-	             :accessor date-added)
-   (expiration-date  :initarg :expiration-date
-		     :accessor expiration-date)
-   (client           :initarg :client
-		     :accessor client)
-   (orig-appointment :initarg :orig-appointment
-		     :accessor orig-appointment)
-   (minutes          :initarg :minutes
-		     :accessor minutes)))
+  ((date :col-type (:date))))
+
+;(defclass credit ()
+ ; ((date-added       :initarg :date-added
+;	             :accessor date-added)
+ ;  (expiration-date  :initarg :expiration-date
+;		     :accessor expiration-date)
+ ;  (client           :initarg :client
+;		     :accessor client)
+ ;  (orig-appointment :initarg :orig-appointment
+;		     :accessor orig-appointment)
+ ;  (minutes          :initarg :minutes
+;		     :accessor minutes)))
 
 (defmethod print-object ((obj credit) stream)
   (print-unreadable-object (obj stream :type t)
