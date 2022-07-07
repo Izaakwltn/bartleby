@@ -4,6 +4,10 @@
 
 (in-package :bartleby)
 
+;;; SQL compatibility:
+
+(defgeneric sql-print (object)
+  (:documentation "Prints an sql compatible form of the object.")
 ;;;Changing attributes
 
 (defgeneric change-first-name (object first-name)

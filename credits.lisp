@@ -2,6 +2,8 @@
 
 (in-package :bartleby)
 
+(mito:deftable credit ()
+  ((date :col-type (:date)
 (defclass credit ()
   ((date-added       :initarg :date-added
 	             :accessor date-added)

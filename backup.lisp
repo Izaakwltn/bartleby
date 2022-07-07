@@ -6,10 +6,20 @@
 
 ;;; Functions for backing up
 
+;;;-Maybe new file for sql/mito functions
+
 (defvar *use-mito* nil) ;options for (if *use-mito* (mito-process...))
 
 (defun connect-mysql (database-name username password)
   (mito:connect-toplevel :mysql :database-name database-name :username username :password password))
+
+(defun connect-postgres (database-name username password)
+  (mito:connect-toplevel :postgres :database-name database-name :username username :password password))
+
+(defun bartleby-connect ()
+  (connect-postgres "bartleby" "izaak" "johann-sebastian-bach"))
+
+(bartleby-connect)
 
 (defgeneric backup-unit (object)
   (:documentation "Prepares an object for backup."))

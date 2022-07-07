@@ -28,6 +28,12 @@
 	      (number-suffix d)
 	      y))))
 
+(defmethod sql-print ((obj date))
+  (let ((parsed-year (y obj))
+        (parsed-month (m obj))
+        (parsed-day (d obj)))
+    (format nil "~a-~a-~a" parsed-year parsed-month parsed-day)))
+
 (defun date (m d y)
   (make-instance 'date :m m
 		       :d d
@@ -251,75 +257,83 @@
   (next-day (today)))
 
 ;;;;------------------------------------------------------------------------
-;;;;Date Time
+;;; Timestamps
 ;;;;------------------------------------------------------------------------
 
-(defclass date-time ()
-  ((date-o   :initarg :date-o
+(defclass timestamp ()
+  ((date-o :initarg :date-o
 	   :accessor date-o)
    (time-o :initarg :time-o
 	   :accessor time-o)))
 
-(defmethod print-object ((obj date-time) stream)
+(defmethod print-object ((obj timestamp) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((date-o date-o)
 		     (time-o time-o))
 	obj
       (format stream "~a ~a" date-o time-o))))
 
-(defun date-time (date time)
+(defmethod sql-print ((obj timestamp))
+  (let ((parsed-year (y (date-o obj)))
+        (parsed-month (m (date-o obj)))
+        (parsed-day (d (date-o obj)))
+        (parsed-hour (hour (time-o obj)))
+        (parsed-minute (minutes (time-o obj))))
+    (format nil "~a-~a-~a ~a:~a:00" parsed-year parsed-month parsed-day parsed-hour parsed-minute)))
+
+(defun timestamp (date time)
   (make-instance 'date-time :date-o date
 		            :time-o time))
 
-(defun current-date-time ()
+(defun current-timestamp ()
   (date-time (today) (current-time)))
 
 (defun moment (m d yyyy hour minutes)
   "Simple input for a date and time."
-  (date-time (date m d yyyy) (set-time hour minutes)))
+  (timestamp (date m d yyyy) (set-time hour minutes)))
 
-(defmethod backup-unit ((date-time date-time))
-  (let ((cd (date-o date-time))
-	(ct (time-o date-time)))
-    (format nil "(date-time (date ~a ~a ~a) (set-time ~a ~a))"
-	    (m cd)
-	    (d cd)
-	    (y cd)
-	    (hour ct)
-	    (minutes ct))))
+;(defmethod backup-unit ((timestamp timestamp))
+ ; (let ((cd (date-o timestamp))
+;	(ct (time-o timestamp)))
+ ;   (format nil "(date-time (date ~a ~a ~a) (set-time ~a ~a))"
+;	    (m cd)
+;	    (d cd)
+;	    (y cd)
+;	    (hour ct)
+;	    (minutes ct))))
 
-(defmethod add-days ((date-time date-time) days)
+(defmethod add-days ((timestamp timestamp) days)
   "Adds a specified number of dates to the given date-time"
-  (date-time (add-days (date-o date-time) days) (time-o date-time)))
+  (timestamp (add-days (timestamp timestamp) days) (time-o timestamp)))
 
-(defmethod add-time ((date-time date-time) minutes)
+(defmethod add-time ((timestamp timestamp) minutes)
   "Adds minutes to a date-time"
-  (let ((ct (time-o date-time))
-	(cd (date-o date-time)))
-    (cond ((zerop minutes) date-time)
+  (let ((ct (time-o timestamp))
+	(cd (date-o timestamp)))
+    (cond ((zerop minutes) timestamp)
  	  ((and (equal (minutes ct) 59)
 	        (equal (hour ct) 23))
-	   (add-time (date-time (add-days cd 1) (add-time ct 1))
+	   (add-time (timestamp (add-days cd 1) (add-time ct 1))
 		     (- minutes 1)))
 	  ((equal (minutes ct) 59)
-	   (add-time (date-time cd (add-time ct 1)) (- minutes 1)))
-	  (t (add-time (date-time cd (add-time ct 1)) (- minutes 1))))))
+	   (add-time (timestamp cd (add-time ct 1)) (- minutes 1)))
+	  (t (add-time (timestamp cd (add-time ct 1)) (- minutes 1))))))
 
-(defmethod next-day ((date-time date-time))
-  (date-time (add-days date-time 1)))
+(defmethod next-day ((timestamp timestamp))
+  (timestamp (add-days timestamp1)))
 
-(defmethod change-date ((date-time date-time) new-date)
-  (date-time new-date
-	     (time-o date-time)))
+(defmethod change-date ((timestamp timestamp) new-date)
+  (timestamp new-date
+	     (time-o timestamp)))
 
-(defmethod change-time ((date-time date-time) new-time)
-  (date-time (date-o date-time)
+(defmethod change-time ((timestamp timestamp) new-time)
+  (timestamp (date-o timestamp)
 	     new-time))
 
 (defvar *midnight* (set-time 24 0))
 
-(defmethod next-year ((date-time date-time))
-  (date-time (next-year (date-o date-time)) (time-o date-time)))
+(defmethod next-year ((timestamp timestamp))
+  (timestamp (next-year (date-o timestamp)) (time-o timestamp)))
 
 (defun later-date-time-p (dt1 dt2)
   "Compares two date-times, returns t if the first is later"
@@ -368,8 +382,8 @@
 (defmethod last-week ((date date))
   (week (sub-days date 7)))
 
-(defmethod last-week ((date-time date-time))
-  (week (sub-days (date-o date-time) 7)))
+(defmethod last-week ((timestamp timestamp))
+  (week (sub-days (date-o timestamp) 7)))
 
 (defmethod last-week ((week week))
   (last-week (first (days week))))
@@ -382,8 +396,8 @@
 (defmethod next-week ((date date))
   (week (add-days date 7)))
 
-(defmethod next-week ((date-time date-time))
-  (week (add-days (date-o date-time) 7)))
+(defmethod next-week ((timestamp timestamp))
+  (week (add-days (date-o timestamp) 7)))
 
 (defmethod next-week ((week week))
   (next-week (first (days week))))

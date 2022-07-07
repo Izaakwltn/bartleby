@@ -24,6 +24,7 @@
 		  minutes)
 	      (if (> hour 12) "pm" "am")))))
 
+
 (defun set-time (hour minutes)
   (make-instance 'set-time :hour hour
 		           :minutes minutes))

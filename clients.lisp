@@ -2,77 +2,63 @@
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Clients
-;;;;------------------------------------------------------------------------
-
-(defclass client ()
-  ((id             :initarg :id
-		   :accessor id)
-   (first-name     :initarg :first-name
-                   :accessor first-name)
-   (last-name      :initarg :last-name
-	           :accessor last-name)
-   (phone          :initarg :phone
-		   :accessor phone)
-   (email          :initarg :email
-		   :accessor email)
-   ;(address        :initarg :address
-;		   :accessor address) ;;;;to be added back when brave, or figure out ways to accomodate nil
-   (credits        :initarg :credits
-		   :accessor credits)
-   (notes          :initarg :notes
-		   :accessor notes)))
+;;; Client class/sql object
 
 (mito:deftable client ()
-  ((id :col-type (:int))
-   (first-name :col-type (:varchar 64))
-   (last-name :col-type (:varchar 64))
-   (phone     :col-type (:int 64) ;;;;can I make a special type?
+  ((first-name :col-type (:varchar 64))
+   (last-name  :col-type (:varchar 64))
+   (phone      :col-type (or (:char 10) :null)) ; maybe ammend to varchar for international
+   (email      :col-type (or (:varchar 64) :null))
+   (address    :col-type (or (:varchar 64) :null))
+   (credits    :col-type (:int))
+   (notes      :col-type (or (:varchar 128) :null)))
+  (:conc-name client-))
 
 (defmethod print-object ((obj client) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((first-name first-name)
-		     (last-name  last-name)
-		     (id         id)
-		     (phone      phone)
-		     (email      email)
-		     (notes      notes))
+    (with-accessors ((first-name client-first-name)
+		     (last-name  client-last-name)
+		     (phone      client-phone)
+		     (email      client-email)
+                     (address    client-address)
+                     (credits    client-credits)
+		     (notes      client-notes))
 	obj
       (format stream
-	      "~%Name: ~a ~a~% ID: ~a~% Phone: ~a~%Email: ~a~%Address: ~a~%Credit Minutes: ~a~%Notes: ~a~%"
-	      first-name last-name id phone email (total-credit-minutes client) notes))))
+	      "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Credit Minutes: ~a~%Notes: ~a~%"
+	      first-name last-name phone email address credits notes))))
 
-(defun make-client (id first-name last-name phone email credits notes)
-  (make-instance 'client :id         id
-			 :first-name first-name
-		         :last-name  last-name
-			 :phone      phone
-			 :email      email
-			 :credits    credits
-			 :notes      notes))
+(mito:ensure-table-exists 'client)
+
+(defun make-client (first-name last-name phone email address credits notes)
+  (make-instance 'client :first-name first-name
+                         :last-name  last-name
+                         :phone      phone
+                         :email      email
+                         :address    address
+                         :credits    credits
+                         :notes      notes))
+
+(defun new-client (first-name last-name phone email address notes)
+  (mito:create-dao (make-client first-name last-name phone email address 0 notes)))
+
+(defmethod add-client ((client client))
+  (mito:insert-dao client))
 
 ;;;;------------------------------------------------------------------------
-;;;;Adding to, removing from, and editing *clients*
+;;;Adding to, removing from, and editing *clients*
 ;;;;------------------------------------------------------------------------
 
 (defvar *clients* nil)
 
-(defmethod add-client ((client client))
-  "Add a client to *clients*"
-  (push client *clients*)
-  (refresh-client-backup))
+;(defmethod add-client ((client client))
+ ; "Add a client to *clients*"
+  ;(push client *clients*)
+ ; (refresh-client-backup))
 
 (defmethod remove-client ((client client))
-  "Removes the client from *clients*, backup tbd."
-  (setq *clients*
-	(remove-if #'(lambda (c)
-		       (equal (id c) (id client)))
-		   *clients*))
-  (refresh-client-backup))
-
-(defun probably-do-not-remove-all-clients ()
-  (mapcar #'remove-client *clients*))
+  "Removes the client from the Client sql table"
+  (mito:delete-dao client))
 
 (defmethod replace-client ((client client) new-client)
   "Removes the client, adds a new client in its place."
@@ -84,148 +70,44 @@
 ;;;;------------------------------------------------------------------------
 
 (defmethod change-first-name ((client client) first-name)
-  "Changes the first name of a client"
-  (replace-client client (make-client (id client)
-				      first-name
-				      (last-name client)
-				      (phone     client)
-				      (email     client)
-				      (credits client)
-	    			      (notes     client))))
+  (setf (slot-value client 'first-name) first-name)
+  (mito:save-dao client))
 
 (defmethod change-last-name ((client client) last-name)
   "Changes the last name of a client."
-  (replace-client client (make-client (id client)
-				      (first-name client)
-				      last-name
-				      (phone      client)
-				      (email      client)
-				      (credits client)
-				      (notes      client))))
-
-(defmethod change-id ((client client) client-id)
-  "Changes the client ID of a client"
-  (replace-client client (make-client id
-				      (first-name client)
-				      (last-name  client)
-				      (phone      client)
-				      (email      client)
-				      (credits client)
-				      (notes      client))))
+  (setf (slot-value client 'last-name) last-name)
+  (mito:save-dao client))
 
 (defmethod change-phone ((client client) new-phone)
   "Changes the phone number of a client"
-  (replace-client client (make-client (id         client)
-				      (first-name client)
- 				      (last-name  client)
-				      new-phone
-				      (email      client)
-				      (credits client)
-				      (notes      client))))
+  (setf (slot-value client 'phone) new-phone)
+  (mito:save-dao client))
 
-(defmethod change-email ((client client) email)
+(defmethod change-email ((client client) new-email)
   "Changes the email of a client"
-  (replace-client client (make-client (id client)
-				      (first-name client)
- 				      (last-name  client)
-				      (credits    client)
-				      (phone      client)
-				      email
-				      (credits client)
-				      (notes      client))))
+  (setf (slot-value client 'email) new-email)
+  (mito:save-dao client))
 
-;(defmethod change-address ((client client) address)
- ; "Changes the address of a client"
-  ;(replace-client client (make-client (first-name     client)
- ;				      (last-name      client)
-;				      (id      client)
-;				      (credit-minutes client)
-;				      (phone          client)
-;				      (email          client)
-;				      address
-;				      (notes          client))))
+(defmethod change-address ((client client) new-address)
+  "Changes the address of a client"
+  (setf (slot-value client 'address) new-address)
+  (mito:save-dao client))
 
-(defmethod change-notes ((client client) notes)
+(defmethod change-credits ((client client) new-credits)
+  "Changes the credit minutes of a client"
+  (setf (slot-value client 'credits) new-credits)
+  (mito:save-dao client))
+
+(defmethod change-notes ((client client) new-notes)
   "Changes notes on a client"
-  (replace-client client (make-client (id             client)
-				      (first-name     client)
- 				      (last-name      client)
-				      (phone          client)
-				      (email          client)
-				      (credits client)
-				      notes)))
-
-;;;;------------------------------------------------------------------------
-;;;;Adding new clients
-;;;;------------------------------------------------------------------------
-
-(defvar last-client-id (if (first *clients*)
-			   (id (first *clients*))
-			   1000))
-
-(defun new-client-id ()
-  "Generates a new client-id, takes note of the most recent id."
-  (setq last-client-id (+ last-client-id 1))
-  last-client-id)
-
-(defun new-client (first-name last-name string-phone string-email address notes)
-  "generates a client with a new id and default makeups"
-  (add-client (make-client (new-client-id)
-			   first-name
-			   last-name
-			   phone-string
-			   email-string
-			   nil
-			   notes)))
-			   ;(make-instance 'client :first-name first-name
-	;	                     :last-name  last-name
-	;		             :id  (new-client-id)
-	;		             :phone      (make-phone-number string-p;hone)
-	;		             :email      (make-email string-email);
-	;			     :address    address
-	;		             :credit-minutes    0
-	;		             :notes      notes)))
-
-;;;;------------------------------------------------------------------------
-;;;;Backing up clients
-;;;;------------------------------------------------------------------------
-					;offer sql option asap
-
-(defmethod backup-unit ((credit credit))
-  (format nil "(make-credit ~a ~a (client-id-search ~a) (appointment-id-search ~a) ~a ~a)"
-	  (backup-unit (date-added credit))
-	  (backup-unit (expiration-date credit))
-	  (id (client credit))
-	  (id (orig-appointment credit))
-	  (minutes credit)))
-
-(defmethod backup-unit ((client client))
-  (format nil "(load-saved-item (make-client ~a ~a ~a ~a ~a ~a ~a ~a))~%"
-	  (id client)
-	  (write-to-string (first-name client))
-	  (write-to-string (last-name client))
-	  (id client)
-	  (credit-minutes client)
-	  (backup-unit (phone client))
-	  (backup-unit (email client))
-	  (backup-unit (credits client))
-	  (write-to-string (notes client))))
-
-(defun refresh-client-backup ()
-  (make-backup "clients" (sort (copy-list *clients*) #'(lambda (client1 client2)
-				   (< (id client1) (id client2))))))
-
-(defmethod load-saved-item ((client client))
-  (push client *clients*))
-
-(defun update-last-client-id ()
-  (if (null *clients*)
-      (setq last-client-id 1001)
-      (setq last-client-id (id (first *clients*)))))
+  (setf (slot-value client 'notes) new-notes)
+  (mito:save-dao client))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Credit Minutes            ----maybe this should be with receipts, or at least used there
 ;;;;------------------------------------------------------------------------
+
+;;;;;;; new file- credits.lisp -> credit table
 
 (defmethod total-credit-minutes ((client client))
   (loop :for c :in (credits client)

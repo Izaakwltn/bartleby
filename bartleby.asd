@@ -1,6 +1,6 @@
 ;;;; bartleby.asd
 ;;;;
-;;;;Copyright Izaak Walton (c) 2022
+;;;; Copyright Izaak Walton (c) 2022
 
 (asdf:defsystem #:bartleby
   :version "0.0.1"
@@ -10,10 +10,11 @@
   :depends-on ("local-time" "mito")
   :serial t
   :components ((:file "package")
+               (:file "sql")
 	       (:file "system-generics")
 	       (:file "sort")
 	       (:file "search")
-	       (:file "backup")
+	       ;(:file "backup")
 	       (:file "time")
 	       (:file "dates")
 	       ;(:file "calendar") ;;;;maybe later
