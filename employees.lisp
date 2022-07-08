@@ -63,102 +63,63 @@
   (mito:save-dao employee))
 
 (defmethod change-last-name ((employee employee) last-name)
-  (replace-employee employee (make-employee (id employee)
-					    (first-name employee)
-					    last-name
-					    (phone employee)
-					    (email employee)
-					    (hourly-rate employee)
-					    (notes       employee))))
-
-(defmethod change-id ((employee employee) id)
-  (replace-employee employee (make-employee id
-					    (first-name employee)
-					    (last-name employee)
-					    (phone employee)
-					    (email employee)
-					    (hourly-rate employee)
-					    (notes       employee))))
+  (setf (slot-value employee 'last-name) last-name)
+  (mito:save-dao employee))
 
 (defmethod change-phone ((employee employee) phone)
-  (replace-employee employee (make-employee (id employee)
-					    (first-name employee)
-					    (last-name employee)
-					    phone
-					    (email employee)
-					    (hourly-rate employee)
-					    (notes employee))))
+  (setf (slot-value employee 'phone) phone)
+  (mito:save-dao employee))
 
 (defmethod change-email ((employee employee) email)
-  (replace-employee employee (make-employee (id employee)
-					    (first-name employee)
-					    (last-name employee)
-					    (phone employee)
-					    email
-					    (hourly-rate employee)
-					    (notes       employee))))
+  (setf (slot-value employee 'email) email)
+  (mito:save-dao employee))
 
-;(defmethod change-address ((employee employee) address)
- ; (replace-employee employee (make-employee (first-name employee)
-;					    (last-name employee)
-;					    (id employee)
-;					    (phone employee)
-;					    (email employee)
-;					    address
-;					    (hourly-rate employee))))
+(defmethod change-address ((employee employee) address)
+  (setf (slot-value employee 'address) address)
+  (mito:save-dao employee))
 
 (defmethod change-hourly ((employee employee) hourly-rate)
-  (replace-employee employee (make-employee (id employee)
-					    (first-name employee)
-					    (last-name employee)
-					    (phone employee)
-					    (email employee)
-					    hourly-rate
-					    (notes employee))))
+  (setf (slot-value employee 'hourly-rate) hourly-rate)
+  (mito:save-dao employee))
 
 (defmethod change-notes ((employee employee) notes)
-  (replace-employee employee (make-employee (id employee)
-					    (first-name employee)
-					    (last-name employee)
-					    (phone employee)
-					    (email employee)
-					    (hourly-rate employee)
-					    notes)))
+  (setf (slot-value employee 'notes) notes)
+  (mito:save-dao employee))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Adding New Employees
 ;;;;------------------------------------------------------------------------
 
-(defvar izaak
-  (make-employee 2001 "Izaak" "Walton"
-		 (make-phone-number "4043872185")
-		 (make-email "izaakviolin@gmail.com")
-		 37
-		 "A Teacher"))
+;(defvar izaak
+ ; (make-employee 2001 "Izaak" "Walton"
+;		 (make-phone-number "4043872185")
+;		 (make-email "izaakviolin@gmail.com")
+;		 37
+;		 "A Teacher"))
 
 ;(add-employee izaak)
 
-(defvar last-employee-id (if (first *employees*)
-			     (+ (id (first *employees*)) 1)
-			     2000))
+;(defvar last-employee-id (if (first *employees*)
+;			     (+ (id (first *employees*)) 1)
+;			     2000))
 
-(defun new-employee-id ()
-  "Generates a new employee id, updates last-employee-id."
-  (setq last-employee-id (+ last-employee-id 1))
-  last-employee-id)
+;(defun new-employee-id ()
+ ; "Generates a new employee id, updates last-employee-id."
+  ;(setq last-employee-id (+ last-employee-id 1))
+ ; l;ast-employee-id)
 
-(defun new-employee (first-name last-name string-phone string-email hourly-rate notes)
-  "Generates a a new employee with a new employee id."
-  (add-employee (make-employee (new-employee-id) first-name last-name (make-phone-number string-phone) (make-email string-email) hourly-rate notes)))
+;(defun new-employee (first-name last-name string-phone string-email hourly-rate notes)
+ ; "Generates a a new employee with a new employee id."
+  ;(add-employee (make-employee (new-employee-id) first-name last-name (make-phone-number string-phone) (make-email string-email) hourly-rate notes)))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for employees:
 ;;;;------------------------------------------------------------------------
 
-(defun employee-id-search (employee-id)
-  "Searches for an employee by employee-id."
-  (loop for employee in *employees*
-	if (equal (write-to-string employee-id)
-		  (write-to-string (id employee)))
-	  do (return employee)))
+;(defun employee-id-search (employee-id)
+;  "Searches for an employee by employee-id."
+;  (loop for employee in *employees*;
+;	if (equal (write-to-string em;ployee-id)
+;		  (write-to-string (id employee)))
+;	  do (return employee)))
 
