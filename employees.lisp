@@ -7,30 +7,33 @@
 ;;; Employee class/sql object
 
 (mito:deftable employee ()
-  ((first-name  :col-type (:varchar 64))
+  (;(id :col-type (:varchar 36)
+    ;   :primary-key t)
+   (first-name  :col-type (:varchar 64))
    (last-name   :col-type (:varchar 64))
    (phone       :col-type (or (:char 10) :null))
    (email       :col-type (or (:varchar 64) :null))
    (address     :col-type (or (:varchar 100) :null))
    (hourly-rate :col-type (:int))
-   (notes       :col-type (or (:varchar 128) :null))))
+   (notes       :col-type (or (:varchar 128) :null)))
+  (:conc-name employee-))
 
 (mito:ensure-table-exists 'employee)
 
 (defmethod print-object ((obj employee) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((first-name first-name)
-		     (last-name last-name)
-		     (phone phone)
-		     (email email)
-		     (address address)
-		     (hourly-rate hourly-rate)
-		     (notes notes))
+    (with-accessors ((first-name employee-first-name)
+		     (last-name employee-last-name)
+		     (phone employee-phone)
+		     (email employee-email)
+		     (address employee-address)
+		     (hourly-rate employee-hourly-rate)
+		     (notes employee-notes))
 	obj
-      (format stream "~%Employee-ID: ~a~%Name: ~a ~a~%~a~%~a~%~a~%Rate: $~a/hr~%"
+      (format stream "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Rate: $~a/hr~%Notes: ~a"
 	      first-name last-name phone email address hourly-rate notes))))
 
-(defun make-employee (first-name last-name phone email hourly-rate notes)
+(defun make-employee (first-name last-name phone email address hourly-rate notes)
   (make-instance 'employee :first-name  first-name
          		   :last-name   last-name
 			   :phone       phone
@@ -40,6 +43,9 @@
 			   :notes       notes))
 
 ;;; Adding and removing employees
+
+(defun employee-count ()
+  (mito:count-dao 'employee))
 
 (defmethod add-employee ((employee employee))
   (mito:insert-dao employee))

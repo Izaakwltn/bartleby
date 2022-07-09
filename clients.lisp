@@ -7,12 +7,14 @@
 ;;; Client class/sql object
 
 (mito:deftable client ()
-  ((first-name :col-type (:varchar 64))
+  (;(id :col-type (:varchar 36)
+    ;   :primary-key t)
+   (first-name :col-type (:varchar 64))
    (last-name  :col-type (:varchar 64))
    (phone      :col-type (or (:char 10) :null))
    (email      :col-type (or (:varchar 64) :null))
    (address    :col-type (or (:varchar 64) :null))
-   (credits    :col-type (:int))
+   ;(credits    :col-type (:int))
    (notes      :col-type (or (:varchar 128) :null)))
   (:conc-name client-))
 
@@ -25,20 +27,19 @@
 		     (phone      client-phone)
 		     (email      client-email)
                      (address    client-address)
-                     (credits    client-credits)
+                     ;(credits    client-credits)
 		     (notes      client-notes))
 	obj
       (format stream
-	      "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Credit Minutes: ~a~%Notes: ~a~%"
-	      first-name last-name phone email address credits notes))))
+	      "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Credit Minutes:~%Notes: ~a~%"
+	      first-name last-name phone email address  notes))))
 
-(defun make-client (first-name last-name phone email address credits notes)
+(defun make-client (first-name last-name phone email address notes)
   (make-instance 'client :first-name first-name
                          :last-name  last-name
                          :phone      phone
                          :email      email
                          :address    address
-                         :credits    credits
                          :notes      notes))
 
 ;;; Adding and removing clients
@@ -94,15 +95,44 @@
   (setf (slot-value client 'notes) new-notes)
   (mito:save-dao client))
 
-;;;;------------------------------------------------------------------------
-;;;;Credit Minutes            ----maybe this should be with receipts, or at least used there
-;;;;------------------------------------------------------------------------
+;;; Find clients
 
-;;;;;;; new file- credits.lisp -> credit table
+(defun client-count ()
+  (mito:count-dao 'client))
+
+(defun client-id-search (client-id)
+  (mito:find-dao 'client :id client-id))
+
+(defun client-first-name-search (first-name)
+  (loop :for i :from 1 :to (client-count)
+        :if (string-equal (client-first-name (mito:find-dao 'client :id i))
+                          first-name)
+          :collect (mito:find-dao 'client :id i) :into matches
+        :finally (return matches)))
+
+(defun client-last-name-search (last-name)
+  (loop :for i :from 1 :to (client-count)
+        :if (string-equal (client-last-name (mito:find-dao 'client :id i))
+                          last-name)
+          :collect (mito:find-dao 'client :id i) :into matches
+        :finally (return matches)))
+
+;(defun client-full-name-search (first-name last-name)
+ ; (intersection (client-first-name-search first-name)
+  ;              (client-last-name-search last-name)))
+
+
+;;; Client Credits
+
+(defun credit-count ()
+  (mito:count-dao 'credit))
 
 (defmethod total-credit-minutes ((client client))
-  (loop :for c :in (credits client)
-	:sum (minutes c)))
+  (loop :for i :from 1 :to (credit-count)
+	:if (string-equal (client-id client)
+                          (client-id (credit-client (mito:find-dao 'credit :id i))))
+          :sum (credit-minutes (mito:find-dao 'credit :id i)) :into total-minutes
+        :finally (return total-minutes)))
 
 
 (defmethod add-credit ((client client) date-added minutes &optional expiration-days)
@@ -144,27 +174,21 @@
 ;	:if (> (parse-integer (credit-minutes client)) 0)
 ;	  :collect client))
 
-(defun client-id-search (id)
-  "Searches for a client by their client id."
-  (loop :for client :in *clients*
-	:if (equal (write-to-string id) (write-to-string (id client)))
-	  :do (return client)))
+;(defun last-name-search (last-name)
+ ; "Searches for a client by their last name."
+  ;(loop :for client :in *clients*
+;	:if (equal last-name (last-name client))
+;	  :do (return client)))
 
-(defun last-name-search (last-name)
-  "Searches for a client by their last name."
-  (loop :for client :in *clients*
-	:if (equal last-name (last-name client))
-	  :do (return client)))
+;(defun first-name-search (first-name)
+;  "Searches for a client by their first name."
+ ; (loop :for client :in *clients*
+;	:if (equal first-name (first-name client))
+;	  :do (return client)))
 
-(defun first-name-search (first-name)
-  "Searches for a client by their first name."
-  (loop :for client :in *clients*
-	:if (equal first-name (first-name client))
-	  :do (return client)))
-
-(defun full-name-search (first-name last-name)
-  "Searches for a client by their full name."
-  (loop :for client :in *clients*
-	:if (and (equal first-name (first-name client))
-		(equal last-name  (last-name client)))
-	  :do (return client)))
+;(defun full-name-search (first-name last-name)
+ ; "Searches for a client by their full name."
+  ;(loop :for client :in *clients*
+;	:if (and (equal first-name (first-name client))
+;		(equal last-name  (last-name client)))
+;;	  :do (return client)))

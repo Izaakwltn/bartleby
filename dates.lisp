@@ -305,11 +305,11 @@
     (format nil "~a-~a-~a ~a:~a:00" parsed-year parsed-month parsed-day parsed-hour parsed-minute)))
 
 (defun timestamp (date time)
-  (make-instance 'date-time :date-o date
+  (make-instance 'timestamp :date-o date
 		            :time-o time))
 
 (defun current-timestamp ()
-  (date-time (today) (current-time)))
+  (timestamp (today) (current-time)))
 
 (defun moment (m d yyyy hour minutes)
   "Simple input for a date and time."

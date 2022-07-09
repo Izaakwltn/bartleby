@@ -1,107 +1,71 @@
-;;;;appointments.lisp
+;;;; appointments.lisp
+;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Appointment Class
-;;;;------------------------------------------------------------------------
+;;; Appointment Class/SQL object
 
-(defclass appointment ()
-  ((id            :initarg :id
-		  :accessor id)
-   (clients       :initarg :clients
-	          :accessor clients)
-   (employees     :initarg :employees
-	          :accessor employees)
-   (meeting-room  :initarg :meeting-room
-	          :accessor meeting-room)
-   (date-time     :initarg :dt
-		  :accessor dt)
-   (duration      :initarg :duration
-	          :accessor duration)
-   (notes         :initarg :notes
-	          :accessor notes)))
+(mito:deftable appointment () ; maybe separate class for group-classes, or appointment class
+  ((client       :col-type client)
+   (employee     :col-type employee)
+   (meeting-room :col-type meeting-room)
+   (timestamp    :col-type (:timestamp))
+   (duration     :col-type (:int))
+   (notes        :col-type (or (:varchar 128) :null)))
+  (:conc-name appointment-))
 
-;::::::::::::::::::::::::::::::
-;printing appointments
-
-(defun printable-people (people-list)
-  (loop :for p :in people-list
-	:collect (concatenate 'string
-			      (first-name p)
-			      " "
-			      (last-name p)
-			      ", ID: "
-			      (write-to-string (id p)))))
+(mito:ensure-table-exists 'appointment)
 
 (defmethod print-object ((obj appointment) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((id            id)
-		     (clients       clients)
-		     (employees     employees)
-		     (meeting-room  meeting-room)
-		     (dt            dt)
-		     (duration      duration)
-		     (notes         notes))
+    (with-accessors ((client-id     appointment-client-id)
+		     (employee-id   appointment-employee-id)
+		     (meeting-room  appointment-meeting-room-id)
+		     (timestamp     appointment-timestamp)
+		     (duration      appointment-duration)
+		     (notes         appointment-notes))
 	obj
       (format stream
-	      "~%~a~%~a~%~%Room: ~a~%Client(s):~%~{~a~%~}~%Employee(s):~%~{~a~}~%Duration: ~a~%Notes: ~a~%"
-	      id
-	      dt
+	      "~%~%~a~%~%Room: ~a~%Client:~%~{~a~%~}~%Employee:~%~{~a~}~%Duration: ~a~%Notes: ~a~%"
+	      timestamp
 	      meeting-room
-	      (printable-people clients)
-	      (printable-people employees)
-	      duration
+	      client-id
+              employee-id
+              duration
 	      notes))))
 
-(defun client-list (client-ids)
-  (loop :for i :in client-ids
-	:collect (client-id-search i)))
-
-(defun employee-list (employee-ids)
-  (loop :for i :in employee-ids
-	:collect (employee-id-search i)))
-
-(defun make-appointment (id client-ids employee-ids room-num date-time duration notes)
-  (make-instance 'appointment :id           id
-		              :clients      (client-list client-ids)
-		              :employees    (employee-list employee-ids)
-			      :meeting-room (room-search room-num)
-		              :dt           date-time
+(defun make-appointment (client-id employee-id meeting-room timestamp duration notes)
+  (make-instance 'appointment :client       client-id
+		              :employee     employee-id
+			      :meeting-room meeting-room
+		              :timestamp    timestamp
 			      :duration     duration
 			      :notes        notes))
 
-;;;;------------------------------------------------------------------------
-;;;;Adding to, removing from, and editing *appointments*
-;;;;------------------------------------------------------------------------
+;;; Adding and removing Appointments
 
 (defvar *appointments* nil)
 
 (defmethod add-appointment ((appointment appointment))
-  "Adds an appointment to the *appointments* list."
-  (push appointment *appointments*)
-  (refresh-appointment-backup))
+  "Adds an appointment to the appointment SQL table."
+  (mito:insert-dao appointment))
 
 (defmethod remove-appointment ((appointment appointment))
   "Removes an appointment from the *appointments* list"
-  (setq *appointments*
-	(remove-if #'(lambda (a)
-		       (equal (id a) (id appointment)))
-		   *appointments*))
-  (refresh-appointment-backup))
+  (mito:delete-dao appointment))
 
-(defmethod replace-appointment ((appointment appointment)
-				client-ids employee-ids meeting-room date-time duration notes)
+(defmethod replace-appointment ((appointment appointment) new-appointment)
   "Removes appointment, adds a replacement appointment."
   (remove-appointment appointment)
-  (add-appointment (make-appointment (id appointment) client-ids employee-ids meeting-room date-time duration notes)))
+  (add-appointment new-appointment))
 
-(defmethod credit-appointment ((appointment appointment))
-  (make-credit (date-o (dt appointment))
-	       (client appointment)
-	       appointment
-	       (duration appointment)
-	       nil))
+;(defmethod credit-appointment ((appointment appointment))
+ ; (make-credit (date-o (dt appointment))
+;	       (client appointment)
+;	       appointment
+;	       (duration appointment)
+;	       nil))
 
 (defun appointment-id-search (app-id)
   (find-if #'(lambda (a)
@@ -278,3 +242,7 @@
 ;;;;
 ;;;;------------------------------------------------------------------------
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+;(add-appointment (make-appointment (mito:find-dao 'client :id 1) (mito:find-dao 'employee :id 1) (mito:find-dao 'meeting-room :id 1) (sql-print (timestamp (date 7 13 2022) (set-time 10 30))) 45 "+15 makeup"))

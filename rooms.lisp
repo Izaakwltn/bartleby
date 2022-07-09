@@ -7,7 +7,9 @@
 ;;; Room Class
 
 (mito:deftable meeting-room ()
-  ((num  :col-type (:int))
+  (;(id :col-type (:varchar 36)
+    ;   :primary-key t)
+   (num  :col-type (:int))
    (name :col-type (:varchar 64))
    (capacity  :col-type (:int))
    (notes     :col-type (:varchar 128)))
@@ -28,9 +30,9 @@
 	      room-capacity
 	      room-notes))))
 
-(defun make-room (room-num room-name capacity notes)
-  (make-instance 'meeting-room :id        room-num
-		               :room-name room-name
+(defun make-room (num name capacity notes)
+  (make-instance 'meeting-room :num       num
+		               :name      name
 			       :capacity  capacity
 		               :notes     notes))
 

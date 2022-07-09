@@ -18,13 +18,13 @@
 	       (:file "dates")
 	       ;(:file "calendar") ;;;;maybe later
 	       (:file "contact")
-	       (:file "credits")
 	       (:file "clients")
 	       (:file "rooms")
 	       (:file "employees")
 	       (:file "appointments")
 	       (:file "availability") 
 	       (:file "receipts")
+               (:file "credits")
 	       (:file "invoices") ;add check-out.lisp
 	       ;(:module "interface"
 		;:serial t
