@@ -1,4 +1,6 @@
-;;;;clients.lisp
+;;;; clients.lisp
+;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
@@ -7,7 +9,7 @@
 (mito:deftable client ()
   ((first-name :col-type (:varchar 64))
    (last-name  :col-type (:varchar 64))
-   (phone      :col-type (or (:char 10) :null)) ; maybe ammend to varchar for international
+   (phone      :col-type (or (:char 10) :null))
    (email      :col-type (or (:varchar 64) :null))
    (address    :col-type (or (:varchar 64) :null))
    (credits    :col-type (:int))
@@ -47,7 +49,6 @@
 (defun new-client (first-name last-name phone email address notes)
   (mito:create-dao (make-client first-name last-name phone email address 0 notes)))
 
-
 (defmethod remove-client ((client client))
   "Removes the client from the Client sql table"
   (mito:delete-dao client))
@@ -57,9 +58,7 @@
   (remove-client client)
   (add-client new-client))
 
-;;;;------------------------------------------------------------------------
-;;;;Editing one attribute at a time
-;;;;------------------------------------------------------------------------
+;;; Editing one attribute at a time
 
 (defmethod change-first-name ((client client) first-name)
   (setf (slot-value client 'first-name) first-name)
@@ -169,8 +168,3 @@
 	:if (and (equal first-name (first-name client))
 		(equal last-name  (last-name client)))
 	  :do (return client)))
-
-;;;;------------------------------------------------------------------------
-;;;;
-;;;;------------------------------------------------------------------------
-

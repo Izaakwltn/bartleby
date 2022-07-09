@@ -1,11 +1,10 @@
-;;;;dates.lisp
+;;;; dates.lisp
 ;;;;
+;;;; Copyright (c) Izaak Walton
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Date Class
-;;;;------------------------------------------------------------------------
+;;; Date Class
 
 (defclass date ()
   ((month :initarg :m
@@ -29,26 +28,56 @@
 	      y))))
 
 (defmethod sql-print ((obj date))
-  (let ((parsed-year (y obj))
-        (parsed-month (m obj))
-        (parsed-day (d obj)))
-    (format nil "~a-~a-~a" parsed-year parsed-month parsed-day)))
+  (let ((parsed-year  (write-to-string (y obj)))
+        (parsed-month (write-to-string (m obj)))
+        (parsed-day   (write-to-string (d obj))))
+    (format nil
+	    "~a-~a-~a"
+	    parsed-year
+	    (if (eq 1 (length parsed-month))
+		(concatenate 'string "0" parsed-month)
+		parsed-month)
+	    (if (eq 1 (length parsed-month))
+		(concatenate 'string "0" parsed-day)
+		parsed-day))))
 
 (defun date (m d y)
   (make-instance 'date :m m
 		       :d d
 		       :y y))
 
-(defmethod backup-unit ((date date))
-  "Generates a backup-able unit for a date"
-  (format nil "(date ~a ~a ~a)"
-	  (m date)
-	  (d date)
-	  (y date)))
+(defun date-from-sql (sql-date)
+  "Creates a bartleby:date object from an sql-date string."
+  (loop :with yyyy := ""
+	:with mm := ""
+	:with dd := ""
+	:with selector := 0
 
-;;;;------------------------------------------------------------------------
-;;;;Date Functions
-;;;;------------------------------------------------------------------------
+        :for i :from 1 :to (length sql-date)
+        :if (equal (subseq sql-date (- i 1) i) "-")
+	  :do (setq selector (+ selector 1))
+	:else :if (equal selector 0)
+		:do (setq yyyy
+			  (concatenate 'string
+				       yyyy
+				       (subseq sql-date (- i 1) i)))
+	:else :if (equal selector 1)
+		:do (setq mm
+			  (concatenate 'string
+				       mm
+				       (subseq sql-date (- i 1) i)))
+	:else
+	  :do (setq dd
+		    (concatenate 'string
+				 dd
+				 (subseq sql-date (- i 1) i)))
+	:finally (return (date (parse-integer mm)
+			       (parse-integer dd)
+			       (parse-integer yyyy)))))
+		
+	
+  
+;;;Date Functions
 
 (defun later-date-p (date1 date2)
   "Returns t if date1 is later than date2."
@@ -122,9 +151,7 @@
       (date 3 1 (+ (y date) 1))
       (date (m date) (d date) (+ (y date) 1))))
 
-;;;;------------------------------------------------------------------------
-;;;;Date Calculations
-;;;;------------------------------------------------------------------------
+;;; Date Calculations
 
 (defvar common-year-numbers '((1  31)
 			      (2  28)
@@ -235,9 +262,7 @@
 	  ((equal n 3) "rd")
 	  (t "th"))))
 
-;;;;------------------------------------------------------------------------
-;;;;This day and that
-;;;;------------------------------------------------------------------------
+;;; This day and that
 
 (defun today ()
   "Returns today's date."
@@ -256,9 +281,7 @@
   "Returns tomorrow's date."
   (next-day (today)))
 
-;;;;------------------------------------------------------------------------
 ;;; Timestamps
-;;;;------------------------------------------------------------------------
 
 (defclass timestamp ()
   ((date-o :initarg :date-o
@@ -291,16 +314,6 @@
 (defun moment (m d yyyy hour minutes)
   "Simple input for a date and time."
   (timestamp (date m d yyyy) (set-time hour minutes)))
-
-;(defmethod backup-unit ((timestamp timestamp))
- ; (let ((cd (date-o timestamp))
-;	(ct (time-o timestamp)))
- ;   (format nil "(date-time (date ~a ~a ~a) (set-time ~a ~a))"
-;	    (m cd)
-;	    (d cd)
-;	    (y cd)
-;	    (hour ct)
-;	    (minutes ct))))
 
 (defmethod add-days ((timestamp timestamp) days)
   "Adds a specified number of dates to the given date-time"
@@ -344,9 +357,7 @@
       t
       nil))
 
-;;;;------------------------------------------------------------------------
-;;;;Week Class
-;;;;------------------------------------------------------------------------
+;;; Week Class
 
 (defclass week ()
   ((days :initarg :days
@@ -374,8 +385,6 @@
 (defun this-week ()
   (week (today)))
 
-;::::::::::::::::::::::::::::::
-
 (defgeneric last-week (object)
   (:documentation "Returns the previous week"))
 
@@ -387,8 +396,6 @@
 
 (defmethod last-week ((week week))
   (last-week (first (days week))))
-
-;::::::::::::::::::::::::::::::
 
 (defgeneric next-week (object)
   (:documentation "Returns the following week"))
@@ -402,11 +409,7 @@
 (defmethod next-week ((week week))
   (next-week (first (days week))))
 
-
-
-;;;;------------------------------------------------------------------------
-;;;;Month Class
-;;;;------------------------------------------------------------------------
+;;; Month Class
 
 (defclass month ()
   ((month-num  :initarg :month-num
@@ -472,7 +475,3 @@
 
 (defmethod next-month ((month month))
   (next-month (first (days month))))
-
-;;;;------------------------------------------------------------------------
-;;;;
-;;;;------------------------------------------------------------------------

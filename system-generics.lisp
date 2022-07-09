@@ -8,7 +8,8 @@
 
 (defgeneric sql-print (object)
   (:documentation "Prints an sql compatible form of the object."))
-;;;Changing attributes
+
+;;;Changing object attributes
 
 (defgeneric change-first-name (object first-name)
   (:documentation "Change the first name of the object"))
@@ -35,7 +36,7 @@
   (:documentation "Changes the notes for an object"))
 
 (defgeneric change-hourly (object hourly-rate)
-  (:documentation "Changes the hourly rate for an object")) ;employees, maybe rooms and clients
+  (:documentation "Changes the hourly rate for an object"))
 
 (defgeneric change-capacity (object capacity)
   (:documentation "Changes the capacity for an object")) ;use with rooms and appointments

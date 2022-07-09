@@ -3,8 +3,13 @@
 (in-package :bartleby)
 
 (mito:deftable credit ()
-  ((date :col-type (:date))))
+  ((date-added :col-type (:date))
+   (expiration :col-type (:date))
+   (client-id  :references (client id))
+   (app-id     :references (appointment id))
+   (minutes    :col-type (:int))))
 
+(mito:ensure-table-exists 'credit)
 ;(defclass credit ()
  ; ((date-added       :initarg :date-added
 ;	             :accessor date-added)
@@ -19,18 +24,18 @@
 
 (defmethod print-object ((obj credit) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((date-added       date-added)
-		     (expiration-date  expiration-date)
-		     (client           client)
-		     (orig-appointment orig-appointment)
-		     (minutes          minutes))
+    (with-accessors ((date-added date-added)
+		     (expiration expiration)
+		     (client-id  client-id)
+		     (app-id     app-id)
+		     (minutes    minutes))
 	obj
       (format stream
 	      "~a~%~a~%~a~%~a~%~a~%"
 	      date-added
-	      expiration-date
-	      client
-	      orig-appointment
+	      expiration
+	      client-id
+	      app-id
 	      minutes))))
 
 (defun make-credit (date-added client orig-appointment minutes &optional expiration-days)
@@ -41,14 +46,6 @@
 			 :orig-appointment orig-appointment
 			 :minutes          minutes))
 
-
-;(defmethod backup-unit ((credit credit))
- ; (format nil "(make-credit ~a ~a (client-id-search ~a) (appointment-id-search ~a) ~a ~a)"
-;	  (backup-unit (date-added credit))
-;	  (backup-unit (expiration-date credit))
-;	  (id (client credit))
-;	  (id (orig-appointment credit))
-;	  (minutes credit)))
   
 ;(defmethod total-credit-minutes ((client client))
  ; (loop :for c :in (credits client)
@@ -70,10 +67,4 @@
 ;	       (client appointment)
 ;	       appointment
 ;	       (duration appointment)
-;	       nil))
-
-
-		 
-			  
-(defvar *all-credits* nil)
-			  
+;	       nil))			  

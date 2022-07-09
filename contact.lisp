@@ -1,12 +1,10 @@
-;;;;contact.lisp
+;;;; contact.lisp
 ;;;;
-;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Address Class
-;;;;------------------------------------------------------------------------
+;;; Address Class
 
 (defclass address ()
   ((street-number :initarg :street-number
@@ -35,22 +33,10 @@
 		          :street-name   street-name
 			  :city          city
 			  :state         state
-			  :zip-code      zip-code))    ;this will only be effective with a proper string-reading function
+			  :zip-code      zip-code))    ; this will only be effective with a proper string-reading function
 
-(defmethod backup-unit ((address address))
-  (format nil "(make-address ~a ~a ~a ~a ~a)"
-	  (street-number address)
-	  (write-to-string (street-name address))
-	  (write-to-string (city address))
-	  (write-to-string (state address))
-	  (zip-code address)))
 
-(defun random-address () ;;;;make an actual function soon
- (make-address "2022" "Johnson Street" " Denver" "Kansas" "90000")) ;;;;;;;;;;;;;;;make this
-
-;;;;------------------------------------------------------------------------
-;;;;Phone Class
-;;;;------------------------------------------------------------------------
+;;; Phone Class
 
 (defclass phone-number ()
   ((country :initarg :country
@@ -71,6 +57,12 @@
 	obj
       (format stream "+~a(~a)~a-~a" country area middle end))))
 
+(defmethod sql-print ((phone-number phone-number))
+  (concatenate 'string
+	       (area phone-number)
+	       (middle phone-number)
+	       (end phone-number)))
+
 (defun make-phone-number (number-string)
   "Stores a string phone number as an object including country and area codes"
   (let ((l (length number-string)))
@@ -90,16 +82,7 @@
 		   (concatenate 'string number (write-to-string (random 9))))
 	 :finally (return number))))
 
-(defmethod backup-unit ((phone-number phone-number))
-  (format nil "(make-instance 'phone-number :country ~a :area ~a :middle ~a :end ~a)"
-	  (country phone-number)
-	  (area phone-number)
-	  (middle phone-number)
-	  (end phone-number)))
-
-;;;;------------------------------------------------------------------------
-;;;;Email Addresses
-;;;;------------------------------------------------------------------------
+;;; Email Addresses
 
 (defclass email-address ()
   ((username :initarg :username
@@ -135,10 +118,11 @@
 	(make-instance 'email-address :username (first parsed-email)
 				      :domain (second parsed-email))))
 
-(defmethod backup-unit ((email-address email-address))
-  (format nil "(make-instance 'email-address :username ~a :domain ~a)"
-	  (write-to-string (username email-address))
-	  (write-to-string (domain email-address))))
+(defmethod sql-print ((email-address email-address))
+  (concatenate 'string
+	       (username email-address)
+	       "@"
+	       (domain email-address)))
 
 (defvar email-domains '("gmail.com" "yahoo.com" "hotmail.com" "aol.com" "msn.com"))
 
@@ -148,9 +132,3 @@
 
 (defun auto-employee-email (first-name last-name company-email-domain)
   (make-email (concatenate 'string last-name "." first-name "@" company-email-domain)))
-;;;;fix these up
-
-;;;;------------------------------------------------------------------------
-;;;;------------------------------------------------------------------------
-;;;;------------------------------------------------------------------------
-  

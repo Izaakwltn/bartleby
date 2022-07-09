@@ -1,150 +1,84 @@
-;;;;rooms.lisp
+;;;; rooms.lisp
 ;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Room Class
-;;;;------------------------------------------------------------------------
+;;; Room Class
 
-(defclass meeting-room ()
-  ((id         :initarg :id
-	       :accessor id)
-   (room-name  :initarg :room-name
-	       :accessor room-name)
-   (capacity   :initarg :capacity
-	       :accessor capacity)
-   (notes      :initarg :notes
-	       :accessor notes)))
+(mito:deftable meeting-room ()
+  ((num  :col-type (:int))
+   (name :col-type (:varchar 64))
+   (capacity  :col-type (:int))
+   (notes     :col-type (:varchar 128)))
+  (:conc-name room-))
+
+(mito:ensure-table-exists 'meeting-room)
 
 (defmethod print-object ((obj meeting-room) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((id id)
+    (with-accessors ((room-num room-num)
 		     (room-name room-name)
-		     (capacity capacity)
-		     (notes notes))
+		     (room-capacity room-capacity)
+		     (room-notes room-notes))
 	obj
       (format stream "~%Room ~a, ~a~%Capacity: ~a~%Notes: ~a~%"
-	      id
+	      room-num
 	      room-name
-	      capacity
-	      notes))))
+	      room-capacity
+	      room-notes))))
 
-(defun make-room (id room-name capacity notes)
-  (make-instance 'meeting-room :id        id
+(defun make-room (room-num room-name capacity notes)
+  (make-instance 'meeting-room :id        room-num
 		               :room-name room-name
 			       :capacity  capacity
 		               :notes     notes))
 
-;;;;------------------------------------------------------------------------
-;;;;Adding to, removing from, and editing *clients*
-;;;;------------------------------------------------------------------------
-
-(defvar *rooms* nil)
+;;; Adding and removing rooms
 
 (defmethod add-room ((meeting-room meeting-room))
   "Adds a meeting room to *rooms*"
-  (push meeting-room *rooms*)
-  (refresh-room-backup))
-
+  (mito:insert-dao meeting-room))
+  
 (defmethod remove-room ((meeting-room meeting-room))
   "Removes a room from *rooms*"
-  (setq *rooms* (remove-if #'(lambda (r)
-		 (equal (id r) (id meeting-room)))
-			   *rooms*))
-  (refresh-room-backup))
+  (mito:delete-dao meeting-room))
 
-(defmethod replace-room ((meeting-room meeting-room)
-			 room-name capacity notes)
+(defmethod replace-room ((meeting-room meeting-room) new-meeting-room)
   "Removes room, adds a replacement room."
   (remove-room meeting-room)
-  (add-room (make-room (id meeting-room)
-		       room-name
-		       capacity
-		       notes)))
+  (add-room new-meeting-room))
 
-;;;;------------------------------------------------------------------------
-;;;;Editing one attribute at a time
-;;;;------------------------------------------------------------------------
+;;; Editing one attribute at a time
 
-(defmethod change-id ((meeting-room meeting-room) new-number)
-  (replace-room meeting-room (make-room new-number
-					(room-name meeting-room)
-				        (capacity meeting-room)
-					(notes meeting-room))))
+(defmethod change-num ((meeting-room meeting-room) new-number)
+  (setf (slot-value meeting-room 'num) new-number)
+  (mito:save-dao meeting-room))
 
 (defmethod change-name ((meeting-room meeting-room) new-name)
-  (replace-room meeting-room (make-room (room-num meeting-room)
-					new-name
-				        (capacity meeting-room)
-					(notes meeting-room))))
+  (setf (slot-value meeting-room 'name) new-name)
+  (mito:save-dao meeting-room))
 
 (defmethod change-capacity ((meeting-room meeting-room) new-capacity)
-  (replace-room meeting-room (make-room (room-num meeting-room)
-					(room-name meeting-room)
-					new-capacity
-					(notes meeting-room))))
+  (setf (slot-value meeting-room 'capacity) new-capacity)
+  (mito:save-dao meeting-room))
 
 (defmethod change-notes((meeting-room meeting-room) new-notes)
-  (replace-room meeting-room (make-room (room-num meeting-room)
-					(room-name meeting-room)
-					(capacity meeting-room)
-					new-notes)))
+  (setf (slot-value meeting-room 'notes) new-notes)
+  (mito:save-dao meeting-room))
 
-;;;;------------------------------------------------------------------------
-;;;;Adding New Rooms
-;;;;------------------------------------------------------------------------
-
-(defvar last-room-num (if (first *rooms*)
-			  (+ (id (first *rooms*)) 1)
-			  1))
-
-(defun new-room-num ()
-  "Increments the last room number."
-  (setq last-room-num (+ last-room-num 1))
-  last-room-num)
-
-(defun new-room (room-name capacity notes)
-  "Generates a new room with a new room number."
-  (add-room (make-room (new-room-num) room-name capacity notes)))
-
-;;;;------------------------------------------------------------------------
-;;;;Backing up rooms
-;;;;------------------------------------------------------------------------
-
-(defmethod backup-unit ((meeting-room meeting-room))
-  (format nil "(load-saved-item (make-room ~a ~a ~a ~a))~%"
-	  (id meeting-room)
-	  (write-to-string (room-name meeting-room))
-	  (capacity meeting-room)
-	  (write-to-string (notes meeting-room))))
-
-(defun refresh-room-backup ()
-  (make-backup "rooms" (sort (copy-list *rooms*) #'(lambda (room1 room2)
-						     (< (id room1) (id room2))))))
-
-(defmethod load-saved-item ((meeting-room meeting-room))
-  (push meeting-room *rooms*))
-
-(defun update-last-room-num ()
-  (if (null *rooms*)
-      nil
-      (setq last-room-num (id (first *rooms*)))))
 ;;;;------------------------------------------------------------------------
 ;;;;Searching for rooms
 ;;;;------------------------------------------------------------------------
 
-(defun room-search (room-num)
-  "Searches for rooms by room number."
-  (loop :for r :in *rooms*
-	:if (equal room-num (id r))
-	  :do (return r)))
+;(defun room-search (room-num)
+ ; "Searches for rooms by room number."
+  ;(loop :for r :in *rooms*
+;;	:if (equal room-num (id r))
+;	  :do (return r)))
 
-;(add-room (make-room 0 "Virtual" 1000 "Default, Virtual lesson space."))
 
-;;;;------------------------------------------------------------------------
-;;;;Room tests
-;;;;------------------------------------------------------------------------
+;;; Room tests
 
 (defvar *room-names* '("The Library" "Room with the Broken Chair""Guitar Room" "The Chokey" "The Kitchen" "The room where everything works" "The room where nothing works"))
 

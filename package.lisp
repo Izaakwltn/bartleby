@@ -5,8 +5,12 @@
 (defpackage #:bartleby
   (:use #:cl)
 
+  ;;; sql.lisp
+  (:export #:bartleby-connect)
+  
   ;;; system-generics.lisp
-  (:export #:change-first-name
+  (:export #:sql-print
+	   #:change-first-name
 	   #:change-last-name
 	   #:change-id
 	   #:change-credits
@@ -19,26 +23,22 @@
 	   #:change-name
 	   #:change-date
 	   #:change-time
-	   #:change-date-time
-	   #:backup-unit)
+	   #:change-date-time)
 
-  ;;; backup.lisp
-  (:export #:backup-unit
-	   #:make-backup
-	   #:blank-backup
-	   #:load-saved-item)
-	   
   ;;; time.lisp
-  (:export #:set-time 
+  (:export #:set-time ; class and function
 	   #:add-time
 	   #:current-time
 	   #:later-time-p
+	   #:later-time
 	   #:equal-time
 	   #:time-conflict-p)
   
   ;;; dates.lisp
   (:export #:date ;class and function
+	   #:date-from-sql
 	   #:later-date-p
+	   #:later-date
 	   #:equal-date
 	   #:month-days
 	   #:add-days
@@ -83,20 +83,14 @@
   ;;; clients.lisp
   (:export #:client
 	   #:make-client
-	   #:*clients*
 	   #:add-client
+	   #:new-client
 	   #:remove-client
 	   #:replace-client
-	   #:last-client-id ;var
-	   #:new-client
-	   #:refresh-client-backup
-	   #:update-last-client-id
 
 	   #:change-credits
 	   #:add-credits
 	   #:use-credits
-
-	   
 	   #:clients-with-credits ;;;;these will probably get moved to search.lisp
 	   #:client-id-search     ;;;;in search they will return any client or employee
 	   #:last-name-search

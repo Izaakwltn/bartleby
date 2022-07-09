@@ -29,11 +29,6 @@
   (make-instance 'set-time :hour hour
 		           :minutes minutes))
 
-(defmethod backup-unit ((set-time set-time))
-  (format nil "(set-time ~a ~a)"
-	  (hour set-time)
-	  (minutes set-time)))
-
 (defgeneric add-time (object minutes) ;;also used for date-time
   (:documentation "Adds a specified number of minutes to a given object"))
   

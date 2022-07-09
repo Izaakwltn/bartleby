@@ -44,8 +44,17 @@
 (defmethod add-employee ((employee employee))
   (mito:insert-dao employee))
 
-;(defmethod new-employee (first-name last-name phone email address hourly-rate notes)
- ; (mito:create-dao (make-employee first-name last-name phone email address hourly-rate notes)))
+(defvar *standard-hourly* 37)
+
+(defun new-employee (first-name last-name phone email notes &optional hourly-rate)
+  "Makes a new employee with optional hourly-rate."
+  (mito:create-dao (make-employee first-name
+				  last-name
+		                  phone
+		                  email
+		                  (if hourly-rate
+		                      hourly-rate
+		                      *standard-hourly*))))
 
 (defmethod remove-employee ((employee employee))
   "Removes the employee from the Employee sql table"
@@ -85,41 +94,3 @@
 (defmethod change-notes ((employee employee) notes)
   (setf (slot-value employee 'notes) notes)
   (mito:save-dao employee))
-
-;;;;------------------------------------------------------------------------
-;;;;Adding New Employees
-;;;;------------------------------------------------------------------------
-
-;(defvar izaak
- ; (make-employee 2001 "Izaak" "Walton"
-;		 (make-phone-number "4043872185")
-;		 (make-email "izaakviolin@gmail.com")
-;		 37
-;		 "A Teacher"))
-
-;(add-employee izaak)
-
-;(defvar last-employee-id (if (first *employees*)
-;			     (+ (id (first *employees*)) 1)
-;			     2000))
-
-;(defun new-employee-id ()
- ; "Generates a new employee id, updates last-employee-id."
-  ;(setq last-employee-id (+ last-employee-id 1))
- ; l;ast-employee-id)
-
-;(defun new-employee (first-name last-name string-phone string-email hourly-rate notes)
- ; "Generates a a new employee with a new employee id."
-  ;(add-employee (make-employee (new-employee-id) first-name last-name (make-phone-number string-phone) (make-email string-email) hourly-rate notes)))
-
-;;;;------------------------------------------------------------------------
-;;;;Searching for employees:
-;;;;------------------------------------------------------------------------
-
-;(defun employee-id-search (employee-id)
-;  "Searches for an employee by employee-id."
-;  (loop for employee in *employees*;
-;	if (equal (write-to-string em;ployee-id)
-;		  (write-to-string (id employee)))
-;	  do (return employee)))
-

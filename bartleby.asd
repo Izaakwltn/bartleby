@@ -14,7 +14,6 @@
 	       (:file "system-generics")
 	       (:file "sort")
 	       (:file "search")
-	       ;(:file "backup")
 	       (:file "time")
 	       (:file "dates")
 	       ;(:file "calendar") ;;;;maybe later
@@ -27,12 +26,6 @@
 	       (:file "availability") 
 	       (:file "receipts")
 	       (:file "invoices") ;add check-out.lisp
-	       ;(:file "backup-of-clients")
-	       ;(:file "backup-of-employees")
-	       ;(:file "backup-of-rooms")
-	       ;(:file "backup-of-appointments")
-	       ;(:file "backup-of-receipts")
-	       ;(:file "backup-tweaks")
 	       ;(:module "interface"
 		;:serial t
 		;:components ((:file "lexing")
