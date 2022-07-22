@@ -51,11 +51,6 @@
 	   #:next-day
 	   #:tomorrow
 
-	   #:date-time
-	   #:current-date-time
-	   #:moment
-	   #:later-date-time-p
-
 	   #:week ;class and method
 	   #:this-week
 	   #:last-week
