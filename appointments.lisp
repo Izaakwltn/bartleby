@@ -7,9 +7,9 @@
 ;;; Appointment Class/SQL object
 
 (mito:deftable appointment () ; maybe separate class for group-classes, or appointment class
-  ((client       :col-type client)
-   (employee     :col-type employee)
-   (meeting-room :col-type meeting-room)
+  ((client-id    :col-type (:int))
+   (employee-id  :col-type (:int))
+   (room-id      :col-type (:int))
    (timestamp    :col-type (:timestamp))
    (duration     :col-type (:int))
    (notes        :col-type (or (:varchar 128) :null)))
@@ -21,27 +21,27 @@
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((client-id     appointment-client-id)
 		     (employee-id   appointment-employee-id)
-		     (meeting-room  appointment-meeting-room-id)
+		     (room-id       appointment-room-id)
 		     (timestamp     appointment-timestamp)
 		     (duration      appointment-duration)
 		     (notes         appointment-notes))
 	obj
       (format stream
-	      "~%~%~a~%~%Room: ~a~%Client:~%~{~a~%~}~%Employee:~%~{~a~}~%Duration: ~a~%Notes: ~a~%"
+	      "~%~%~a~%~%Room: ~a~%Client:~%~a~%Employee:~%~a~%Duration: ~a~%Notes: ~a~%"
 	      timestamp
-	      meeting-room
-	      client-id
-              employee-id
+	      (room-id-search room-id)
+	      (client-id-search client-id)
+              (employee-id-search employee-id)
               duration
 	      notes))))
 
-(defun make-appointment (client-id employee-id meeting-room timestamp duration notes)
-  (make-instance 'appointment :client       client-id
-		              :employee     employee-id
-			      :meeting-room meeting-room
-		              :timestamp    timestamp
-			      :duration     duration
-			      :notes        notes))
+(defun make-appointment (client-id employee-id room-id timestamp duration notes)
+  (make-instance 'appointment :client-id   client-id
+		              :employee-id employee-id
+			      :room-id     room-id
+		              :timestamp   timestamp
+			      :duration    duration
+			      :notes       notes))
 
 ;;; Adding and removing Appointments
 
@@ -60,134 +60,42 @@
   (remove-appointment appointment)
   (add-appointment new-appointment))
 
-;(defmethod credit-appointment ((appointment appointment))
- ; (make-credit (date-o (dt appointment))
-;	       (client appointment)
-;	       appointment
-;	       (duration appointment)
-;	       nil))
-
 (defun appointment-id-search (app-id)
   (find-if #'(lambda (a)
 	       (equal (id a) app-id))
 	   *appointments*))
 
-;;;;------------------------------------------------------------------------
-;;;;Changing one attribute at a time: 
-;;;;------------------------------------------------------------------------
+(defun appointment-count ()
+  (mito:count-dao 'appointment))
 
-(defmethod client-ids ((appointment appointment))
-  "returns client ids for all clients in an appointment"
-  (loop :for c :in (clients appointment)
-	:collect (id c)))
+;;; Changing one attribute at a time: 
 
-(defmethod employee-ids ((appointment appointment))
-  "Returns employee ids for all clients in an appointment."
-  (loop :for e :in (employees appointment)
-	:collect (id e)))
+(defmethod change-client ((appointment appointment) client-id)
+  (setf (slot-value appointment 'client-id) client-id)
+  (mito:save-dao appointment))
 
-(defmethod change-id ((appointment appointment) new-id)
-  "Will figure it out later, maybe unecessary but just ticking every box.")
+(defmethod change-employee ((appointment appointment) employee-id)
+  (setf (slot-value appointment 'employee-id) employee-id)
+  (mito:save-dao appointment))
 
-(defmethod change-clients ((appointment appointment) new-client-ids)
-  (replace-appointment appointment
-		       new-client-ids
-		       (employee-ids appointment)
-		       (meeting-room appointment)
-		       (dt appointment)
-		       (duration appointment)
-		       (notes appointment)))
+(defmethod change-room ((appointment appointment) room-id)
+  (setf (slot-value appointment 'room-id) room-id)
+  (mito:save-dao appointment))
 
-(defmethod change-employees ((appointment appointment) new-employee-ids)
-  (replace-appointment appointment
-		       (client-ids appointment)
-		       new-employee-ids
-		       (meeting-room appointment)
-		       (dt appointment)
-		       (duration appointment)
-		       (notes appointment)))
+(defmethod change-timestamp ((appointment appointment) timestamp)
+  (setf (slot-value appointment 'timestamp) timestamp)
+  (mito:save-dao appointment))
 
-(defmethod change-room ((appointment appointment) new-room)
-  (replace-appointment appointment
-		       (client-ids appointment)
-		       (employee-ids appointment)
-		       new-room
-		       (dt        appointment)
-		       (duration  appointment)
-		       (notes     appointment)))
+(defmethod change-duration ((appointment appointment) duration)
+  (setf (slot-value appointment 'duration) duration)
+  (mito:save-dao appointment))
 
-(defmethod change-date-time ((appointment appointment) new-date-time) ;;;;run availability check
-  (replace-appointment appointment
-		       (client-ids appointment)
-		       (employee-ids appointment)
-		       (room-num (meeting-room appointment))
-		       new-date-time
-		       (duration appointment)
-		       (notes appointment)))
+(defmethod change-room ((appointment appointment) notes)
+  (setf (slot-value appointment 'notes) notes)
+  (mito:save-dao appointment))
 
-(defmethod change-duration ((appointment appointment) new-duration) ;;;;run availability check
-  (replace-appointment appointment
-		       (client-ids appointment)
-		       (employee-ids appointment)
-		       (meeting-room appointment)
-		       (dt appointment)
-		       new-duration
-		       (notes appointment)))
+;;;Recurring Appointments
 
-(defmethod change-notes ((appointment appointment) new-notes)
-  (replace-appointment appointment
-		       (client-ids appointment)
-		       (employee-ids appointment)
-		       (meeting-room appointment)
-		       (dt appointment)
-		       (duration appointment)
-		       new-notes))
-
-;;;;------------------------------------------------------------------------
-;;;;Adding new appointments
-;;;;------------------------------------------------------------------------
-
-(defvar last-app-id (if (first *appointments*)
-			(id (first *appointments*))
-			10000))
-
-(defun new-app-id ()
-  "Generates a new appointment number."
-  (setq last-app-id (+ last-app-id 1))
-  last-app-id)
-
-(defun update-last-app-id ()
-  (if (null *appointments*)
-      (setq last-app-id 10000)
-      (setq last-app-id (id (first *appointments*)))))
-
-(defun new-appointment (client-ids employee-ids room-num date-time duration notes)
-  (add-appointment (make-appointment (new-app-id) client-ids employee-ids room-num date-time duration notes)))
-
-;;;;------------------------------------------------------------------------
-;;;;Backing up Appointments
-;;;;------------------------------------------------------------------------
-
-(defmethod backup-unit ((appointment appointment))
-  (format nil "(load-saved-item (make-appointment ~a '(~{~a ~}) '(~{~a~}) ~a ~a ~a ~a))"
-	  (id appointment)
-	  (client-ids appointment)
-	  (employee-ids appointment)
-	  (id (meeting-room appointment))
-	  (backup-unit (dt appointment))
-	  (duration appointment)
-	  (write-to-string (notes appointment))))
-
-(defun refresh-appointment-backup ()
-  (make-backup "appointments" (sort (copy-list *appointments*) #'(lambda (app1 app2)
-								  (< (id app1) (id app2))))))
-
-(defmethod load-saved-item ((appointment appointment))
-  (push appointment *appointments*))
-
-;;;;------------------------------------------------------------------------
-;;;;Recurring Appointments
-;;;;------------------------------------------------------------------------
 (defmethod new-date-time ((appointment appointment) new-date-time)
   (make-appointment (new-app-id)
 		    (client-ids appointment)
@@ -237,12 +145,21 @@
 	:do (progn (add-appointment (next-year appointment))
 		   (setf a (next-year appointment)))))
 
+;;; Searching Appointments
 
-;;;;------------------------------------------------------------------------
-;;;;
-;;;;------------------------------------------------------------------------
+(defun appointment-count ()
+  (mito:count-dao 'appointment))
 
+(defun appointment-id-search (appointment-id)
+  (mito:find-dao 'appointment :id appointment-id))
 
+(defgeneric appointments (object)
+  (:documentation "Returns all appointments associated with an object."))
 
-;;;;;;;;;;;;;;;;;;;;;;
-;(add-appointment (make-appointment (mito:find-dao 'client :id 1) (mito:find-dao 'employee :id 1) (mito:find-dao 'meeting-room :id 1) (sql-print (timestamp (date 7 13 2022) (set-time 10 30))) 45 "+15 makeup"))
+(defmethod appointments ((client client))
+  (let ((c (client-id client)))
+    (loop :for i :from 1 :to (appointment-count)
+	  :if (equal c (client-id (mito:find-dao 'appointment :id i)))
+	    :collect (mito:find-dao 'appointment :id i) :into matches
+	  :finally (return matches))))
+		     

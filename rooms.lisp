@@ -69,15 +69,16 @@
   (setf (slot-value meeting-room 'notes) new-notes)
   (mito:save-dao meeting-room))
 
-;;;;------------------------------------------------------------------------
-;;;;Searching for rooms
-;;;;------------------------------------------------------------------------
+;;; Searching for rooms
 
-;(defun room-search (room-num)
- ; "Searches for rooms by room number."
-  ;(loop :for r :in *rooms*
-;;	:if (equal room-num (id r))
-;	  :do (return r)))
+(defun room-count ()
+  (mito:count-dao 'meeting-room))
+
+(defun room-id-search (room-id)
+  (mito:find-dao 'meeting-room :id room-id))
+
+
+
 
 
 ;;; Room tests

@@ -33,7 +33,7 @@
       (format stream "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Rate: $~a/hr~%Notes: ~a"
 	      first-name last-name phone email address hourly-rate notes))))
 
-(defun make-employee (first-name last-name phone email address hourly-rate notes)
+(defun make-employee (first-name lasat-name phone email address hourly-rate notes)
   (make-instance 'employee :first-name  first-name
          		   :last-name   last-name
 			   :phone       phone
@@ -100,3 +100,8 @@
 (defmethod change-notes ((employee employee) notes)
   (setf (slot-value employee 'notes) notes)
   (mito:save-dao employee))
+
+;;; Searching/analyzing employees
+
+(defun employee-id-search (employee-id)
+  (mito:find-dao 'employee :id employee-id))

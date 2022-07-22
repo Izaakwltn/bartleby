@@ -7,9 +7,7 @@
 ;;; Client class/sql object
 
 (mito:deftable client ()
-  (;(id :col-type (:varchar 36)
-    ;   :primary-key t)
-   (first-name :col-type (:varchar 64))
+  ((first-name :col-type (:varchar 64))
    (last-name  :col-type (:varchar 64))
    (phone      :col-type (or (:char 10) :null))
    (email      :col-type (or (:varchar 64) :null))
