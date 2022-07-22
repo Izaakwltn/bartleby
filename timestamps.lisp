@@ -20,6 +20,7 @@
       (format stream "~a ~a" date-o time-o))))
 
 (defun two-digits (numstring)
+  "Formats a number string to have 2 digits"
   (cond ((equal (length numstring) 2)
 	 numstring)
 	((equal (length numstring) 1)
@@ -49,6 +50,7 @@
 		            :time-o time))
 
 (defun current-timestamp ()
+  "Shows the current Date/time"
   (timestamp (today) (current-time)))
 
 (defun moment (m d yyyy hour minutes)
@@ -72,8 +74,7 @@
 	   (add-time (timestamp cd (add-time ct 1)) (- minutes 1)))
 	  (t (add-time (timestamp cd (add-time ct 1)) (- minutes 1))))))
 
-(defmethod next-day ((timestamp timestamp))
-  (timestamp (add-days timestamp1)))
+;;; Altering timestamps
 
 (defmethod change-date ((timestamp timestamp) new-date)
   (timestamp new-date
@@ -85,14 +86,41 @@
 
 (defvar *midnight* (set-time 24 0))
 
-(defmethod next-year ((timestamp timestamp))
-  (timestamp (next-year (date-o timestamp)) (time-o timestamp)))
+;;; Checking status relative to current timestamp
 
 (defun later-timestamp-p (timestamp1 timestamp2)
   "Compares two date-times, returns t if the first is later"
-  (if (and (later-date-p (date-o timestamp1)
-		         (date-o timestamp2))
-	   (later-time-p (time-o timestamp1)
-			 (time-o timestamp2)))
+  (cond ((equal-date (date-o timestamp1)
+                     (date-o timestamp2))
+         (if (later-time-p (time-o timestamp1)
+                           (time-o timestamp2))
+             t nil))
+        ((later-date-p (date-o timestamp1)
+                       (date-o timestamp2))
+         t)
+        (t nil)))
+
+(defun future-p (timestamp)
+  "Determines whether a timestamp is in the future"
+  (if (later-timestamp-p timestamp (current-timestamp))
       t
       nil))
+
+;;; Relative timestamps
+
+(defmethod next-day ((timestamp timestamp))
+  (timestamp (add-days timestamp 1)
+             (time-o timestamp)))
+
+(defmethod previous-day ((timestamp timestamp))
+  (timestamp (sub-days timestamp 1)
+             (time-o timestamp)))
+
+(defmethod last-week ((timestamp timestamp))
+  (week (sub-days (date-o timestamp) 7)))
+
+(defmethod next-week ((timestamp timestamp))
+  (week (add-days (date-o timestamp) 7)))
+
+(defmethod next-year ((timestamp timestamp))
+  (timestamp (next-year (date-o timestamp)) (time-o timestamp)))

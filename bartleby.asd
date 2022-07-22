@@ -35,8 +35,6 @@
 		;;	     (:file "check-out")
 		;	     (:file "help")
 		;	     (:file "bartleby")))
-	       (:module "tests"
+	       (:module "test-populations"
 		:serial t
-		:components ((:file "client-tests")
-			     (:file "employee-tests")
-			     (:file "appointment-tests")))))
+		:components ((:file "test-populations")))))

@@ -60,14 +60,6 @@
   (remove-appointment appointment)
   (add-appointment new-appointment))
 
-(defun appointment-id-search (app-id)
-  (find-if #'(lambda (a)
-	       (equal (id a) app-id))
-	   *appointments*))
-
-(defun appointment-count ()
-  (mito:count-dao 'appointment))
-
 ;;; Changing one attribute at a time: 
 
 (defmethod change-client ((appointment appointment) id)
@@ -94,7 +86,7 @@
   (setf (slot-value appointment 'notes) notes)
   (mito:save-dao appointment))
 
-;;;Recurring Appointments
+;;; Recurring Appointments
 
 (defmethod new-date-time ((appointment appointment) new-date-time)
   (make-appointment (new-app-id)
@@ -148,10 +140,29 @@
 ;;; Searching Appointments
 
 (defun appointment-count ()
+  "Returns the total number of Appointments"
   (mito:count-dao 'appointment))
 
 (defun appointment-id-search (appointment-id)
+  "Searches for an appointment by id integer"
   (mito:find-dao 'appointment :id appointment-id))
+
+(defun all-appointments ()
+  "Returns a list of all appointments"
+  (loop :for i :from 1 :to (appointment-count)
+        :collect (appointment-id-search i)))
+
+(defun all-future-appointments ()
+  "Returns all future appointments"
+  (loop :for i :in (all-appointments)
+        :if (future-p (appointment-timestamp i))
+          :collect i))
+
+(defun all-past-appointments ()
+  "Returns all past appointments"
+  (loop :for i :in (all-appointments)
+        :if (not (future-p (appointment-timestamp i)))
+          :collect i))
 
 (defgeneric appointments (object)
   (:documentation "Returns all appointments associated with an object."))

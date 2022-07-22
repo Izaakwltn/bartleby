@@ -7,9 +7,7 @@
 ;;; Room Class
 
 (mito:deftable meeting-room ()
-  (;(id :col-type (:varchar 36)
-    ;   :primary-key t)
-   (num  :col-type (:int))
+  ((num  :col-type (:int))
    (name :col-type (:varchar 64))
    (capacity  :col-type (:int))
    (notes     :col-type (:varchar 128)))
@@ -77,19 +75,22 @@
 (defun room-id-search (room-id)
   (mito:find-dao 'meeting-room :id room-id))
 
+(defun all-rooms ()
+  (loop :for i :from 1 :to (room-count)
+        :collect (room-id-search i)))
 
 
 
 
 ;;; Room tests
 
-(defvar *room-names* '("The Library" "Room with the Broken Chair""Guitar Room" "The Chokey" "The Kitchen" "The room where everything works" "The room where nothing works"))
+;(defvar *room-names* '("The Library" "Room with the Broken Chair""Guitar Room" "The Chokey" "The Kitchen" "The room where everything works" "The room where nothing works"))
 
-(defun random-room (room-names)
-  (nth (random (length room-names)) room-names))
+;(defun random-room (room-names)
+ ; (nth (random (length room-names)) room-names))
 
-(defun generate-rooms (number-of-rooms)
-  (loop :for i :from 1 :to number-of-rooms
-	:do (new-room (random-room *room-names*) (random 10) "")))
+;(defun generate-rooms (number-of-rooms)
+ ; (loop :for i :from 1 :to number-of-rooms
+;	:do (new-room (random-room *room-names*) (random 10) "")))
 		       
 				      

@@ -12,7 +12,6 @@
    (phone      :col-type (or (:char 10) :null))
    (email      :col-type (or (:varchar 64) :null))
    (address    :col-type (or (:varchar 64) :null))
-   ;(credits    :col-type (:int))
    (notes      :col-type (or (:varchar 128) :null)))
   (:conc-name client-))
 
@@ -25,7 +24,6 @@
 		     (phone      client-phone)
 		     (email      client-email)
                      (address    client-address)
-                     ;(credits    client-credits)
 		     (notes      client-notes))
 	obj
       (format stream
@@ -43,10 +41,8 @@
 ;;; Adding and removing clients
 
 (defmethod add-client ((client client))
+  "Adds a client to the Client sql table"
   (mito:insert-dao client))
-
-(defun new-client (first-name last-name phone email address notes)
-  (mito:create-dao (make-client first-name last-name phone email address 0 notes)))
 
 (defmethod remove-client ((client client))
   "Removes the client from the Client sql table"
@@ -60,6 +56,7 @@
 ;;; Editing one attribute at a time
 
 (defmethod change-first-name ((client client) first-name)
+  "Changes the first name of a client."
   (setf (slot-value client 'first-name) first-name)
   (mito:save-dao client))
 
@@ -96,10 +93,16 @@
 ;;; Find clients
 
 (defun client-count ()
+  "Returns the number of clients stored in the database"
   (mito:count-dao 'client))
 
 (defun client-id-search (client-id)
+  "Searches for a client by id"
   (mito:find-dao 'client :id client-id))
+
+(defun all-clients ()
+  (loop :for i :from 1 :to (client-count)
+        :collect (client-id-search i)))
 
 (defun client-first-name-search (first-name)
   (loop :for i :from 1 :to (client-count)
@@ -115,78 +118,42 @@
           :collect (mito:find-dao 'client :id i) :into matches
         :finally (return matches)))
 
-;(defun client-full-name-search (first-name last-name)
- ; (intersection (client-first-name-search first-name)
-  ;              (client-last-name-search last-name)))
-
-
 ;;; Client Credits
 
-(defun credit-count ()
-  (mito:count-dao 'credit))
+;(defun credit-count ()
+ ; (mito:count-dao 'credit))
 
-(defmethod total-credit-minutes ((client client))
-  (loop :for i :from 1 :to (credit-count)
-	:if (string-equal (client-id client)
-                          (client-id (credit-client (mito:find-dao 'credit :id i))))
-          :sum (credit-minutes (mito:find-dao 'credit :id i)) :into total-minutes
-        :finally (return total-minutes)))
-
-
-(defmethod add-credit ((client client) date-added minutes &optional expiration-days)
-  (make-credit date-added
-	       client
-               nil
-	       minutes
-	       (if expiration-days
-		   expiration-days
-		   nil)))
+;(defmethod total-credit-minutes ((client client))
+ ; (loop :for i :from 1 :to (credit-count)
+;	:if (string-equal (client-id client)
+ ;;                         (client-id (credit-client (mito:find-dao 'credit :id i))))
+   ;       :sum (credit-minutes (mito:find-dao 'credit :id i)) :into total-minutes
+    ;    :finally (return total-minutes)))
 
 
+;(defmethod add-credit ((client client) date-added minutes &optional expiration-days)
+ ; (make-credit date-added
+;	       client
+ ;              nil
+;	       minutes
+;	       (if expiration-days
+;		   expiration-days
+;		   nil)))
 
-(defmethod change-credits    ((client client) credits)
-  "Changes the credit minutes of a client"
-  (replace-client client (make-client (id client)
-				      (first-name client)
-				      (last-name client)
-				      (phone     client)
-				      (email     client)
-				      (credits client)
-				      (notes     client))))
 
-(defmethod add-credits ((client client) new-credits)
-  (change-credits client (+ (credit-minutes client) new-credits)))
 
-(defmethod use-credits ((client client) used-credits)
-  (change-credits client (- (credit-minutes client) used-credits)))
-
-;;;;------------------------------------------------------------------------
-;;;;Searching for clients
-;;;;------------------------------------------------------------------------
-;;;;composite search- return combined list of items that match each search
-
-;might end up just in search.lisp 
-;(defun clients-with-credits ()
- ; "Returns a list of all clients with makeup credits."
-  ;(loop :for client :in *clients*
-;	:if (> (parse-integer (credit-minutes client)) 0)
-;	  :collect client))
-
-;(defun last-name-search (last-name)
- ; "Searches for a client by their last name."
-  ;(loop :for client :in *clients*
-;	:if (equal last-name (last-name client))
-;	  :do (return client)))
-
-;(defun first-name-search (first-name)
-;  "Searches for a client by their first name."
- ; (loop :for client :in *clients*
-;	:if (equal first-name (first-name client))
-;	  :do (return client)))
-
-;(defun full-name-search (first-name last-name)
- ; "Searches for a client by their full name."
-  ;(loop :for client :in *clients*
-;	:if (and (equal first-name (first-name client))
-;		(equal last-name  (last-name client)))
-;;	  :do (return client)))
+;(defmethod change-credits    ((client client) credits)
+ ; "Changes the credit minutes of a client"
+  ;(replace-client client (make-client (id client)
+;				      (first-name client)
+;				      (last-name client)
+;				      (phone     client)
+;				      (email     client)
+;				      (credits client)
+;				      (notes     client))))
+;;
+;(defmethod add-credits ((client client) new-credits)
+ ; (change-credits client (+ (credit-minutes client) new-credits)))
+;
+;(defmethod use-credits ((client client) used-credits)
+ ; (change-credits client (- (credit-minutes client) used-credits)))

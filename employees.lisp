@@ -7,9 +7,7 @@
 ;;; Employee class/sql object
 
 (mito:deftable employee ()
-  (;(id :col-type (:varchar 36)
-    ;   :primary-key t)
-   (first-name  :col-type (:varchar 64))
+  ((first-name  :col-type (:varchar 64))
    (last-name   :col-type (:varchar 64))
    (phone       :col-type (or (:char 10) :null))
    (email       :col-type (or (:varchar 64) :null))
@@ -33,7 +31,7 @@
       (format stream "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Rate: $~a/hr~%Notes: ~a"
 	      first-name last-name phone email address hourly-rate notes))))
 
-(defun make-employee (first-name lasat-name phone email address hourly-rate notes)
+(defun make-employee (first-name last-name phone email address hourly-rate notes)
   (make-instance 'employee :first-name  first-name
          		   :last-name   last-name
 			   :phone       phone
@@ -45,9 +43,11 @@
 ;;; Adding and removing employees
 
 (defun employee-count ()
+  "Returns the total number of stored employees"
   (mito:count-dao 'employee))
 
 (defmethod add-employee ((employee employee))
+  "Adds an employee to the Employtee sql table"
   (mito:insert-dao employee))
 
 (defvar *standard-hourly* 37)
@@ -102,6 +102,10 @@
   (mito:save-dao employee))
 
 ;;; Searching/analyzing employees
+
+(defun all-employees ()
+  (loop :for i :from 1 :to (employee-count)
+        :collect (employee-id-search i)))
 
 (defun employee-id-search (employee-id)
   (mito:find-dao 'employee :id employee-id))
