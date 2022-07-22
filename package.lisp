@@ -61,6 +61,16 @@
 	   #:last-month
 	   #:next-month)
 
+  ;;; timestamps.lisp
+  (:export #:timestamp ; class and method
+           #:current-timestamp
+           #:moment
+           #:change-date
+           #:change-time
+           #:later-timestamp-p
+           #:future-p
+           #:previous-day)
+  
   ;;; contact.lisp
   (:export #:address
 	   #:make-address
