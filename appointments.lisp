@@ -70,16 +70,16 @@
 
 ;;; Changing one attribute at a time: 
 
-(defmethod change-client ((appointment appointment) client-id)
-  (setf (slot-value appointment 'client-id) client-id)
+(defmethod change-client ((appointment appointment) id)
+  (setf (slot-value appointment 'client-id) id)
   (mito:save-dao appointment))
 
-(defmethod change-employee ((appointment appointment) employee-id)
-  (setf (slot-value appointment 'employee-id) employee-id)
+(defmethod change-employee ((appointment appointment) id)
+  (setf (slot-value appointment 'employee-id) id)
   (mito:save-dao appointment))
 
-(defmethod change-room ((appointment appointment) room-id)
-  (setf (slot-value appointment 'room-id) room-id)
+(defmethod change-room ((appointment appointment) id)
+  (setf (slot-value appointment 'room-id) id)
   (mito:save-dao appointment))
 
 (defmethod change-timestamp ((appointment appointment) timestamp)
@@ -157,9 +157,9 @@
   (:documentation "Returns all appointments associated with an object."))
 
 (defmethod appointments ((client client))
-  (let ((c (client-id client)))
+  (let ((c (mito:object-id client)))
     (loop :for i :from 1 :to (appointment-count)
-	  :if (equal c (client-id (mito:find-dao 'appointment :id i)))
+	  :if (equal c (mito:object-id (mito:find-dao 'appointment :id i)))
 	    :collect (mito:find-dao 'appointment :id i) :into matches
 	  :finally (return matches))))
 		     

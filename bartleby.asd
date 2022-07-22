@@ -16,6 +16,7 @@
 	       (:file "search")
 	       (:file "time")
 	       (:file "dates")
+	       (:file "timestamps")
 	       ;(:file "calendar") ;;;;maybe later
 	       (:file "contact")
 	       (:file "clients")
