@@ -4,38 +4,6 @@
 
 (in-package :bartleby)
 
-;;; Address Class
-
-(defclass address ()
-  ((street-number :initarg :street-number
-		  :accessor street-number)
-   (street-name   :initarg :street-name
-		  :accessor street-name)
-   (city          :initarg :city
-		  :accessor city)
-   (state         :initarg :state
-		  :accessor state)
-   (zip-code      :initarg :zip-code
-		  :accessor zip-code)))
-
-(defmethod print-object ((obj address) stream)
-  (print-unreadable-object (obj stream :type t)
-    (with-accessors ((street-number street-number)
-		     (street-name   street-name)
-		     (city          city)
-		     (state         state)
-		     (zip-code      zip-code))
-	obj
-      (format stream "~a ~a~%~a, ~a ~a" street-number street-name city state zip-code))))
-
-(defun make-address (street-number street-name city state zip-code)
-  (make-instance 'address :street-number street-number
-		          :street-name   street-name
-			  :city          city
-			  :state         state
-			  :zip-code      zip-code))    ; this will only be effective with a proper string-reading function
-
-
 ;;; Phone Class
 
 (defclass phone-number ()
@@ -72,15 +40,6 @@
 		                 :area (subseq number-string (- l 10) (- l 7))
 				 :middle (subseq number-string (- l 7) (- l 4))
 				 :end (subseq number-string (- l 4) l))))
-
-(defun random-phone ()
-  "Generates a random, probably not functioning US phone number."
-  (make-phone-number
-   (loop :with number := nil
-        :for i :from 1 :to 10
-	 :do (setf number
-		   (concatenate 'string number (write-to-string (random 9))))
-	 :finally (return number))))
 
 ;;; Email Addresses
 
@@ -124,11 +83,34 @@
 	       "@"
 	       (domain email-address)))
 
-(defvar email-domains '("gmail.com" "yahoo.com" "hotmail.com" "aol.com" "msn.com"))
+;;; Address Class
 
-(defun auto-email (first-name last-name)
-  "Automatically generates an email using someone's name"
-  (make-email (concatenate 'string last-name "." first-name "@" (nth (random 4) email-domains))))
+;(defclass address ()
+ ; ((street-number :initarg :street-number
+;		  :accessor street-number)
+ ;  (street-name   :initarg :street-name
+;		  :accessor street-name)
+ ;  (city          :initarg :city
+;		  :accessor city)
+ ;  (state         :initarg :state
+;		  :accessor state)
+ ;  (zip-code      :initarg :zip-code
+;		  :accessor zip-code)))
+;
+;(;;defmethod print-object ((obj address) stream)
+ ; (print-unreadable-object (obj stream :type t)
+  ;  (with-accessors ((street-number street-number)
+;		     (street-name   street-name)
+;		     (city          city)
+;		     (state         state)
+;		     (zip-code      zip-code))
+;	obj
+ ;     (format stream "~a ~a~%~a, ~a ~a" street-number street-name city state zip-;code))))
 
-(defun auto-employee-email (first-name last-name company-email-domain)
-  (make-email (concatenate 'string last-name "." first-name "@" company-email-domain)))
+;(defun make-address (street-number street-name city state zip-code)
+ ;; (make-instance 'address :street-number street-number
+;		          :street-name   street-name
+;			  :city          city
+;			  :state         state
+;			  :zip-code      zip-code))    ; this will only be effective with a proper string-reading function
+

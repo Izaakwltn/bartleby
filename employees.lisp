@@ -42,10 +42,6 @@
 
 ;;; Adding and removing employees
 
-(defun employee-count ()
-  "Returns the total number of stored employees"
-  (mito:count-dao 'employee))
-
 (defmethod add-employee ((employee employee))
   "Adds an employee to the Employtee sql table"
   (mito:insert-dao employee))
@@ -103,9 +99,14 @@
 
 ;;; Searching/analyzing employees
 
-(defun all-employees ()
-  (loop :for i :from 1 :to (employee-count)
-        :collect (employee-id-search i)))
+(defun employee-count ()
+  "Returns the total number of stored employees"
+  (mito:count-dao 'employee))
 
 (defun employee-id-search (employee-id)
   (mito:find-dao 'employee :id employee-id))
+
+(defun all-employees ()
+  "Returns all employees in the database"
+  (loop :for i :from 1 :to (employee-count)
+        :collect (employee-id-search i)))

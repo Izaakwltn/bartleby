@@ -85,10 +85,10 @@
   (setf (slot-value client 'credits) new-credits)
   (mito:save-dao client))
 
-(defmethod change-notes ((client client) new-notes)
-  "Changes notes on a client"
-  (setf (slot-value client 'notes) new-notes)
-  (mito:save-dao client))
+;(defmethod change-notes ((client client) new-notes)
+ ; "Changes notes on a client"
+  ;(setf (slot-value client 'notes) new-notes)
+  ;(;mito:save-dao client))
 
 ;;; Find clients
 

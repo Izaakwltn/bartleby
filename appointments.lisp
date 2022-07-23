@@ -45,8 +45,6 @@
 
 ;;; Adding and removing Appointments
 
-(defvar *appointments* nil)
-
 (defmethod add-appointment ((appointment appointment))
   "Adds an appointment to the appointment SQL table."
   (mito:insert-dao appointment))
@@ -88,29 +86,28 @@
 
 ;;; Recurring Appointments
 
-(defmethod new-date-time ((appointment appointment) new-date-time)
-  (make-appointment (new-app-id)
-		    (client-ids appointment)
-		    (employee-ids appointment)
-		    (id (meeting-room appointment))
-		    new-date-time
-		    (duration appointment)
-		    (notes appointment)))
+(defmethod copy-new-timestamp ((appointment appointment) new-timestamp)
+  (make-appointment (appointment-client-id appointment)
+		    (appointment-employee-id appointment)
+		    (appointment-room-id appointment)
+		    new-timestamp
+		    (appointment-duration appointment)
+		    (appointment-notes appointment)))
 
 (defmethod add-days ((appointment appointment) days)
-  (new-date-time appointment (add-days (dt appoitnment) days)))
+  (copy-new-timestamp appointment (add-days (dt appoitnment) days)))
 
 (defmethod next-day ((appointment appointment))
-  (new-date-time appointment (next-day (dt appointment))))
+  (copy-new-timestamp appointment (next-day (dt appointment))))
 
 (defmethod next-week ((appointment appointment))
-  (new-date-time appointment (add-days (dt appointment) 7)))
+  (copy-new-timestamp appointment (add-days (dt appointment) 7)))
 
 (defmethod next-month ((appointment appointment))
-  (new-date-time appointment (next-month (dt appointment))))
+  (copy-new-timestamp appointment (next-month (dt appointment))))
 
 (defmethod next-year ((appointment appointment))
-  (new-date-time appointment (next-year (dt appointment))))
+  (copy-new-timestamp appointment (next-year (dt appointment))))
 
 (defmethod recurring ((appointment appointment) number-of-appointments day-gap)
     (loop :with a := appointment

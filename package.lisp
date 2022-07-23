@@ -72,87 +72,70 @@
            #:previous-day)
   
   ;;; contact.lisp
-  (:export #:address
-	   #:make-address
-	   #:random-address
-	   
-	   #:phone-number
+  (:export #:phone-number
 	   #:make-phone-number
-	   #:random-phone
 
 	   #:email-address
 	   #:parse-email
-	   #:make-email
-	   #:auto-email)
+	   #:make-email)
 
   ;;; clients.lisp
   (:export #:client
 	   #:make-client
 	   #:add-client
-	   #:new-client
 	   #:remove-client
 	   #:replace-client
 
-	   #:change-credits
-	   #:add-credits
-	   #:use-credits
-	   #:clients-with-credits ;;;;these will probably get moved to search.lisp
-	   #:client-id-search     ;;;;in search they will return any client or employee
-	   #:last-name-search
-	   #:first-name-search
-	   #:full-name-search)
+	   #:client-count
+	   #:client-id-search
+	   #:all-clients
+	   #:client-last-name-search
+	   #:client-first-name-search)
 
   ;;; rooms.lisp
   (:export #:meeting-room
 	   #:make-room
-	   #:*rooms*
 	   #:add-room
 	   #:remove-room
 	   #:replace-room
-	   #:last-room-num ;var
-	   #:new-room
-	   #:refresh-room-backup
-	   #:update-last-room-num
 
-	   #:room-search ;;;;move to search.lisp
-
-	   #:*room-names* ;;;;move to room-tests.lisp
-	   #:random-room
-	   #:generate-rooms)
+	   #:room-count
+	   #:room-id-search
+	   #:all-rooms)
   
   ;;; employees.lisp
   (:export #:employee
 	   #:make-employee
-	   #:*employees*
+	   
 	   #:add-employee
+	   #:new-employee
+	   #:*standard-hourly*
 	   #:remove-employee
 	   #:replace-employee
-	   #:refresh-employee-backup
-	   #:last-employee-id
-	   #:new-employee
-	   
-	   #:employee-id-search) ;;;;move to search.lisp
+
+	   #:employee-count
+	   #:employee-id-search
+	   #:all-employees) ;;;;move to search.lisp
   
   ;;; appointments.lisp
   (:export #:appointment
-	   #:printable-people
 	   #:make-appointment
-	   #:*appointments*
 	   #:add-appointment
 	   #:remove-appointment
 	   #:replace-appointment
-	   #:new-appointment
-	   #:refresh-appointment-backup
-
+	   
+	   #:copy-new-timestamp
 	   #:recurring
 	   #:weekly
 	   #:monthly
 	   #:yearly
-	   
-	   #:appointment-id-search ;;;;move to search.lisp
-	   )
-	   ;#:past-p)
 
+	   #:appointment-count
+	   #:appointment-id-search
+           #:all-appointments
+	   #:all-future-appointments
+	   #:all-past-appointments)
+	   
   ;;; availability.lisp
   (:export #:appointments
 	   #:block-off

@@ -1,0 +1,5 @@
+Rethinking bartleby structure:
+
+Develop simple hunchentoot interface
+
+Backup/mito/sql operations on a different thread 

@@ -37,7 +37,7 @@
 ;;; Adding and removing rooms
 
 (defmethod add-room ((meeting-room meeting-room))
-  "Adds a meeting room to *rooms*"
+  "Adds a meeting room to the meeting_room sql db"
   (mito:insert-dao meeting-room))
   
 (defmethod remove-room ((meeting-room meeting-room))
@@ -78,19 +78,3 @@
 (defun all-rooms ()
   (loop :for i :from 1 :to (room-count)
         :collect (room-id-search i)))
-
-
-
-
-;;; Room tests
-
-;(defvar *room-names* '("The Library" "Room with the Broken Chair""Guitar Room" "The Chokey" "The Kitchen" "The room where everything works" "The room where nothing works"))
-
-;(defun random-room (room-names)
- ; (nth (random (length room-names)) room-names))
-
-;(defun generate-rooms (number-of-rooms)
- ; (loop :for i :from 1 :to number-of-rooms
-;	:do (new-room (random-room *room-names*) (random 10) "")))
-		       
-				      
