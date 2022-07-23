@@ -40,16 +40,60 @@
    (saturday  :col-type (or (:char 11) :null))
    (sunday    :col-type (or (:char 11) :null))))
 
-(mito:ensure-table-exists 'client)
+(mito:ensure-table-exists 'availability)
 
-(defgeneric add-availability (object)
+(defmethod print-object ((obj availability) stream)
+  (print-unreadable-object (obj stream :type t)
+    obj
+    (format stream
+            "Monday ~a~%Tuesday ~a~%Wednesday ~a~%Thursday ~a~%Friday ~a~%Saturday ~a~%Sunday ~a~%"
+            (availability-monday obj)
+            (availability-tuesday obj)
+            (availability-wednesday obj)
+            (availability-thursday obj)
+            (availability-friday obj)
+            (availability-saturday obj)
+            (availability-sunday obj))))
+
+;;; Making availability charts
+
+(defgeneric make-availability (object monday tuesday wednesday thursday friday saturday sunday)
+  (:documentation "Makes a complete availability chart for a given object"))
+
+(defmethod make-availability ((employee employee) mon tue wed thu fri sat sun)
+  (make-instance 'availability :object-id (mito:object-id employee)
+                               :monday mon
+                               :tuesday tue
+                               :wednesday wed
+                               :thursday thu
+                               :friday fri
+                               :saturday sat
+                               :sunday sun))
+
+(defmethod make-availability ((meeting-room meeting-room) mon tue wed thu fri sat sun)
+  (make-instance 'availability :object-id (mito:object-id meeting-room)
+                               :monday mon
+                               :tuesday tue
+                               :wednesday wed
+                               :thursday thu
+                               :friday fri
+                               :saturday sat
+                               :sunday sun))
+
+(defmethod add-availability ((availability availability))
+  "Adds an availability chart to the sql db"
+  (mito:insert-dao availability))
+
+;;; Blank availability charts for temporary use
+
+(defgeneric blank-availability (object)
   (:documentation "Adds a blank availability chart for a given object"))
 
-(defmethod add-availability ((employee employee))
+(defmethod blank-availability ((employee employee))
   (mito:insert-dao (make-instance 'availability
 				  :object-id (mito:object-id employee))))
 
-(defmethod add-availability ((meeting-room meeting-room))
+(defmethod blank-availability ((meeting-room meeting-room))
   (mito:insert-dao (make-instance 'availability
 				  :object-id (mito:object-id meeting-room))))
 
@@ -67,7 +111,7 @@
 ;;; Change availability for an object, one day at a time
 
 (defgeneric change-availability (object day avail-string)
-  (:documentation "Changes the monday availability for an object"))
+ (:documentation "Changes the monday availability for an object"))
 
 (defmethod change-availability ((employee employee) day avail-string)
   (let ((avail (find-availability employee)))
@@ -79,9 +123,19 @@
     (setf (slot-value avail day) avail-string)
     (mito:save-dao avail)))
 
-;;; Eventually, change multiple days at once, prompt or webapp
+;;; Day-of-the-week availability processing
 
-(defvar availability-days '(monday tuesday wednesday thursday friday saturday sunday))
+(defvar availability-days '((1 #'availability-monday)
+                            (2 #'availability-tuesday)
+                            (3 #'availability-wednesday)
+                            (4 #'availability-thursday)
+                            (5 #'availability-friday)
+                            (6 #'availabaility-saturday)
+                            (7 #'availability-sunday)))
+
+(defmethod day-of-week-avail ((availability availability) day-of-week)
+  (funcall (eval (second (assoc day-of-week availability-days)))
+           availability))
 
 
 ;;; Appointment Conflict Calculations
@@ -119,14 +173,16 @@
 
 (defmethod appointments ((week week))
   (loop :for i :from 1 :to (appointment-count)
-	:if (member (date-o (appointment-timestamp (mito:find-dao 'appointment :id i))) (days week))
+        :if (member (date-o (appointment-timestamp (mito:find-dao 'appointment :id i)))
+                    (days week))
 	  :collect (mito:find-dao 'appointment :id i) :into matches
 	:finally (return matches)))
 
 (defmethod appointments ((month month))
   (loop :for i :from 1 :to (appointment-count)
-	:if (member (date-o (appointment-timestamp (mito:find-dao 'appointment :id i))) (days month))
-	  :collect (mito:fin-dao 'appointment :id i) :into matches
+	:if (member (date-o (appointment-timestamp (mito:find-dao 'appointment :id i)))
+                    (days month))
+	  :collect (mito:find-dao 'appointment :id i) :into matches
 	:finally (return matches)))
 
 ;;; Blocks for irregular unavailabilities
@@ -136,96 +192,121 @@
 
 (defmethod block-off ((employee employee) timestamp duration)
   (add-appointment
-   (make-appointment 0 (id employee) 404 timestamp duration "Unavailable")))
+   (make-appointment 0 (mito:object-id employee) 404 timestamp duration "Unavailable")))
 
 (defmethod block-off ((meeting-room meeting-room) timestamp duration)
   (add-appointment
-   (make-appointment 0 0 (id meeting-room) timestamp duration "Unavailable")))
+   (make-appointment 0 0 (mito:object-id meeting-room) timestamp duration "Unavailable")))
 
-				
+
+;;; Available Time Slots
+
+(defgeneric available-times (object start-timestamp end-timestamp)
+  (:documentation "Finds all available 30 min timeslots for the given time period."))
+
+;(defmethod available-times ((employee employee) start-timestamp end-timestamp)
+ ; (cond ((later-timestamp start-timestamp
+  ;                        (first (read-availability
+   ;                               (day-of-week-avail
+     ;                              (find-availability employee)
+    ;                               (day-of-week (date-o start-timestamp))))))
+
+                                        ; steps for available times
+                                        ; first, start with either the start-timestamp
+                                        ; or the beginning of the availability for that day
+
+                                        ; then cycle through 30 minute time slots until
+                                        ; there is a conflict with either the end of shift
+                                        ; or end-timestamp
+                                        ; then cycle through the appointments for that employee
+                                        ; and remove any "available" slots that conflict
+
+
+
 ;;; Appointment conflict calculations:
 
-(defun overlap-p (appointment1 appointment2)
-  "Determines whether two appointments overlap in time."
-  (or (time-conflict-p (start-time appointment1)
-		       (start-time appointment2)
-		       (end-time appointment2))
-      (time-conflict-p (start-time appointment2)
-		       (start-time appointment1)
-		       (end-time appointment1))))
+;;; 
+;(defun overlap-p (appointment1 appointment2)
+ ; "Determines whether two appointments overlap in time."
+  ;(or (time-conflict-p (start-time appointment1)
+;		       (start-time appointment2)
+;		       (end-time appointment2))
+ ;     (time-conflict-p (start-time appointment2)
+;		       (start-time appointment1)
+;		       (end-time appointment1))))
 
-(defmethod available-p ((appointment appointment))
-  "Determines whether a suggested appointment poses conflicts."
-  (let ((e (id (employee appointment)))
-	(r (id (meeting-room appointment)))
-	(c (id (meeting-room appointment))))
-    (loop :for a :in *appointments*
-	  :if (and (or (equal e (id (employee a)))
-		       (equal r (id (meeting-room a)))
-		       (equal c (id (client a))))
-		   (overlap-p a appointment))
-	    :do (return nil)
-	  :else
-	    :do (return t))))
+;(defmethod available-p ((appointment appointment))
+ ; "Determines whether a suggested appointment poses conflicts."
+  ;(let ((e (id (employee appointment)))
+;	(r (id (meeting-room appointment)))
+;	(c (id (meeting-room appointment))))
+ ;   (loop :for a :in *appointments*
+;	  :if (and (or (equal e (id (employee a)))
+;		       (equal r (id (meeting-room a)))
+;		       (equal c (id (client a))))
+;		   (overlap-p a appointment))
+;	    :do (return nil)
+;	  :else
+;	    :do (return t))))
 
 (defgeneric availability-cycle (object start-time start-date end-time end-date duration)
   (:documentation "Cycles through the given time-frame, returns all open slots."))
 
-(defmethod availability-cycle ((employee employee) start-time start-date end-time end-date duration)
-  (loop :with ct      := start-time
-	:with cd      := start-date
-	:with opts    := nil
+;(defmethod availability-cycle ((employee employee) start-time start-date end-time end-date duration);
+  ;(loop :with ct      := start-time
+;	:with cd      := start-date
+;	:with opts    := nil
+;
+;	:if (and (equal-date (later-date cd end-date) cd)
+;		 (equal-time (later-time ct end-time) ct))
+;	  :do (return opts)
+;	:else :if (available-p (make-appointment 0 0 (id employee) 0 cd ct duration ""))
+;		:do (progn (setq opts
+;				 (cons (make-appointment
+;					0 0 (id employee) 0 cd ct duration "")
+;				       opts))
+;			   (setq ct (add-time ct duration))
+;;			   (if (and (equal (hour ct) 24)
+;				    (> (+ (minutes ct) duration) 60))
+;			       (setq cd (add-days cd 1))))
+;	:else :do (progn (setq ct (add-time ct duration))
+;			        (if (and (equal (hour ct) 24)
+;;				         (> (+ (minutes ct) duration) 60))
+;				    (setq cd (add-days cd 1))))))
 
-	:if (and (equal-date (later-date cd end-date) cd)
-		 (equal-time (later-time ct end-time) ct))
-	  :do (return opts)
-	:else :if (available-p (make-appointment 0 0 (id employee) 0 cd ct duration ""))
-		:do (progn (setq opts
-				 (cons (make-appointment
-					0 0 (id employee) 0 cd ct duration "")
-				       opts))
-			   (setq ct (add-time ct duration))
-			   (if (and (equal (hour ct) 24)
-				    (> (+ (minutes ct) duration) 60))
-			       (setq cd (add-days cd 1))))
-	:else :do (progn (setq ct (add-time ct duration))
-			        (if (and (equal (hour ct) 24)
-				         (> (+ (minutes ct) duration) 60))
-				    (setq cd (add-days cd 1))))))
 
-
-(defmethod availability-cycle ((meeting-room meeting-room) start-time start-date end-time end-date duration)
-  (loop :with ct      := start-time
-	:with cd      := start-date
-	:with opts    := nil
-
-	:if (and (equal-date (later-date cd end-date) cd)
-		 (equal-time (later-time ct end-time) ct))
-	  :do (return opts)
-	:else :if (available-p (make-appointment 0 0 0 (id meeting-room) cd ct duration ""))
-		:do (progn (setq opts
-				 (cons (make-appointment
-					0 0 0 (id meeting-room) cd ct duration "")
-				       opts))
-			   (setq ct (add-time ct duration))
-			   (if (and (equal (hour ct) 24)
-				    (> (+ (minutes ct) duration) 60))
-			       (setq cd (add-days cd 1))))
-	:else :do (progn (setq ct (add-time ct duration))
-			        (if (and (equal (hour ct) 24)
-				         (> (+ (minutes ct) duration) 60))
-				    (setq cd (add-days cd 1))))))
+;(defmethod availability-cycle ((meeting-room meeting-room) start-time start-date end-time end-date duration)
+ ; (loop :with ct      := start-time
+;	:with cd      := start-date
+;	:with opts    := nil
+;
+;	:if (and (equal-date (later-date cd end-date) cd)
+;		 (equal-time (later-time ct end-time) ct))
+;	  :do (return opts)
+;	:else :if (available-p (make-appointment 0 0 0 (id meeting-room) cd ct duration ""))
+;		:do (progn (setq opts
+;				 (cons (make-appointment
+;					0 0 0 (id meeting-room) cd ct duration "")
+;				       opts))
+;			   (setq ct (add-time ct duration))
+;			   (if (and (equal (hour ct) 24)
+;				    (> (+ (minutes ct) duration) 60))
+;			       (setq cd (add-days cd 1))))
+;	:else :do (progn (setq ct (add-time ct duration))
+;			        (if (and (equal (hour ct) 24)
+;				         (> (+ (minutes ct) duration) 60))
+;				    (setq cd (add-days cd 1))))))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Object availability
 ;;;;------------------------------------------------------------------------
 
-(defgeneric available-slots (object start-date end-date duration)
-  (:documentation "Returns all available appointments for a given object."))
-;;;;I think I messed up time- new day starts on 23 not 24
+;(defgeneric available-slots (object start-date end-date duration)
+;  (:documentation "Returns all available appointments for a given object."))
+;;;;;I think I messed up time- new day starts on 23 not 24
 
-(defmethod available-slots ((employee employee) start-date end-date duration)
-  (availability-cycle employee (set-time 1 00) start-date (set-time 23 00) end-date duration))
+;(defmethod available-slots ((employee employee) start-date end-date duration)
+ ; (availability-cycle employee (set-time 1 00) start-date (set-time 23 00) end-date duration))
 
 					;(defun available-p (appointment)
  ; "Checks availability of employee and room against the list of appointments"

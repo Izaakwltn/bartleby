@@ -74,6 +74,12 @@
 	   (add-time (timestamp cd (add-time ct 1)) (- minutes 1)))
 	  (t (add-time (timestamp cd (add-time ct 1)) (- minutes 1))))))
 
+(defmethod day-of-week ((timestamp timestamp))
+  (day-of-week (date-o timestamp)))
+
+(defmethod day-of-week-name ((timestamp timestamp))
+  (day-of-week (date-o timestamp)))
+
 ;;; Altering timestamps
 
 (defmethod change-date ((timestamp timestamp) new-date)
@@ -99,6 +105,18 @@
                        (date-o timestamp2))
          t)
         (t nil)))
+
+(defun later-timestamp (timestamp1 timestamp2)
+  "Compares two date-times, returns the later of the two"
+  (cond ((equal-date (date-o timestamp1)
+                     (date-o timestamp2))
+         (if (later-time-p (time-o timestamp1)
+                           (time-o timestamp2))
+             timestamp1 timestamp2))
+        ((later-date-p (date-o timestamp1)
+                       (date-o timestamp2))
+         timestamp1)
+        (t timestamp2)))
 
 (defun future-p (timestamp)
   "Determines whether a timestamp is in the future"

@@ -234,10 +234,16 @@
 		       (5 "Friday")
 		       (6 "Saturday")))
 
+(defgeneric day-of-week (object)
+  (:documentation "Determines the day of the week"))
+
 (defmethod day-of-week ((date date)) ;;;returns day number
   "Determines the day of the week for a given date."
   (let ((jan1 (second (assoc (y date) firsts-of-january))))
     (day-cycle jan1 (mod (- (day-nth date) 1) 7))))
+
+(defgeneric day-of-week-name (object)
+  (:documentation "Returns the name of the day of the week."))
 
 (defmethod day-of-week-name ((date date))
   "Returns the name of the day of the week of a date."

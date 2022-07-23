@@ -39,7 +39,7 @@
   (make-instance 'appointment :client-id   client-id
 		              :employee-id employee-id
 			      :room-id     room-id
-		              :timestamp   timestamp
+		              :timestamp   (sql-print timestamp)
 			      :duration    duration
 			      :notes       notes))
 

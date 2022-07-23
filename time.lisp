@@ -22,7 +22,7 @@
 	      (if (equal 1 (length (write-to-string minutes)))
 		  (concatenate 'string "0" (write-to-string minutes))
 		  minutes)
-	      (if (> hour 12) "pm" "am")))))
+	      (if (>= hour 12) "pm" "am")))))
 
 
 (defun set-time (hour minutes)
