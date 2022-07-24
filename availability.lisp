@@ -24,7 +24,7 @@
 	       (two-digits (write-to-string (minutes end-time)))))
 
 (defun read-availability (avail-string)
-  "Converts 'HH:MM-HH:MM' string into two set-times"
+  "Converts 'HH:MM-HH:MM' string into two set-time instances."
   (list (set-time (parse-integer (subseq avail-string 0 2))
 		  (parse-integer (subseq avail-string 3 5)))
 	(set-time (parse-integer (subseq avail-string 6 8))
@@ -199,6 +199,18 @@
    (make-appointment 0 0 (mito:object-id meeting-room) timestamp duration "Unavailable")))
 
 
+;;; Appointment conflict calculations:
+
+(defun overlap-p (appointment1 appointment2)
+  "Determines whether two appointments overlap in time."
+  (or (time-conflict-p (start-time appointment1)
+		       (start-time appointment2)
+		       (end-time appointment2))
+     (time-conflict-p (start-time appointment2)
+		       (start-time appointment1)
+		       (end-time appointment1))))
+
+
 ;;; Available Time Slots
 
 (defgeneric available-times (object start-timestamp end-timestamp)
@@ -225,15 +237,14 @@
 
 ;;; Appointment conflict calculations:
 
-;;; 
-;(defun overlap-p (appointment1 appointment2)
- ; "Determines whether two appointments overlap in time."
-  ;(or (time-conflict-p (start-time appointment1)
-;		       (start-time appointment2)
-;		       (end-time appointment2))
- ;     (time-conflict-p (start-time appointment2)
-;		       (start-time appointment1)
-;		       (end-time appointment1))))
+(defun overlap-p (appointment1 appointment2)
+  "Determines whether two appointments overlap in time."
+  (or (time-conflict-p (start-time appointment1)
+		       (start-time appointment2)
+		       (end-time appointment2))
+     (time-conflict-p (start-time appointment2)
+		       (start-time appointment1)
+		       (end-time appointment1))))
 
 ;(defmethod available-p ((appointment appointment))
  ; "Determines whether a suggested appointment poses conflicts."
@@ -297,26 +308,7 @@
 ;				         (> (+ (minutes ct) duration) 60))
 ;				    (setq cd (add-days cd 1))))))
 
-;;;;------------------------------------------------------------------------
-;;;;Object availability
-;;;;------------------------------------------------------------------------
 
-;(defgeneric available-slots (object start-date end-date duration)
-;  (:documentation "Returns all available appointments for a given object."))
-;;;;;I think I messed up time- new day starts on 23 not 24
-
-;(defmethod available-slots ((employee employee) start-date end-date duration)
- ; (availability-cycle employee (set-time 1 00) start-date (set-time 23 00) end-date duration))
-
-					;(defun available-p (appointment)
- ; "Checks availability of employee and room against the list of appointments"
-  ;(and (loop :for a :in (
-;
-;(defgeneric availability (object)
- ; (:documentation "Returns a list of availability for a given object."))
-;
-;(defmethod availability ((obj employee)
-;			 "available"))
 
 ;;;;------------------------------------------------------------------------
 ;;;;Set Availability functions

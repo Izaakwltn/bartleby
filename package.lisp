@@ -171,9 +171,10 @@
 	   #:print-invoice
 	   #:invoice-it)
 
+  ;;; test-populations.lisp
   (:export #:generate-clients
-	   #:generate-employees))
-	   ;#:generate-rooms
+	   #:generate-employees
+	   #:generate-rooms))
 	   ;#:generate-appointments)
   
 
