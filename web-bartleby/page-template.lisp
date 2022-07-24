@@ -19,21 +19,28 @@
        (:title ,title)
        (:script :src ,cl-bootstrap:*jquery-url*)
        (:script :src ,cl-bootstrap:*bootstrap-js-url*)))
-      ;(:header
-      ; (:nav ;maybe eventually fill with a loop from a list of pages
-;	(:a :href "index.html" "Home") ; new appointment ; new client...
-;	(:a :href "Schedule.html" "Schedule")
-;	(:a :href "lessons.html" "Lessons")
-;	(:a :href "resonance.html" "Resonance Calculator")
-;	(:a :href "library/refdesk.html" "Sheet Music Library")))
      (:body
-      (cl-bootstrap:bs-navbar (:brand "cl-bootstrap")
-        (cl-bootstrap:bs-navbar-nav ()
-            (cl-bootstrap:bs-nav-dropdown (:title "New")
-              (cl-bootstrap:bs-nav-li (:href "/new-appointment") "Appointment")
-              (:li (:a :href "/new-client" "Client"))
-              (:li (:a :href "/new-employee" "Employee"))
-              (:li (:a :href "/new-room" "Room")))))
+      (cl-bootstrap:bs-navbar (:brand "Bartleby")
+	(cl-bootstrap:bs-navbar-nav ()
+	  (cl-bootstrap:bs-nav-dropdown (:title "New")
+	    (cl-bootstrap:bs-nav-li (:href "/new-appointment") "Appointment")
+            (:li (:a :href "/new-client" "Client"))
+            (:li (:a :href "/new-employee" "Employee"))
+            (:li (:a :href "/new-room" "Room")))
+	  (cl-bootstrap:bs-nav-dropdown (:title "Browse")
+              (cl-bootstrap:bs-nav-li (:href "/browse-appointments") "Appointments")
+              (:li (:a :href "/browse-clients" "Clients"))
+              (:li (:a :href "/browse-employees" "Employees"))
+	      (:li (:a :href "/browse-rooms" "Rooms")))
+	  (cl-bootstrap:bs-nav-dropdown (:title "Calendar")
+              (cl-bootstrap:bs-nav-li (:href "/day-calendar") "Daily")
+              (:li (:a :href "/week-calendar" "Weekly"))
+              (:li (:a :href "/month-calendar" "Monthly")))
+	  (cl-bootstrap:bs-navbar-form ()
+		    (:div
+			(:div :class "form-group"
+			    (:input :type "text" :class "form-control" :placeholder "Search"))
+			(:button :type "submit" :class "btn btn-default" "Submit")))))
       (cl-bootstrap:bs-container ()
         (cl-bootstrap:bs-row
           (cl-bootstrap:bs-col-md ()
@@ -46,9 +53,9 @@
 
 (hunchentoot:define-easy-handler (app :uri "/") ()
   (with-page (:title "Home")
-    (cl-bootstrap:bs-well
-      (:p "I would prefer not to")
-      (:p (cl-bootstrap:bs-icon (:glyph "search"))))))
+    (:h1 "Bartleby the Scheduler")
+    (:p "Welcome to Bartleby the Scheduler, a barebones approach to scheduling, written in Common Lisp")
+    (:hr)))
 
 (defun generate-html-file (filename html-text)
   (with-open-file (output

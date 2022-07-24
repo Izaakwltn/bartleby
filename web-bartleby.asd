@@ -12,5 +12,5 @@
   :components ((:module "web-bartleby"
                 :serial t
                 :components ((:file "package")
-                             (:file "server")))))
-                             ;(:file "page-template")))))
+                             (:file "server")
+                             (:file "page-template")))))
