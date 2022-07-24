@@ -4,8 +4,10 @@
 
 (in-package :web-bartleby)
 
+(setf (html-mode) :html5)
+
 (defmacro with-page ((&key title) &body body)
-  `(spinneret::with-html-string
+  `(cl-who:with-html-output-to-string (*standard-output* nil :prologue t :indent t)
      (:doctype)
      (:html :lang "en"
       (:head
