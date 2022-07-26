@@ -7,10 +7,19 @@
   :author "Izaak Walton <izaakw@protonmail.com"
   :license "GNU General Purpose License"
   :description "Webapp for Bartleby Scheduling System"
-  :depends-on ("bartleby" "cl-who" "cl-bootstrap" "hunchentoot")
+  :depends-on ("bartleby" "cl-who" "spinneret" "cl-bootstrap" "hunchentoot")
   :serial t
   :components ((:module "web-bartleby"
                 :serial t
                 :components ((:file "package")
                              (:file "server")
-                             (:file "page-template")))))
+                             (:file "page-template")
+			     (:module "www"
+			      :serial t
+			      :components ((:file "new-client")
+					   (:file "new-appointment")
+					   (:file "new-employee")
+					   (:file "new-room")
+					   (:file "browse-clients")
+					   (:file "browse-employees")
+					   (:file "browse-rooms")))))))

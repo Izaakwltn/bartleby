@@ -7,7 +7,7 @@
 (hunchentoot:define-easy-handler (new-client-form :uri "/new-client") ()
   (with-page (:title "New Client")
     (:h1 "New Client")
-    (:form
+    (:form :action "/submit-new-client"
      (:label :for "fname"
 	     "First Name")
      (:input :type "text" :id "fname" :name "fname")
@@ -20,7 +20,9 @@
 	     "Phone Number XXXXXXXXXX ")
      (:input :type "text" :id "phone" :name "phone")
      (:hr)
-     (cl-bootstrap:bs-form-email ())
+     (:label :for "email"
+	     "Email ")
+     (:input :type "text" :id "email" :name "email")
      (:hr)
      (:label :for "address"
 	     "Address ")
@@ -32,5 +34,8 @@
 	          (cl-bootstrap:bs-form-checkbox "Check me out")
 		  (:button :type "submit" :class "btn btn-default" "Submit"))))
 
-;(hunchentoot:define-easy-handler (submit-new-client :uri "/submit-new-client") ()
- ; (
+(hunchentoot:define-easy-handler (submit-new-client :uri "/submit-new-client")
+  (fname lname phone email address notes)
+  (setf (hunchentoot:content-type*) "text/html")
+  (bartleby:add-client (bartleby::make-client fname lname phone email address notes))
+  (browse-clients))

@@ -4,7 +4,7 @@
 
 (in-package :web-bartleby)
 
-(setf (html-mode) :html5)
+(setf (cl-bootstrap::html-mode) :html5)
 
 (defmacro with-page ((&key title) &body body)
   `(cl-who:with-html-output-to-string (*standard-output* nil :prologue t :indent t)
