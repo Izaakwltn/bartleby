@@ -77,9 +77,18 @@
 	     
 ;;; Date Functions
 
+(defun equal-date (date1 date2)
+  "Determines whether two dates are equal."
+  (if (and (equal (m date1) (m date2))
+	   (equal (d date1) (d date2))
+	   (equal (y date1) (y date2)))
+	 t
+	 nil))
+
 (defun later-date-p (date1 date2)
   "Returns t if date1 is later than date2."
-  (cond ((> (y date1) (y date2)) t)
+  (cond ((equal-date date1 date2) nil)
+        ((> (y date1) (y date2)) t)
 	((> (y date2) (y date1)) nil)
 	((> (m date1) (m date2)) t)
 	((> (m date2) (m date1)) nil)
@@ -97,13 +106,13 @@
 	((> (d date2) (d date1)) date2)
 	(t date1)))
 
-(defun equal-date (date1 date2)
-  "Determines whether two dates are equal."
-  (if (and (equal (m date1) (m date2))
-	   (equal (d date1) (d date2))
-	   (equal (y date1) (y date2)))
-	 t
-	 nil))
+;(defun equal-date (date1 date2)
+ ; "Determines whether two dates are equal."
+  ;(if (and (equal (m date1) (m date2))
+;	   (equal (d date1) (d date2))
+;	   (equal (y date1) (y date2)))
+;	 t
+;	 nil))
 
 (defun month-days (month year)
   "Given a month and a year, returns the number of days in that month."
@@ -366,6 +375,15 @@
 	                            (m-days (month-days (m date) (y date))))
 				(loop :for i :from 1 :to m-days
 	                              :collect (date m i y)))))
+
+(defun week-gatherer (date last-day-of-month)
+  (cond ((later-date-p (first (days (week date))) last-day-of-month) nil)
+        (t (cons (week date) (week-gatherer
+                              (add-days date 7) last-day-of-month)))))
+
+(defmethod gather-weeks ((month month))
+  (week-gatherer (first (days month))
+                 (first (last (days month)))))
 
 (defun this-month ()
   (month (today)))

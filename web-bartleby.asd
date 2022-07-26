@@ -16,10 +16,12 @@
                              (:file "page-template")
 			     (:module "www"
 			      :serial t
-			      :components ((:file "new-client")
+			      :components ((:file "home-page")
+                                           (:file "new-client")
 					   (:file "new-appointment")
 					   (:file "new-employee")
 					   (:file "new-room")
 					   (:file "browse-clients")
 					   (:file "browse-employees")
-					   (:file "browse-rooms")))))))
+					   (:file "browse-rooms")
+                                           (:file "monthly-calendar")))))))

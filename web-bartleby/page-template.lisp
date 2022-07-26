@@ -33,9 +33,9 @@
               (:li (:a :href "/browse-employees" "Employees"))
 	      (:li (:a :href "/browse-rooms" "Rooms")))
 	  (cl-bootstrap:bs-nav-dropdown (:title "Calendar")
-              (cl-bootstrap:bs-nav-li (:href "/day-calendar") "Daily")
-              (:li (:a :href "/week-calendar" "Weekly"))
-              (:li (:a :href "/month-calendar" "Monthly")))
+              (cl-bootstrap:bs-nav-li (:href "/daily-calendar") "Daily")
+              (:li (:a :href "/weekly-calendar" "Weekly"))
+              (:li (:a :href "/monthly-calendar" "Monthly")))
 	  (cl-bootstrap:bs-navbar-form ()
 		    (:div
 			(:div :class "form-group"
@@ -51,39 +51,39 @@
 
 ;;;;HTML generation
 
-(hunchentoot:define-easy-handler (home-page :uri "/") ()
-  (with-page (:title "Home")
-    (:h1 "Bartleby the Scheduler")
-    (:p "Welcome to Bartleby the Scheduler, a barebones approach to scheduling, written in Common Lisp")
-    (:hr)))
+;(hunchentoot:define-easy-handler (home-page :uri "/") ()
+ ; (with-page (:title "Home")
+  ;  (:h1 "Bartleby the Scheduler")
+   ; (:p "Welcome to Bartleby the Scheduler, a barebones approach to scheduling, written in Common Lisp")
+   ; (:hr)))
 
-(hunchentoot:define-easy-handler (new-client-form :uri "/new-client") ()
-  (with-page (:title "New Client")
-    (:h1 "New Client")
-    (:form
-     (:label :for "fname"
-	     "First Name")
-     (:input :type "text" :id "fname" :name "fname")
-     (:hr)
-     (:label :for "lname"
-	     " Last Name ")
-     (:input :type "text" :id "lname" :name "lname")
-     (:hr)
-     (:label :for "phone"
-	     "Phone Number XXXXXXXXXX ")
-     (:input :type "text" :id "phone" :name "phone")
-     (:hr)
-     (cl-bootstrap:bs-form-email ())
-     (:hr)
-     (:label :for "address"
-	     "Address ")
-     (:input :type "text" :id "address" :name "address")
-     (:hr)
-     (:label :for "notes"
-	     "Notes ")
-     (:input :type "text" :id "notes" :name "notes")
-	          (cl-bootstrap:bs-form-checkbox "Check me out")
-	     (:button :type "submit" :class "btn btn-default" "Submit"))))
+;(hunchentoot:define-easy-handler (new-client-form :uri "/new-client") ()
+ ; (with-page (:title "New Client")
+  ;  (:h1 "New Client")
+   ; (:form
+    ; (:label :for "fname"
+;	     "First Name")
+ ;    (:input :type "text" :id "fname" :name "fname")
+  ;   (:hr)
+   ;  (:label :for "lname"
+;	     " Last Name ")
+   ;  (:input :type "text" :id "lname" :name "lname")
+ ;    (:hr)
+  ;   (:label :for "phone"
+;	     "Phone Number XXXXXXXXXX ")
+ ;    (:input :type "text" :id "phone" :name "phone")
+  ;   (:hr)
+   ;  (cl-bootstrap:bs-form-email ())
+    ; (:hr)
+     ;(:label :for "address"
+;	     "Address ")
+ ;    (:input :type "text" :id "address" :name "address")
+  ;   (:hr)
+  ;   (:label :for "notes"
+;	     "Notes ")
+ ;    (:input :type "text" :id "notes" :name "notes")
+;	          (cl-bootstrap:bs-form-checkbox "Check me out")
+;	     (:button :type "submit" :class "btn btn-default" "Submit"))))
 
 (defun generate-html-file (filename html-text)
   (with-open-file (output

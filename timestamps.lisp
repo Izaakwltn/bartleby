@@ -45,6 +45,13 @@
 	    (two-digits string-hour)
 	    (two-digits string-minute))))
 
+(defun timestamp-from-sql (t-string)
+  (timestamp (date (parse-integer (subseq t-string 6 8))
+                   (parse-integer (subseq t-string 9 11))
+                   (parse-integer (subseq t-string 1 5)))
+             (set-time (parse-integer (subseq t-string 12 14))
+                       (parse-integer (subseq t-string 15 17)))))
+
 (defun timestamp (date time)
   (make-instance 'timestamp :date-o date
 		            :time-o time))
