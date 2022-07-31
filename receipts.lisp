@@ -1,191 +1,100 @@
-;;;;receipts.lisp
+;;;; receipts.lisp
 ;;;;
-;;;;
+;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Receipts
-;;;;------------------------------------------------------------------------
+;;; Receipts
 
 (defvar *receipts* nil)
 
 (defclass receipt ()
-  ((id            :initarg :id
-		  :accessor id)
-   (appointment   :initarg :appointment
-		  :accessor appointment)
-   (makeup-change :initarg :makeup-change
-		  :accessor makeup-change)
-   (attendance    :initarg :attendance
-		  :accessor attendance)
-   (duration      :initarg :duration
-		  :accessor duration)
+  ((appointment-id :col-type (:int))
+   (attendance    :col-type (:int))
    (notes         :initarg :notes
 		  :accessor notes)))
-				      ;in interface, can accept nil value
 
-(defvar attendance-values '((0 "Arrived                ")
-			    (1 "No Show                ")
-			    (2 "Cancelled, Makeup Added")
-			    (3 "Makeup Used            ")
-			    (4 "Lesson + Makeup Minutes")))
+(mito:ensure-table-exists 'receipt)  
+
+(defvar attendance-values '(arrived no-show cancelled-add-makeup makeup-used lesson-extra-makeup-used))
+
+(deftype attendance-value () (member attendance-values))
 
 (defmethod print-object ((obj receipt) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((id            id)
-	             (appointment   appointment)
-		     (attendance    attendance)
-		     (duration      duration)
-		     (makeup-change makeup-change)
+    (with-accessors ((receipt-appointment-id   receipt-appointment-id)
+		     (receipt-attendance    receipt-attendance)
 		     (notes         notes))
 	obj
-      (format stream"Receipt #~a, ~a ~a ~a, ~a ~a minutes, Makeup Change: ~a Notes: ~a"
-	      id
-	      (dt appointment)
-	      (clients appointment)
-	      (employees appointment)
-	      (second (assoc attendance attendance-values))
-	      duration
-	      makeup-change
+      (format stream "Receipt # ~a~%~a"
+	      (mito:object-id obj)
+	      (mito:find-object 'appointment :id receipt-appointment)
+	      (second (assoc receipt-attendance attendance-values))
 	      notes))))
 
-(defmethod make-receipt ((appointment appointment) id attendance duration makeup-change notes)
-  (make-instance 'receipt :id            id
-			  :appointment   appointment
-		          :attendance    attendance
-			  :duration      duration
-			  :makeup-change makeup-change
-			  :notes         notes))
+(defmethod make-receipt ((appointment appointment) attendance notes)
+  (make-instance 'receipt :appointment-id (mito:object-id appointment)
+		          :attendance     attendance
+			  :notes          notes))
 
-;;;;------------------------------------------------------------------------
-;;;;Adding and removing receipts
-;;;;------------------------------------------------------------------------
-(defvar *receipts* nil)
+;;; Adding and removing receipts
 
 (defmethod add-receipt ((receipt receipt))
-  (push receipt *receipts*)
-  (refresh-receipt-backup))
+  (mito:insert-dao receipt))
 
 (defmethod remove-receipt ((receipt receipt))
-  (setq *receipts*
-	(remove-if #'(lambda (r)
-		       (equal (id r) (id receipt))))))
-;;;;------------------------------------------------------------------------
-;;;;Backing up receipts                                                          ;;;;;like clients, employees etc
-;;;;------------------------------------------------------------------------
-(defmethod backup-unit ((receipt receipt))
-  (let ((app (appointment receipt)))
-    (format nil "(load-saved-item (make-receipt (make-appointment ~a (quote ~a) (quote ~a) ~a ~a ~a ~a) ~a ~a ~a ~a ~a~%))"
-	    (id            app)
-	    (client-ids    app)
-	    (employee-ids  app)
-	    (id            (meeting-room app))
-	    (backup-unit   (dt app))
-	    (duration      app)
-	    (write-to-string (notes app))
-	    (id            receipt)
-	    (attendance    receipt)
-	    (duration      receipt)
-	    (makeup-change receipt)
-	    (write-to-string (notes         receipt)))))
+  (mito:delete-dao receipt))
 
-(defun refresh-receipt-backup ()
-  (make-backup "receipts" (sort (copy-list *receipts*) #'(lambda (r1 r2)
-							   (< (id r1) (id r2))))))
+(defmethod replace-receipt ((receipt receipt) new-receipt)
+  (remove-receipt receipt)
+  (add-receipt new-receipt))
 
-(defmethod load-saved-item ((receipt receipt))
-  (push receipt *receipts*))
-
-(defun update-last-receipt-id ()
-  (setq last-receipt-id (id (first *receipts*))))
-
-;;;;------------------------------------------------------------------------
-;;;;New Receipts
-;;;;------------------------------------------------------------------------
-
-(defvar last-receipt-id (if (first *receipts*)
-			    (id (first *appointments*))
-			    20000))
-
-(defun new-receipt-id ()
-  (setq last-receipt-id (+ last-receipt-id 1))
-  last-receipt-id)
-
-(defmethod new-receipt ((appointment appointment) attendance duration makeup-change notes)
-  (add-receipt (make-receipt appointment (new-receipt-id) attendance duration makeup-change notes)))
-
-;;;;------------------------------------------------------------------------
-;;;;Finding appointments ready for check-out
-;;;;------------------------------------------------------------------------
-
-(defmethod past-p ((appointment appointment))
-  (if (later-date-time-p (current-date-time)
-			 (dt appointment))
-      t
-      nil))
-			 
+;;; Finding appointments ready for check-out
+	 
 (defgeneric ready-appointments (object)
   (:documentation "Finds all past, unchecked appointments for the given object"))
 
 (defmethod ready-appointments ((employee employee))
   "Returns all past appointments."
-    (loop :for a in *appointments*
-          :if (and (find-if #'(lambda (e)
-				(equal (id e) (id employee)))
-			    (employees a))
-		   (past-p a))
-	    :collect a into apts
-	  :finally (return apts)))
+    (past-appointments (appointments employee)))
 
 (defmethod ready-appointments ((client client))
   "Returns all past appointments for the client."
-  (loop :for a in *appointments*
-	:if (and (find-if #'(lambda (c)
-			      (equal (id c) (id client)))
-			  (clients a))
-		 (past-p a))
-	  :collect a into apts
-	:finally (return apts)))
+  (past-appointments (appointments client)))
 
 (defmethod ready-appointments ((meeting-room meeting-room))
-  (loop :for a in *appointments*
-	:if (and (equal (id meeting-room) (id (meeting-room a)))
-		 (past-p a))
-	  :collect a into apts
-	:finally (return apts)))
+  (past-appointments (appointments meeting-room)))
 
-;;;;------------------------------------------------------------------------
-;;;;Appointments by object for a given month
-;;;;------------------------------------------------------------------------
-                                                                    ;maybe this should be moved to the appointments section
-(defgeneric month-appointments (object month)
-  (:documentation "Returns all appointments for an object given a month number"))
+;;;Appointments by object for a given month
+;maybe this should be moved to the appointments section
+;(defgeneric month-appointments (object month)
+ ; (:documentation "Returns all appointments for an object given a month number"))
 
-(defmethod month-appointments ((employee employee) month)
-  (loop :for a :in *appointments*
-	:if (and (find-if #'(lambda (e)
-			      (equal (id e) (id employee)))
-			  (employees a))
-		 (equal (m (date-o (dt a))) month))
-	  :collect a :into apts
-	:finally (return apts)))
+;(defmethod month-appointments ((employee employee) month)
+ ; (loop :for a :in *appointments*
+;	:if (and (find-if #'(lambda (e)
+;			      (equal (id e) (id employee)))
+;			  (employees a))
+;		 (equal (m (date-o (dt a))) month))
+;	  :collect a :into apts
+;	:finally (return apts)))
 
-(defmethod month-appointments ((client client) month)
-  (loop :for a :in *appointments*
-	:if (and (find-if #'(lambda (c)
-			      (equal (id c) (id client)))
-			  (clients a))
-		 (equal (m (date-o (dt a))) month))
-	  :collect a :into apts
-	:finally (return apts)))
+;(defmethod month-appointments ((client client) month)
+ ; (loop :for a :in *appointments*
+;	:if (and (find-if #'(lambda (c)
+;			      (equal (id c) (id client)))
+;			  (clients a))
+;		 (equal (m (date-o (dt a))) month))
+;	  :collect a :into apts
+;	:finally (return apts)))
 
-(defmethod month-appointments ((meeting-room meeting-room) month)
-  (loop :for a :in *appointments*
-	:if (and (equal (id meeting-room) (id (meeting-room a)))
-		 (equal (m (date-o (dt a))) month))
-	  :collect a :into apts
-	:finally (return apts)))
+;(defmethod month-appointments ((meeting-room meeting-room) month)
+ ; (loop :for a :in *appointments*
+;	:if (and (equal (id meeting-room) (id (meeting-room a)))
+;		 (equal (m (date-o (dt a))) month))
+;	  :collect a :into apts
+;	:finally (return apts)))
+;
 
 ;;;;------------------------------------------------------------------------
 ;;;;Checking out appointments

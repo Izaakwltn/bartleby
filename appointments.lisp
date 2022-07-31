@@ -155,19 +155,29 @@
         :if (future-p (appointment-timestamp i))
           :collect i))
 
+(defun past-appointments (appointment-list)
+  (loop :for i :in appointment-list
+	:if (not (future-p (appointment-timestamp i)))
+	  :colelct i))
+
 (defun all-past-appointments ()
   "Returns all past appointments"
-  (loop :for i :in (all-appointments)
-        :if (not (future-p (appointment-timestamp i)))
-          :collect i))
+  (past-appointments (all-appointments)))
 
-(defgeneric appointments (object)
-  (:documentation "Returns all appointments associated with an object."))
+;(defgeneric appointments (object)
+ ; (:documentation "Returns all appointments associated with an object."))
 
-(defmethod appointments ((client client))
-  (let ((c (mito:object-id client)))
-    (loop :for i :from 1 :to (appointment-count)
-	  :if (equal c (mito:object-id (mito:find-dao 'appointment :id i)))
-	    :collect (mito:find-dao 'appointment :id i) :into matches
-	  :finally (return matches))))
+;(defmethod appointments ((client client))
+ ; (let ((c (mito:object-id client)))
+  ;  (loop :for i :from 1 :to (appointment-count)
+;	  :if (equal c (mito:object-id (mito:find-dao 'appointment :id i)))
+;	    :collect (mito:find-dao 'appointment :id i) :into matches
+;	  :finally (return matches))))
+
+;(defmethod appointments ((employee employee))
+ ; (let ((c (mito:object-id employee employee)))
+  ;  (loop :for i :from 1 :to (appointment-count)
+;	  :if (equal c (mito:object-id (mito:find-dao 'appointment :id i)))
+;	    :collect (mito:find-dao 'appointment :id i) :into matches
+;	  :finally (return matches))))
 		     
