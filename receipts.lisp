@@ -6,13 +6,11 @@
 
 ;;; Receipts
 
-(defvar *receipts* nil)
-
-(defclass receipt ()
+(mito:deftable receipt ()
   ((appointment-id :col-type (:int))
    (attendance    :col-type (:int))
-   (notes         :initarg :notes
-		  :accessor notes)))
+   (notes         :col-type (:int)))
+  (:conc-name "receipt-"))
 
 (mito:ensure-table-exists 'receipt)  
 
@@ -22,25 +20,25 @@
 
 (defmethod print-object ((obj receipt) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((receipt-appointment-id   receipt-appointment-id)
+   (with-accessors ((receipt-appointment-id   receipt-appointment-id)
 		     (receipt-attendance    receipt-attendance)
-		     (notes         notes))
+      	     (receipt-notes         receipt-notes))
 	obj
-      (format stream "Receipt # ~a~%~a"
+     (format stream "Receipt # ~a~%~a~%~a~%~a"
 	      (mito:object-id obj)
-	      (mito:find-object 'appointment :id receipt-appointment)
+	      (mito:find-dao 'appointment :id receipt-appointment)
 	      (second (assoc receipt-attendance attendance-values))
-	      notes))))
+	      receipt-notes))))
 
 (defmethod make-receipt ((appointment appointment) attendance notes)
-  (make-instance 'receipt :appointment-id (mito:object-id appointment)
+ (make-instance 'receipt :appointment-id (mito:object-id appointment)
 		          :attendance     attendance
 			  :notes          notes))
 
 ;;; Adding and removing receipts
 
 (defmethod add-receipt ((receipt receipt))
-  (mito:insert-dao receipt))
+ (mito:insert-dao receipt))
 
 (defmethod remove-receipt ((receipt receipt))
   (mito:delete-dao receipt))
@@ -64,6 +62,18 @@
 
 (defmethod ready-appointments ((meeting-room meeting-room))
   (past-appointments (appointments meeting-room)))
+
+
+
+
+
+
+
+
+
+
+
+
 
 ;;;Appointments by object for a given month
 ;maybe this should be moved to the appointments section

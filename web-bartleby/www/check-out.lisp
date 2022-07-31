@@ -5,7 +5,7 @@
 (in-package :web-bartleby)
 
 (defmethod checkable-appointment ((appointment bartleby::appointment))
-  (:tr (:td (format nil "~a ~a"
+  (spinneret:with-html (:tr (:td (format nil "~a ~a"
 		    (bartleby::client-first-name (mito:find-dao 'client :id (bartleby::appointment-client-id appointment)))
 		    (bartleby::client-last-name (mito:find-dao 'client :id (bartleby::appointment-client-id appointment)))))
        (:td (format nil "~a ~a"
@@ -13,10 +13,10 @@
 		     (mito:find-dao 'employee :id (bartleby::appointment-employee-id appointment)))
 		    (bartleby::employee-last-name
 		     (mito:find-dao 'employee :id (bartleby::appointment-employee-id appointment)))))
-       (:td (format nil "~a" (bartleby::appointment-timestamp appointment)))
-       (:td (:select (loop :for i :in bartleby::appointment-values
-			   :do (:option :value i (format nil "~a" i)))))))
-					
+       (:td (format nil "~a" (bartleby::timestamp-from-sql (bartleby::appointment-timestamp appointment))))
+       (:td (:select (loop :for i :in bartleby::attendance-values
+						:do (:option :value i (format nil "~a" i))))))))
+
 (hunchentoot:define-easy-handler (appointments-check-out :uri "/appointments-check-out") ()
   (with-page (:title "Check out Appointments")
     (:h1 "Check out Appointments")
@@ -29,7 +29,7 @@
 	     (:th "Attendance")
 	    (:tbody
 	     (spinneret:with-html
-		   (loop :for a :in (all-past-appointments)
+		   (loop :for a :in (bartleby::all-past-appointments)
 		         :do (checkable-appointment a)))))))))
      ;(:hr)
 ;     (spinneret:with-html (:select :name "employee" :form "new-appointment"
