@@ -152,12 +152,12 @@
 (defun all-future-appointments ()
   "Returns all future appointments"
   (loop :for i :in (all-appointments)
-        :if (future-p (appointment-timestamp i))
+        :if (future-p (timestamp-from-sql (write-to-string (appointment-timestamp i))))
           :collect i))
 
 (defun past-appointments (appointment-list)
   (loop :for i :in appointment-list
-	:if (not (future-p (timestamp-from-sql (appointment-timestamp i))))
+	:if (not (future-p (timestamp-from-sql (write-to-string (appointment-timestamp i)))))
 	  :collect i))
 
 (defun all-past-appointments ()
