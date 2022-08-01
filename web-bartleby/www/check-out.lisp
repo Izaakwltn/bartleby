@@ -23,9 +23,11 @@
 				      (bartleby::employee-last-name
 				       (mito:find-dao 'bartleby::employee
 						      :id (bartleby::appointment-employee-id appointment)))))
-			 (:td (format nil "~a"
-				      (bartleby::timestamp-from-sql
-				       (write-to-string (bartleby::appointment-timestamp appointment)))))
+			 (:td (let ((ts (bartleby::timestamp-from-sql
+				         (write-to-string (bartleby::appointment-timestamp appointment)))))
+				(let ((dos (bartleby::date-o ts))
+				      (tos (bartleby::time-o ts)))
+				  (format nil "~a ~a" dos tos))))
 			 (:td (:select :name "attendance" :form "appointment-check-out"
 				(loop :for i :in bartleby::attendance-values
 			              :do (:option :value i (format nil "~a" i)))))

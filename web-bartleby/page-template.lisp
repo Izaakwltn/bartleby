@@ -35,7 +35,8 @@
 	  (cl-bootstrap:bs-nav-dropdown (:title "Calendar")
               (cl-bootstrap:bs-nav-li (:href "/daily-calendar") "Daily")
               (:li (:a :href "/weekly-calendar" "Weekly"))
-              (:li (:a :href "/monthly-calendar" "Monthly")))
+	    (:li (:a :href "/monthly-calendar" "Monthly")))
+	  (:a :href "/appointments-check-out" "Check Out")
 	  (cl-bootstrap:bs-navbar-form ()
 		    (:div
 			(:div :class "form-group"

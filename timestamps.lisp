@@ -46,7 +46,7 @@
 	    (two-digits string-minute))))
 
 (defun timestamp-from-sql (t-string)
-  (timestamp (date (parse-integer (subseq t-string 6 8))
+  (timestamp (date (parse-integer (subseq t-string 5 8))
                    (parse-integer (subseq t-string 9 11))
                    (parse-integer (subseq t-string 1 5)))
              (set-time (parse-integer (subseq t-string 12 14))
@@ -66,7 +66,7 @@
 
 (defmethod add-days ((timestamp timestamp) days)
   "Adds a specified number of dates to the given date-time"
-  (timestamp (add-days (timestamp timestamp) days) (time-o timestamp)))
+  (timestamp (add-days (date-o timestamp) days) (time-o timestamp)))
 
 (defmethod add-time ((timestamp timestamp) minutes)
   "Adds minutes to a date-time"

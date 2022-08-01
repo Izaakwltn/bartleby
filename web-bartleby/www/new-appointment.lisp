@@ -44,7 +44,7 @@
      (:label :for "notes"
 	     "Notes ")
      (:input :type "text" :id "notes" :name "notes")
-	          (cl-bootstrap:bs-form-checkbox "Check me out")
+	          (cl-bootstrap:bs-form-checkbox "Recurring")
 	     (:button :type "submit" :class "btn btn-default" "Submit"))))
 
 

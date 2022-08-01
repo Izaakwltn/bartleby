@@ -95,20 +95,33 @@
 		    (appointment-notes appointment)))
 
 (defmethod add-days ((appointment appointment) days)
-  (copy-new-timestamp appointment (add-days (dt appoitnment) days)))
+  (copy-new-timestamp appointment (add-days (timestamp-from-sql (appointment-timestamp appointment)) days)))
 
 (defmethod next-day ((appointment appointment))
-  (copy-new-timestamp appointment (next-day (dt appointment))))
+  (copy-new-timestamp appointment (next-day (appointment-timestamp appointment))))
 
 (defmethod next-week ((appointment appointment))
-  (copy-new-timestamp appointment (add-days (dt appointment) 7)))
+  (copy-new-timestamp appointment (add-days (appointment-timestamp appointment) 7)))
 
 (defmethod next-month ((appointment appointment))
-  (copy-new-timestamp appointment (next-month (dt appointment))))
+  (copy-new-timestamp appointment (next-month (let ((at (appointment-timestamp appointment)))
+					       (if (typep at 'simple-base-string)
+							    (recurring-timestamp-format at)
+							    at)))))
 
 (defmethod next-year ((appointment appointment))
-  (copy-new-timestamp appointment (next-year (dt appointment))))
+  (copy-new-timestamp appointment (next-year (let ((at (appointment-timestamp appointment)))
+					       (if (typep at 'simple-base-string)
+							    (recurring-timestamp-format at)
+							    at)))))
 
+(defun recurring-timestamp-format (t-string)
+  (timestamp (date (parse-integer (subseq t-string 5 7))
+                   (parse-integer (subseq t-string 8 10))
+                   (parse-integer (subseq t-string 0 4)))
+             (set-time (parse-integer (subseq t-string 11 13))
+                       (parse-integer (subseq t-string 14 16)))))
+  
 (defmethod recurring ((appointment appointment) number-of-appointments day-gap)
     (loop :with a := appointment
 	  :for i :from 1 :to number-of-appointments

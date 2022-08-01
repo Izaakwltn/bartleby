@@ -6,9 +6,8 @@
 
 ;;; Receipts
 
-(mito:deftable receipt ()
-  ((appointment-id :col-type (:int))
-   (attendance    :col-type (:int))
+(mito:deftable receipt (appointment)
+  ((attendance    :col-type (:int))
    (notes         :col-type (:int)))
   (:conc-name "receipt-"))
 
@@ -20,15 +19,25 @@
 
 (defmethod print-object ((obj receipt) stream)
   (print-unreadable-object (obj stream :type t)
-   (with-accessors ((receipt-appointment-id   receipt-appointment-id)
-		     (receipt-attendance    receipt-attendance)
-      	     (receipt-notes         receipt-notes))
+   (with-accessors ((client-id     appointment-client-id)
+		    (employee-id   appointment-employee-id)
+		    (room-id       appointment-room-id)
+		    (timestamp     appointment-timestamp)
+		    (duration      appointment-duration)
+		    (notes         appointment-notes)
+                    (attendance    receipt-attendance)
+      	            (receipt-notes receipt-notes))
 	obj
-     (format stream "Receipt # ~a~%~a~%~a~%~a"
-	      (mito:object-id obj)
-	      (mito:find-dao 'appointment :id receipt-appointment)
-	      (second (assoc receipt-attendance attendance-values))
-	      receipt-notes))))
+     (format stream "Receipt #~a~%~a~%~a~%~a~%~a~%~a~%~a~%~a~%~a"
+	     (mito:object-id obj)
+	     timestamp
+	     (room-id-search room-id)
+	     (client-id-search client-id)
+             (employee-id-search employee-id)
+             duration
+	     notes
+	     attendance
+	     receipt-notes))))
 
 (defmethod make-receipt ((appointment appointment) attendance notes)
  (make-instance 'receipt :appointment-id (mito:object-id appointment)
