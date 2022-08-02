@@ -7,8 +7,8 @@
 ;;; Receipts
 
 (mito:deftable receipt (appointment)
-  ((attendance    :col-type (:int))
-   (notes         :col-type (:int)))
+  ((attendance    :col-type (:varchar 32))
+   (final-notes :col-type (:varchar 128)))
   (:conc-name "receipt-"))
 
 (mito:ensure-table-exists 'receipt)  
@@ -19,14 +19,14 @@
 
 (defmethod print-object ((obj receipt) stream)
   (print-unreadable-object (obj stream :type t)
-   (with-accessors ((client-id     appointment-client-id)
-		    (employee-id   appointment-employee-id)
-		    (room-id       appointment-room-id)
-		    (timestamp     appointment-timestamp)
-		    (duration      appointment-duration)
-		    (notes         appointment-notes)
-                    (attendance    receipt-attendance)
-      	            (receipt-notes receipt-notes))
+   (with-accessors ((client-id   appointment-client-id)
+		    (employee-id appointment-employee-id)
+		    (room-id     appointment-room-id)
+		    (timestamp   appointment-timestamp)
+		    (duration    appointment-duration)
+		    (notes       appointment-notes)
+                    (attendance  receipt-attendance)
+      	            (final-notes receipt-final-notes))
 	obj
      (format stream "Receipt #~a~%~a~%~a~%~a~%~a~%~a~%~a~%~a~%~a"
 	     (mito:object-id obj)
@@ -37,13 +37,17 @@
              duration
 	     notes
 	     attendance
-	     receipt-notes))))
+	     final-notes))))
 
 (defmethod make-receipt ((appointment appointment) attendance notes)
- (make-instance 'receipt :appointment-id (mito:object-id appointment)
-		          :attendance     attendance
-			  :notes          notes))
-
+  (make-instance 'receipt :client-id (appointment-client-id appointment)
+			  :employee-id (appointment-employee-id appointment)
+			  :room-id (appointment-room-id appointment)
+			  :timestamp (appointment-timestamp appointment)
+			  :duration (appointment-duration appointment)
+			  :notes       (appointment-notes appointment)
+			  :attendance (write-to-string attendance)
+		          :final-notes notes))
 ;;; Adding and removing receipts
 
 (defmethod add-receipt ((receipt receipt))
@@ -73,9 +77,22 @@
   (past-appointments (appointments meeting-room)))
 
 
+;;; Referencing Receipts
 
+(defun receipt-count ()
+  "Returns the total number of Receipts"
+  (mito:count-dao 'receipt))
 
+(defun receipt-id-search (receipt-id)
+  (mito:find-dao 'receipt :id receipt-id))
 
+(defun all-receipts ()
+  (loop :with receipts := nil
+
+	:for i :upfrom 1
+	:if (equal (length receipts) (receipt-count))
+	  :do (return receipts)
+	:else :do (setq receipts (cons (mito:find-dao 'receipt :id i) receipts))))
 
 
 
