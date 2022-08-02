@@ -3,55 +3,49 @@
 
 (in-package :bartleby)
 
-;;;;------------------------------------------------------------------------
-;;;;Invoice class
-;;;;------------------------------------------------------------------------
+;;; Invoice class
 
 (defclass invoice ()
   ((title        :initarg :title
 	         :accessor title)
-   (subject      :initarg :subject
-		 :accessor subject) ;;;;client or employee, maybe room or eventually office
+ ;  (subject      :initarg :subject
+;		 :accessor subject) ;;;;client or employee, maybe room or eventually office
    (receipts     :initarg :receipts
 		 :accessor receipts)))
 
 (defmethod print-object ((obj invoice) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((title title)
-		     (subject subject)
+		;     (subject subject)
 		     (receipts receipts))
 	obj
       (format stream
-	      "~%~a:~%~%~a~%~{~a~%~}~%"
-	      title subject receipts))))
+	      "~%~a:~%~{~a~%~}~%"
+	      title receipts))))
 
-(defun draft-invoice (title owner-id receipts)
+(defun draft-invoice (title receipts)
   (make-instance 'invoice :title title
-		          :subject (if (employee-id-search owner-id) ;;;make its own function 
-				       (employee-id-search owner-id)
-				       (client-id-search owner-id))
+		          ;:subject (if (employee-id-search owner-id) ;;;make its own function 
+			;;	       (employee-id-search owner-id)
+			;	       (client-id-search owner-id))
 			  :receipts receipts))
 
-;;;;------------------------------------------------------------------------
-;;;;Invoice calculations
+;;;Invoice calculations
 ;;;;------------------------------------------------------------------------
 
 (defmethod invoice-total ((invoice invoice))
   "Returns the total money earned for an invoice."
   (loop :for r :in (receipts invoice)
-	:sum (* (/ (duration (appointment r)) 60)
-		(hourly-rate (employee (appointment r))))))
-
+	:sum (* (/ (appointment-duration r) 60)
+		(employee-hourly-rate (employee-id-search (appointment-employee-id r))))))
 
 (defgeneric month-receipts (object month year)
   (:documentation "Returns all receipts for an object in the month"))
 
 (defmethod month-receipts ((employee employee) month year)
   "Returns all apppointments for an employee in a given month."
-  (loop :for r :in *receipts*
-	:if (and (find-if #'(lambda (e)
-			      (equal (id e) (id employee)))
-			  (employees (appointment r)))
+  (loop :for r :in (all-receipts)
+	:if (and (equal (appointment-employee-id r) (employee-id employee))
 		 (equal month (m (date-o (dt (appointment r)))))
 		 (equal year (y (date-o (dt (appointment r))))))
 	  :collect r :into rcpts
@@ -103,23 +97,23 @@
 				     (last-name (first employee-list))
 				     ", ")))))
 
-(defmethod print-invoice (filename (invoice invoice))
+(defmethod print-invoice ((invoice invoice) filename)
   (with-open-file (out (asdf:system-relative-pathname "bartleby" filename)
 		       :direction         :output
 		       :if-does-not-exist :create
 		       :if-exists         :overwrite)
-    (format out "~%~a~%~%~a ~a~%~%~%"
+    (format out "~%~a~%~%~a~%~%"
 	    (title invoice)
-	    (first-name (subject invoice))
-	    (last-name (subject invoice)))
+	    ;(first-name (subject invoice))
+	    ;(last-name (subject invoice)))
 	    ;(address (owner invoice)))
      (loop :for r :in (receipts invoice)
-	   :do (let ((d  (date-o (dt (appointment r))))
-	             (st (time-o (dt (appointment r))))
-	             (cl (clients (appointment r)))
-		     (em (employees (appointment r))))
+	   :do (let ((d  (date-o (timestamp-from-sql (write-to-string (appointment-timestamp r)))))
+		     (st (time-o (timestamp-from-sql (write-to-string (appointment-timestamp r)))))
+		     (c (client-id-search (appointment-client-id r)))
+		     (e (employee-id-search (appointment-employee-id r))))
 		 (format out
-			 "~a, ~a ~a~a, ~a - ~a:~a ~a~%Client(s): ~a| Employee(s): ~a~%~a ~amin| Makeup Change: ~a~%~%"
+			 "~a, ~a ~a~a, ~a-~a:~a ~a~%Client: ~a| Employee: ~a~%~a ~amin|~%~%"
 			 (second (assoc (day-of-week d) days-of-week))
 		         (second (assoc (m d) month-names))
 		         (if (equal (length (write-to-string (d d))) 1)
@@ -140,20 +134,16 @@
 			     (concatenate 'string "0" (write-to-string (minutes st)))
 			     (minutes st))
 			 (if (> (hour st) 12) "pm" "am")
-			 (if (equal (length cl) 1)
-			     (concatenate 'string (first-name (first cl))
-					  " "
-					  (last-name (first cl)))
-			     (printable-invoice-clients cl))
-			 (if (equal (length em) 1)
-			     (concatenate 'string (first-name (first em))
-					  " "
-					  (last-name (first em)))
-			     (printable-invoice-clients em))
-			 (second (assoc (attendance r) attendance-values))
-			 (write-to-string (duration r))
-			 (write-to-string (makeup-change r))))))
-  (format t "Printing Invoice to: ~a" filename))
+			 (concatenate 'string
+				      (client-first-name c)
+				      " "
+				      (client-last-name c))
+			 (concatenate 'string
+			              (employee-first-name e)
+				      " "
+				      (employee-last-name e))
+			 (write-to-string (receipt-attendance r))
+			 (write-to-string (appointment-duration r))))))))
 			 
 (defgeneric invoice-it (object month year &optional filename title)
   (:documentation "Prints an invoice for an object"))

@@ -25,6 +25,7 @@
 	       (:file "appointments")
 	       (:file "availability") 
 	       (:file "receipts")
+	       (:file "check-out")
                (:file "credits")
 	       (:file "invoices") ;add check-out.lisp
 	       ;(:module "interface"

@@ -107,6 +107,12 @@
   (mito:find-dao 'employee :id employee-id))
 
 (defun all-employees ()
-  "Returns all employees in the database"
-  (loop :for i :from 1 :to (employee-count)
-        :collect (employee-id-search i)))
+  (loop :with employees := nil
+	:with cc      := (employee-count)
+
+	:for i :upfrom 1
+	:do (setq employees (if (null (employee-id-search i))
+			      employees
+			      (cons (employee-id-search i) employees)))
+	:when (equal (length employees) cc)
+	  :do (return employees)))

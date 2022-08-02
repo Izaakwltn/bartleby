@@ -78,3 +78,14 @@
 (defun all-rooms ()
   (loop :for i :from 1 :to (room-count)
         :collect (room-id-search i)))
+
+(defun all-rooms ()
+  (loop :with rooms := nil
+	:with rc      := (room-count)
+
+	:for i :upfrom 1
+	:do (setq rooms (if (null (room-id-search i))
+			      rooms
+			      (cons (room-id-search i) rooms)))
+	:when (equal (length rooms) rc)
+	  :do (return rooms)))

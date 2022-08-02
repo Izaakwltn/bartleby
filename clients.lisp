@@ -101,9 +101,16 @@
   (mito:find-dao 'client :id client-id))
 
 (defun all-clients ()
-  (loop :for i :from 1 :to (client-count)
-        :collect (client-id-search i)))
+  (loop :with clients := nil
+	:with cc      := (client-count)
 
+	:for i :upfrom 1
+	:do (setq clients (if (null (client-id-search i))
+			      clients
+			      (cons (client-id-search i) clients)))
+	:when (equal (length clients) cc)
+	  :do (return clients)))
+				
 (defun client-first-name-search (first-name)
   (loop :for i :from 1 :to (client-count)
         :if (string-equal (client-first-name (mito:find-dao 'client :id i))

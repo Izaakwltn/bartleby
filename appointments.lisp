@@ -159,8 +159,16 @@
 
 (defun all-appointments ()
   "Returns a list of all appointments"
-  (loop :for i :from 1 :to (appointment-count)
-        :collect (appointment-id-search i)))
+  (loop :with appointments := nil
+	:with ac := (appointment-count)
+
+	:for i :upfrom 1
+	:do (setq appointments (if (null (appointment-id-search i))
+				   appointments
+				   (cons (appointment-id-search i) appointments)))
+	:when (equal (length appointments) ac)
+	  :do (return appointments)))
+        ;:else :do (setq appointments (cons (appointment-id-search i) appointments))))
 
 (defun all-future-appointments ()
   "Returns all future appointments"

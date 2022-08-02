@@ -8,8 +8,8 @@
   (spinneret:with-html
     (:form :action "/appointment-check-out" :id "appointment-check-out"
 		    ;(:select :form "appointment-check-out" :name "appointment" (:option :value appointment))
-		    (:tr (:td (:select :form "appointment-check-out" :name "appointment"
-				(:option :value appointment (format nil "~a ~a"
+		    (:tr (:td (:select :form "appointment-check-out" :name "appointment-id"
+				(:option :value (mito:object-id appointment) (format nil "~a ~a"
 				      (bartleby::client-first-name
 				       (mito:find-dao 'bartleby::client
 						      :id (bartleby::appointment-client-id appointment)))
@@ -51,8 +51,8 @@
 		   (loop :for a :in (bartleby::all-past-appointments)
 		         :do (checkable-appointment a)))))))))
 
-(hunchentoot:define-easy-handler (appointment-check-out :uri "/appointment-check-out") (appointment attendance notes)
-  (bartleby::check-out appointment attendance notes)
+(hunchentoot:define-easy-handler (appointment-check-out :uri "/appointment-check-out") (appointment-id attendance notes)
+  (bartleby::check-out (bartleby::appointment-id-search appointment-id) attendance notes)
   (appointments-check-out))
      ;(:hr)
 ;     (spinneret:with-html (:select :name "employee" :form "new-appointment"
