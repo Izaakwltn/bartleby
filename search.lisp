@@ -4,19 +4,44 @@
 
 (in-package :bartleby)
 
-;;;Search methods
+;;; Search methods
 
 ;;; one option- parse search input,
 ;;; if one of the words is "client" "employee" or "appointment" it will only search one of those categories
 
-(defun id-search (id)
-  (cond ((client-id-search id)
-	 (client-id-search id))
-	((employee-id-search id)
-	 (employee-id-search id))
-	((appointment-id-search id)
-	 (appointment-id-search id))
-	(t nil)))
+(deftype token ()
+  '(cons keyword t))
+
+(defun tok (type &optional val)
+  (cons type val))
+
+(alexa:define-string-lexer search-lexer
+  "A Lexer for bartleby search queries."
+  (;(:hyphen-word "[A-Za-z]\\-[A-Za-z]")
+   (:word "[A-Za-z][A-Za-z]*")
+   (:num  "\\dt+")
+   (:space " "))
+  ;("{{HYPHEN-WORD}}" (return (tok :hyphen-word (princ-to-string $@))))
+  ("{{WORD}}"        (return (tok :word (princ-to-string $@))))
+  ("{{NUM}}"            (return (tok :number (princ-to-string $@))))
+  ("{{SPACE}}" nil))
+
+(defun lex-line (string)
+  "Breaks down a formula string into tokens."
+  (loop :with lexer := (search-lexer string)
+	:for tok := (funcall lexer)
+	:while tok
+	:collect tok))
+
+
+;(defun id-search (id)
+;  (cond ((client-id-search id)
+;;	 (client-id-search id))
+;	((employee-id-search id)
+;	 (employee-id-search id))
+;	((appointment-id-search id)
+;	 (appointment-id-search id))
+;	(t nil)))
 
 
 
