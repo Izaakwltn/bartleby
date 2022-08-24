@@ -18,12 +18,12 @@
 (alexa:define-string-lexer search-lexer
   "A Lexer for bartleby search queries."
   (;(:hyphen-word "[A-Za-z]\\-[A-Za-z]")
+   (:num "[0-9][0-9]*")
    (:word "[A-Za-z][A-Za-z]*")
-   (:num  "\\dt+")
    (:space " "))
   ;("{{HYPHEN-WORD}}" (return (tok :hyphen-word (princ-to-string $@))))
   ("{{WORD}}"        (return (tok :word (princ-to-string $@))))
-  ("{{NUM}}"            (return (tok :number (princ-to-string $@))))
+  ("{{NUM}}"         (return (tok :number (princ-to-string $@))))
   ("{{SPACE}}" nil))
 
 (defun lex-line (string)
@@ -33,7 +33,15 @@
 	:while tok
 	:collect tok))
 
+					; Add services, make service enumeration for searching ease
 
+(defun word-search (word)
+  (union (client-first-name-search word)
+	 (client-last-name-search word)
+
+					;	 (employee-first-name-search word) ;this function doesn't exist
+					;	 (employee-last-name-search word)  ;add this function
+	 
 ;(defun id-search (id)
 ;  (cond ((client-id-search id)
 ;;	 (client-id-search id))

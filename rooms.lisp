@@ -89,3 +89,9 @@
 			      (cons (room-id-search i) rooms)))
 	:when (equal (length rooms) rc)
 	  :do (return rooms)))
+
+(defun room-name-search (name)
+  (find-if #'(lambda (r)
+	       (string-equal name (room-name r)))
+	   (all-rooms)))
+	       

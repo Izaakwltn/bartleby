@@ -111,20 +111,28 @@
 	:when (equal (length clients) cc)
 	  :do (return clients)))
 				
+;(defun client-first-name-search (first-name)
+ ; (loop :for i :from 1 :to (client-count)
+  ;      :if (string-equal (client-first-name (mito:find-dao 'client :id i))
+   ;                       first-name)
+    ;      :collect (mito:find-dao 'client :id i) :into matches
+     ;   :finally (return matches)))
 (defun client-first-name-search (first-name)
-  (loop :for i :from 1 :to (client-count)
-        :if (string-equal (client-first-name (mito:find-dao 'client :id i))
-                          first-name)
-          :collect (mito:find-dao 'client :id i) :into matches
-        :finally (return matches)))
+  (find-if #'(lambda (c)
+	       (string-equal first-name (client-first-name c)))
+	   (all-clients)))
+
+;(defun client-last-name-search (last-name)
+ ; (loop :for i :from 1 :to (client-count)
+  ;      :if (string-equal (client-last-name (mito:find-dao 'client :id i))
+   ;                       last-name)
+    ;      :collect (mito:find-dao 'client :id i) :into matches
+     ;   :finally (return matches)))
 
 (defun client-last-name-search (last-name)
-  (loop :for i :from 1 :to (client-count)
-        :if (string-equal (client-last-name (mito:find-dao 'client :id i))
-                          last-name)
-          :collect (mito:find-dao 'client :id i) :into matches
-        :finally (return matches)))
-
+  (find-if #'(lambda (c)
+	       (string-equal last-name (client-last-name c)))
+	   (all-clients)))
 ;;; Client Credits
 
 ;(defun credit-count ()
