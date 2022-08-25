@@ -98,9 +98,6 @@
 
 
 
-
-
-
 ;;;Appointments by object for a given month
 ;maybe this should be moved to the appointments section
 ;(defgeneric month-appointments (object month)

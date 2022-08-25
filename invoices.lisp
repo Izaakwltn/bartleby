@@ -5,31 +5,64 @@
 
 ;;; Invoice class
 
-(defclass invoice ()
-  ((title        :initarg :title
-	         :accessor title)
- ;  (subject      :initarg :subject
-;		 :accessor subject) ;;;;client or employee, maybe room or eventually office
-   (receipts     :initarg :receipts
-		 :accessor receipts)))
+                                        ; maybe do html generation for now
+;;; new approach- more filled out invoice class, defmethods for different objects
+   ;;; to make invoice, just give an object and a month and it will complete the rest
+;;; attributes:
+   ;;; object, object contact (a block of address, phone number, and email
+   ;;; month
+   ;;; list of appointments (printed differently based on object)
+   ;;; 
+
+(mito:deftable invoice ()
+  ((obj-type :col-type (:varchar 32))
+   (obj-id   :col-type (:varchar 32))
+   (month    :col-type (:int))
+   (filename :col-type (:varchar 32)))
+  (:conc-name "invoice-"))
+
+(mito:ensure-table-exists 'invoice)
+
+(defvar invoice-object-types '(client employee room))
+
+(defun find-invoice-object (obj-type obj-id)
+  "Finds the object at the center of the invoice"
+  (cond ((string-equal obj-type "client")
+         (client-id-search obj-id))
+        ((string-equal obj-type "employee")
+         (employee-id-search obj-id))
+        ((string-equal obj-type "meeting-room")
+         (room-id-search obj-id))))
 
 (defmethod print-object ((obj invoice) stream)
   (print-unreadable-object (obj stream :type t)
-    (with-accessors ((title title)
-		;     (subject subject)
-		     (receipts receipts))
+    (with-accessors ((obj-type invoice-obj-type)
+                     (obj-id   invoice-obj-id)
+                     (month    invoice-month)
+                     (filename invoice-filename))
 	obj
       (format stream
-	      "~%~a:~%~{~a~%~}~%"
-	      title receipts))))
+	      "~a-~a~%~a~%~a~%"
+	      obj-type obj-id month filename (month-receipts (find-invoice-object obj-type obj-id))))))
 
-(defun draft-invoice (title receipts)
-  (make-instance 'invoice :title title
-		          ;:subject (if (employee-id-search owner-id) ;;;make its own function 
-			;;	       (employee-id-search owner-id)
-			;	       (client-id-search owner-id))
-			  :receipts receipts))
+(defgeneric make-invoice (object month)
+  (:documentation "Puts together information for an invoice"))
 
+(defmethod make-invoice ((client client) month)
+  (make-instance 'invoice :obj-type "client"
+                          :obj-id (client-id client)
+                          :month month
+                          :filename (default-invoice-filename)))
+    
+(defun default-invoice-filename (invoice)
+  "Returns a default filename for a given invoice."
+  (concatenate 'string "invoice"
+               (invoice-obj-type invoice)
+               (invoice-obj-id invoice)
+               (month-name (invoice-month invoice))))
+               
+
+(defvar *invoices* nil) ;populate with invoice
 ;;;Invoice calculations
 ;;;;------------------------------------------------------------------------
 

@@ -22,7 +22,7 @@
 	obj
       (format stream "~a, ~a ~a~a, ~a"
 	      (second (assoc (day-of-week (date m d y)) days-of-week))
-	      (second (assoc m month-names))
+	      (month-name m)
 	      d
 	      (number-suffix d)
 	      y))))
@@ -199,6 +199,10 @@
 		      (11 "November")
 		      (12 "December")))
 
+(defun month-name (n-month)
+  "Returns the name for a given month number"
+  (second (assoc n-month month-names)))
+
 (defun day-cycle (day-value change)
   "Cycles through days of the week as designated."
   (cond ((zerop change) day-value)
@@ -349,10 +353,10 @@
 ;;; Month Class
 
 (defclass month ()
-  ((month-num  :initarg :month-num
-	       :accessor month-num)
-   (month-name :initarg :month-name
-	       :accessor month-name)
+  ((num  :initarg :num
+	       :accessor num)
+   (name :initarg :name
+	       :accessor name)
    (year       :initarg :year
 	       :accessor year)
    (days       :initarg :days
@@ -367,14 +371,14 @@
       (format stream "~a ~a:~%~{~a~%~}~%" month-name year days))))
 
 (defmethod month ((date date))
-  (make-instance 'month :month-num (m date)
-		        :month-name (second (assoc (m date) month-names))
-			:year (y date)
-			:days (let ((m (m date))
-				    (y (y date))
-	                            (m-days (month-days (m date) (y date))))
-				(loop :for i :from 1 :to m-days
-	                              :collect (date m i y)))))
+  (let ((m (m date))
+        (y (y date)))
+    (let ((m-days (month-days m y)))
+      (make-instance 'month :month-num m
+                            :month-name (month-name m)
+                            :year y
+                            :days (loop :for i :from 1 :to m-days
+	                                :collect (date m i y))))))
 
 (defun week-gatherer (date last-day-of-month)
   (cond ((later-date-p (first (days (week date))) last-day-of-month) nil)
