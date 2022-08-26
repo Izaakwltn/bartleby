@@ -6,18 +6,12 @@
 ;;; Invoice class
 
                                         ; maybe do html generation for now
-;;; new approach- more filled out invoice class, defmethods for different objects
-   ;;; to make invoice, just give an object and a month and it will complete the rest
-;;; attributes:
-   ;;; object, object contact (a block of address, phone number, and email
-   ;;; month
-   ;;; list of appointments (printed differently based on object)
-   ;;; 
 
 (mito:deftable invoice ()
   ((obj-type :col-type (:varchar 32))
    (obj-id   :col-type (:varchar 32))
    (month    :col-type (:int))
+   (year     :col-type (:int))
    (filename :col-type (:varchar 32)))
   (:conc-name "invoice-"))
 
@@ -39,38 +33,59 @@
     (with-accessors ((obj-type invoice-obj-type)
                      (obj-id   invoice-obj-id)
                      (month    invoice-month)
-                     (filename invoice-filename))
+                     (year     invoice-year)
+		     (filename invoice-filename))
 	obj
       (format stream
-	      "~a-~a~%~a~%~a~%"
-	      obj-type obj-id month filename (month-receipts (find-invoice-object obj-type obj-id))))))
+	      "~a-~a~%~a/~a~%~a~%"
+	      obj-type obj-id month year filename (month-receipts (find-invoice-object obj-type obj-id))))))
 
-(defgeneric make-invoice (object month)
+(defgeneric make-invoice (object month year)
   (:documentation "Puts together information for an invoice"))
 
-(defmethod make-invoice ((client client) month)
+(defmethod make-invoice ((client client) month year)
   (make-instance 'invoice :obj-type "client"
-                          :obj-id (client-id client)
-                          :month month
+                          :obj-id   (client-id client)
+                          :month    month
+			  :year     year
                           :filename (default-invoice-filename)))
+
+(defmethod make-invoice ((employee employee) month year)
+  (make-instance 'invoice :obj-type "employee"
+		          :obj-id   (employee-id employee)
+			  :month    month
+			  :year     year
+			  :filename (default-invoice-filename)))
+			  
     
 (defun default-invoice-filename (invoice)
-  "Returns a default filename for a given invoice."
+  "Generates a filename for a given invoice."
   (concatenate 'string "invoice"
                (invoice-obj-type invoice)
                (invoice-obj-id invoice)
                (month-name (invoice-month invoice))))
                
+;;; Adding and removing invoices
 
-(defvar *invoices* nil) ;populate with invoice
+(defmethod add-invoice ((invoice invoice))
+  (mito:insert-dao invoice))
+
+(defmethod remove-invoice ((invoice invoice))
+  (mito:delete-dao invoice))
+
+(defmethod replace-invoice ((invoice invoice) new-invoice)
+  (remove-invoice invoice)
+  (add-invoice new-invoice))
+
 ;;;Invoice calculations
 ;;;;------------------------------------------------------------------------
 
 (defmethod invoice-total ((invoice invoice))
   "Returns the total money earned for an invoice."
-  (loop :for r :in (receipts invoice)
+  (loop :for r :in (receipts (find-invoice-object (invoice-obj-type invoice)
+						  (invoice-obj-id invoice)))
 	:sum (* (/ (appointment-duration r) 60)
-		(employee-hourly-rate (employee-id-search (appointment-employee-id r))))))
+		(employee-hourly-rate (employee-id-search (appointment-employee-id r)))))) ;maybe change input to receipt-list
 
 (defgeneric month-receipts (object month year)
   (:documentation "Returns all receipts for an object in the month"))
