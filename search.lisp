@@ -26,9 +26,9 @@
   ("{{NUM}}"         (return (tok :number (princ-to-string $@))))
   ("{{SPACE}}" nil))
 
-(defun lex-line (string)
+(defun lex-query (query)
   "Breaks down a formula string into tokens."
-  (loop :with lexer := (search-lexer string)
+  (loop :with lexer := (search-lexer query)
 	:for tok := (funcall lexer)
 	:while tok
 	:collect tok))

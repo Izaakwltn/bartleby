@@ -8,12 +8,13 @@
 
 (mito:deftable receipt (appointment)
   ((attendance    :col-type (:varchar 32))
+   (makeup      :col-type (:int))
    (final-notes :col-type (:varchar 128)))
   (:conc-name "receipt-"))
 
 (mito:ensure-table-exists 'receipt)  
 
-(defvar attendance-values '(arrived no-show cancelled-add-makeup makeup-used lesson-extra-makeup-used))
+(defvar attendance-values '(arrived no-show cancelled))
 
 (deftype attendance-value () (member attendance-values))
 
@@ -39,12 +40,13 @@
 	     attendance
 	     final-notes))))
 
-(defmethod make-receipt ((appointment appointment) attendance notes)
+(defmethod make-receipt ((appointment appointment) attendance makeup notes)
   (make-instance 'receipt :client-id (appointment-client-id appointment)
 			  :employee-id (appointment-employee-id appointment)
 			  :room-id (appointment-room-id appointment)
 			  :timestamp (appointment-timestamp appointment)
 			  :duration (appointment-duration appointment)
+                          :makeup makeup
 			  :notes       (appointment-notes appointment)
 			  :attendance (write-to-string attendance)
 		          :final-notes notes))

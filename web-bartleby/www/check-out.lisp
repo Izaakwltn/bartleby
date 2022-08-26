@@ -31,6 +31,9 @@
 			 (:td (:select :name "attendance" :form "appointment-check-out"
 				(loop :for i :in bartleby::attendance-values
 			              :do (:option :value i (format nil "~a" i)))))
+                         (:td (:select :name "makeups" :form "appointment-check-out"
+                                (loop :for i :from -60 :to +60 :by 15
+                                      :do (:option :value i (format nil "~a" i)))))
 			 (:td (:input :type "text" :id "notes" :name "notes"))
 			 (:td (:button :type "submit" :class "btn btn-default" "Check Out"))))))
 
@@ -44,14 +47,23 @@
 	     (:th "Employee")
 	     (:th "Date/Time")
 	     (:th "Attendance")
+             (:th "Makeup+/-")
 	     (:th "Notes")
 	     (:th "")
-	    (:tbody
-	     (spinneret:with-html
-		   (loop :for a :in (bartleby::all-past-appointments)
+             (:tbody
+              (spinneret:with-html
+                (loop :for a :in (sort (bartleby::all-past-appointments)
+                                       #'(lambda (x y)
+                                           (bartleby:later-timestamp-p
+                                            (bartleby::timestamp-from-sql
+                                             (write-to-string
+                                              (bartleby::appointment-timestamp y)))
+                                            (bartleby::timestamp-from-sql
+                                             (write-to-string
+                                              (bartleby::appointment-timestamp x))))))
 		         :do (checkable-appointment a)))))))))
 
-(hunchentoot:define-easy-handler (appointment-check-out :uri "/appointment-check-out") (appointment-id attendance notes)
+(hunchentoot:define-easy-handler (appointment-check-out :uri "/appointment-check-out") (appointment-id attendance makeup notes)
   (bartleby::check-out (bartleby::appointment-id-search appointment-id) attendance notes)
   (appointments-check-out))
      ;(:hr)

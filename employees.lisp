@@ -119,7 +119,7 @@
 
 (defun employee-first-name-search (first-name)
   (find-if #'(lambda (e)
-	       (string-equal first-name (employee-first-name c)))
+	       (string-equal first-name (employee-first-name e)))
 	   (all-employees)))
 
 (defun employee-last-name-search (last-name)

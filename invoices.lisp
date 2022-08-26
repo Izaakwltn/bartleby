@@ -19,14 +19,16 @@
 
 (defvar invoice-object-types '(client employee room))
 
-(defun find-invoice-object (obj-type obj-id)
+(defmethod find-invoice-object ((invoice invoice))
   "Finds the object at the center of the invoice"
-  (cond ((string-equal obj-type "client")
-         (client-id-search obj-id))
-        ((string-equal obj-type "employee")
-         (employee-id-search obj-id))
-        ((string-equal obj-type "meeting-room")
-         (room-id-search obj-id))))
+  (let ((obj-type (invoice-obj-type invoice))
+        (obj-id (invoice-obj-id invoice)))
+    (cond ((string-equal obj-type "client")
+           (client-id-search obj-id))
+          ((string-equal obj-type "employee")
+           (employee-id-search obj-id))
+          ((string-equal obj-type "meeting-room")
+           (room-id-search obj-id)))))
 
 (defmethod print-object ((obj invoice) stream)
   (print-unreadable-object (obj stream :type t)
@@ -239,3 +241,50 @@
 ;;;;------------------------------------------------------------------------
 ;;;;
 ;;;;------------------------------------------------------------------------
+
+(defmethod pdf-invoice ((invoice invoice))
+  (pdf:with-document ()
+    (pdf:with-page ()
+      (pdf:with-outline-level ("Invoice" (pdf:register-page-reference))
+        (let ((helvetica (pdf:get-font "Helvetica")))
+          (pdf:in-text-mode
+            (pdf:set-font helvetica 36.0)
+            (pdf:draw-text "Test Invoice")))))
+    (pdf:write-document "test-invoice.pdf")))
+
+;(defun test-invoice-pdf ()
+ ; (let ((width 8.5)
+  ;      (height 11)
+   ;     (margin-top 1)
+    ;    (margin-bottom 1)
+       ; (span .02)
+     ;;   (helvetica (pdf:get-font "Helvetica")))
+ ; (pdf:with-document ()
+  ;  (pdf:with-page ()
+   ;   (loop :for i :from 1 :to 12
+    ;        :do (pdf:rectangle 100 (+ margin-bottom (* i 5)) 1 1)))
+ ;   (pdf:write-document "test-invoice.pdf"))))
+  ;    
+   ;   (pdf:with-outline-level ("Invoice" (pdf:register-page-reference))
+    ;      (pdf:in-text-mode
+     ;       (pdf:set-font helvetica 36.0)
+      ;      ;(pdf:move-text 100 800)
+       ;     (pdf:draw-text "Test Invoice"))
+        ;  (loop :with line := 1
+         ;       :for i :from 1 :to 70
+          ;      :do (pdf:draw-left-text 3 5 "Test" helvetica 12.0)))))
+   ; (pdf:write-document "test-invoice.pdf")))
+
+(defmethod default-title ((invoice invoice))
+  (let ((o (find-invoice-object invoice)))
+    (concatenate 'string o (invoice-month invoice) "/" (invoice-year invoice))))
+
+(defmacro invoice-template ((&key invoice) &body body)
+  `(pdf:with-document ()
+    (pdf:with-page ()
+      (pdf:with-outline-level ( (pdf:register-page-reference))
+        (let ((helvetica (pdf:get-font "Helvetica")))
+          (pdf:in-text-mode
+            (pdf:set-font helvetica 12)
+            (pdf:draw-text "Test Invoice")))))
+    (pdf:write-document (invoice-filename invoice))))

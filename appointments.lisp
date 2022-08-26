@@ -100,9 +100,11 @@
 (defmethod next-day ((appointment appointment))
   (copy-new-timestamp appointment (next-day (appointment-timestamp appointment))))
 
-(defmethod next-week ((appointment appointment))
-  (copy-new-timestamp appointment (add-days (appointment-timestamp appointment) 7)))
+;(defmethod next-week ((appointment appointment))
+ ; (copy-new-timestamp appointment (add-days (appointment-timestamp appointment) 7)))
 
+(defmethod next-week ((appointment appointment))
+  (add-days appointment 7))
 (defmethod next-month ((appointment appointment))
   (copy-new-timestamp appointment (next-month (let ((at (appointment-timestamp appointment)))
 					       (if (typep at 'simple-base-string)

@@ -45,13 +45,28 @@
 	    (two-digits string-hour)
 	    (two-digits string-minute))))
 
-(defun timestamp-from-sql (t-string)
-  (timestamp (date (parse-integer (subseq t-string 5 8))
-                   (parse-integer (subseq t-string 9 11))
-                   (parse-integer (subseq t-string 1 5)))
-             (set-time (parse-integer (subseq t-string 12 14))
-                       (parse-integer (subseq t-string 15 17)))))
+;;;;parse with a lexer instead of
+(alexa:define-string-lexer timestamp-parser
+  ((:noise "[^0-9]")
+   (:num "[0-9][0-9]*"))
+   ;(:noise "^[0-9]"))
+  ("{{NOISE}}" nil)
+  ("{{NUM}}" (return (princ-to-string $@))))
 
+(defun parse-timestamp (t-string)
+  (loop :with lexer := (timestamp-parser t-string)
+        :for tok := (funcall lexer)
+        :while tok
+        :collect tok))
+
+(defun timestamp-from-sql (t-string)
+  (let ((parsed (mapcar #'parse-integer
+                        (parse-timestamp t-string))))
+    (timestamp (date (second parsed)
+                     (third parsed)
+                     (first parsed))
+               (set-time (nth 3 parsed)
+                         (nth 4 parsed)))))
 (defun timestamp (date time)
   (make-instance 'timestamp :date-o date
 		            :time-o time))

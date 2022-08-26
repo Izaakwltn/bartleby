@@ -6,8 +6,8 @@
 
 ;;; Functions for Checking out Appointments
 
-(defmethod check-out ((appointment appointment) attendance notes)
-  (add-receipt (make-receipt appointment attendance notes))
+(defmethod check-out ((appointment appointment) attendance makeup notes)
+  (add-receipt (make-receipt appointment attendance makeup notes))
   (remove-appointment appointment))
 
 (defgeneric receipts (object)
