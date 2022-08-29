@@ -4,11 +4,26 @@
 
 (in-package :web-bartleby)
 
+(defmacro checkout-handler (form-id form-uri)
+  `(hunchentoot:define-easy-handler (,form-id :uri ,form-uri) (appointment-id attendance makeup notes)
+     (bartleby::check-out
+      (bartleby::appointment-id-search (parse-integer appointment-id))
+      attendance
+      (parse-integer makeup)
+      notes)
+     (appointments-check-out)))
+
 (defmethod checkable-appointment ((appointment bartleby::appointment))
-  (spinneret:with-html
-    (:form :action "/appointment-check-out" :id "appointment-check-out"
+  (let* ((form-id (format nil "~a-~a" "appointment-checkout" (mito:object-id appointment)))
+         (form-uri (format nil "/~a" form-id))
+         (handler-name (read-from-string form-id)))
+    (progn (checkout-handler handler-name form-uri) ;(progn (hunchentoot:define-easy-handler (form-id :uri "/appointment-check-out") (appointment-id atte;ndance makeup notes)
+  ;(bartleby::check-out (bartleby::appointment-id-search (parse-integer appointment-id)) attendance (parse-integer makeup) notes)
+  ;(appointments-check-out))
+    (spinneret:with-html
+      (:form :action form-uri :id form-id
 		    ;(:select :form "appointment-check-out" :name "appointment" (:option :value appointment))
-		    (:tr (:td (:select :form "appointment-check-out" :name "appointment-id"
+           (:tr (:td (:select :form form-id :name "appointment-id"
 				(:option :value (mito:object-id appointment) (format nil "~a ~a"
 				      (bartleby::client-first-name
 				       (mito:find-dao 'bartleby::client
@@ -28,19 +43,21 @@
 				(let ((dos (bartleby::date-o ts))
 				      (tos (bartleby::time-o ts)))
 				  (format nil "~a ~a" dos tos))))
-			 (:td (:select :name "attendance" :form "appointment-check-out"
+			 (:td (:select :name "attendance" :form form-id
 				(loop :for i :in bartleby::attendance-values
 			              :do (:option :value i (format nil "~a" i)))))
-                         (:td (:select :name "makeups" :form "appointment-check-out"
+                         (:td (:select :name "makeups" :form form-id
                                 (loop :for i :from -60 :to +60 :by 15
-                                      :do (:option :value i (format nil "~a" i)))))
-			 (:td (:input :type "text" :id "notes" :name "notes"))
-			 (:td (:button :type "submit" :class "btn btn-default" "Check Out"))))))
+                                      :if (zerop i)
+                                        :do (:option :value 0 :selected 0)
+                                      :else
+                                        :do (:option :value i (format nil "~a" i)))))
+			 (:td (:input :type "text" :id "notes" :name "notes" :form form-id))
+			 (:td (:button :type "submit" :class "btn btn-default" "Check Out"))))))))
 
 (hunchentoot:define-easy-handler (appointments-check-out :uri "/appointments-check-out") ()
   (with-page (:title "Check out Appointments")
     (:h1 "Check out Appointments")
-    (:form :action "/appointment-check-out" :id "appointment-check-out"
 	   (cl-bootstrap:bs-table
 	    (:thead
 	     (:th "Client")
@@ -61,10 +78,10 @@
                                             (bartleby::timestamp-from-sql
                                              (write-to-string
                                               (bartleby::appointment-timestamp x))))))
-		         :do (checkable-appointment a)))))))))
+		         :do (checkable-appointment a))))))))
 
 (hunchentoot:define-easy-handler (appointment-check-out :uri "/appointment-check-out") (appointment-id attendance makeup notes)
-  (bartleby::check-out (bartleby::appointment-id-search appointment-id) attendance notes)
+  (bartleby::check-out (bartleby::appointment-id-search (parse-integer appointment-id)) attendance (parse-integer makeup) notes)
   (appointments-check-out))
      ;(:hr)
 ;     (spinneret:with-html (:select :name "employee" :form "new-appointment"
