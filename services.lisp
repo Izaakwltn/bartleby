@@ -78,12 +78,13 @@
   (make-transaction (new-transaction-id)
 		    (current-date-time)
 		    product))
-;;;checked out items become transactions, then become receipts when the sale is 
-;;;;products: gift cards/prepaid subscriptions (4-pack, 8-pack, etc)
+  
+;;; checked out items become transactions, then become receipts when the sale is 
+;;; products: gift cards/prepaid subscriptions (4-pack, 8-pack, etc)
 
 
 
 
   
-;;;mito deftable for clients, employees, rooms, products, services, appointments, and transactions
+;;; mito deftable for clients, employees, rooms, products, services, appointments, and transactions
   

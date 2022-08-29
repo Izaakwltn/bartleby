@@ -5,8 +5,6 @@
 
 ;;; Invoice class
 
-                                        ; maybe do html generation for now
-
 (mito:deftable invoice ()
   ((obj-type :col-type (:varchar 32))
    (obj-id   :col-type (:varchar 32))
