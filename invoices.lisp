@@ -15,18 +15,16 @@
 
 (mito:ensure-table-exists 'invoice)
 
-(defvar invoice-object-types '(client employee room))
+;(defvar invoice-object-types '(client employee room))
 
-(defmethod find-invoice-object ((invoice invoice))
+(defun find-invoice-object (obj-type obj-id)
   "Finds the object at the center of the invoice"
-  (let ((obj-type (invoice-obj-type invoice))
-        (obj-id (invoice-obj-id invoice)))
     (cond ((string-equal obj-type "client")
            (client-id-search obj-id))
           ((string-equal obj-type "employee")
            (employee-id-search obj-id))
           ((string-equal obj-type "meeting-room")
-           (room-id-search obj-id)))))
+           (room-id-search obj-id))))
 
 (defmethod print-object ((obj invoice) stream)
   (print-unreadable-object (obj stream :type t)
@@ -37,33 +35,33 @@
 		     (filename invoice-filename))
 	obj
       (format stream
-	      "~a-~a~%~a/~a~%~a~%"
-	      obj-type obj-id month year filename (month-receipts (find-invoice-object obj-type obj-id))))))
+	      "~a-~a~%~a/~a~%~a~%~{~a~%~}"
+	      obj-type obj-id month year filename (month-receipts (find-invoice-object obj-type obj-id) month year)))))
 
 (defgeneric make-invoice (object month year)
   (:documentation "Puts together information for an invoice"))
 
 (defmethod make-invoice ((client client) month year)
   (make-instance 'invoice :obj-type "client"
-                          :obj-id   (client-id client)
+                          :obj-id   (mito:object-id client)
                           :month    month
 			  :year     year
-                          :filename (default-invoice-filename)))
+                          :filename (default-invoice-filename client month year)))
 
 (defmethod make-invoice ((employee employee) month year)
   (make-instance 'invoice :obj-type "employee"
-		          :obj-id   (employee-id employee)
+		          :obj-id   (mito:object-id employee)
 			  :month    month
 			  :year     year
-			  :filename (default-invoice-filename)))
+			  :filename (default-invoice-filename employee month year)))
 			  
-    
-(defun default-invoice-filename (invoice)
+(defun default-invoice-filename (object month year)
   "Generates a filename for a given invoice."
   (concatenate 'string "invoice"
-               (invoice-obj-type invoice)
-               (invoice-obj-id invoice)
-               (month-name (invoice-month invoice))))
+               (write-to-string (mito:object-id object))
+               (write-to-string (month-name month))
+               "/"
+               (write-to-string year)))
                
 ;;; Adding and removing invoices
 
@@ -93,20 +91,18 @@
 (defmethod month-receipts ((employee employee) month year)
   "Returns all apppointments for an employee in a given month."
   (loop :for r :in (all-receipts)
-	:if (and (equal (appointment-employee-id r) (employee-id employee))
-		 (equal month (m (date-o (dt (appointment r)))))
-		 (equal year (y (date-o (dt (appointment r))))))
+	:if (and (equal (appointment-employee-id r) (mito:object-id employee))
+		 (equal month (m (date-o (appointment-timestamp r))))
+		 (equal year (y (date-o (appointment-timestamp r)))))
 	  :collect r :into rcpts
 	:finally (return rcpts)))
 
 (defmethod month-receipts ((client client) month year)
   "Returns all appointments for a client in a given month"
-  (loop :for r :in *receipts*
-	:if (and (find-if #'(lambda (c)
-			      (equal (id c) (id client)))
-			  (clients (appointment r)))
-		 (equal month (m (date-o (dt (appointment r)))))
-		 (equal year (y (date-o (dt (appointment r))))))
+  (loop :for r :in (all-receipts)
+	:if (and (equal (appointment-client-id r) (mito:object-id client))
+		 (equal month (m (date-o (appointment-timestamp r))))
+		 (equal year (y (date-o (appointment-timestamp r)))))
 	  :collect r :into rcpts
 	:finally (return rcpts)))                            ;;;;;;later add room method
 
@@ -286,3 +282,51 @@
             (pdf:set-font helvetica 12)
             (pdf:draw-text "Test Invoice")))))
     (pdf:write-document (invoice-filename invoice))))
+
+(defun mm-pt (mm)
+  "Converts milimeters to pixel points"
+  (* mm 2.83464388))
+
+(defun inch-pt (inch)
+  "Converts inches into pixel points"
+  (* inch 72))
+
+(defclass invoice-layout ()
+  ((width         :initarg :width
+                  :accessor width)
+   (height        :initarg :height
+                  :accessor height)
+   (margin-top    :initarg :margin-top
+                  :accessor margin-top)
+   (margin-bottom :initarg :margin-bottom
+                  :accessor margin-bottom)))
+
+(defun invoice-layout (width height margin-top margin-bottom)
+  (make-instance 'invoice-layout :width width
+                                 :height height
+                                 :margin-top margin-top
+                                 :margin-bottom margin-bottom))
+
+(defun default-invoice-layout ()
+  (invoice-layout (inch-pt 8.5)
+                  (inch-pt 11)
+                  (inch-pt 10)
+                  (inch-pt 1)))
+
+;;; make title/ banner
+(defmethod make-banner (invoice-layout title)
+  (pdf:draw-centered-text (/ (width invoice-layout) 2)
+                          (margin-top invoice-layout)
+                          "INVOICE"
+                          (pdf:get-font "Helvetica")
+                          (inch-pt .2)))
+  
+;;; then populate with items
+
+(defmethod pdf-invoice ((invoice invoice))
+  (pdf:with-document ()
+    (pdf:with-page ()
+      (pdf:with-outline-level ("Invoice" (pdf:register-page-reference))
+        ;(let ((helvetica (pdf:get-font "Helvetica")))
+          (make-banner (default-invoice-layout) "Turtles")))
+    (pdf:write-document "test-invoice.pdf")))
