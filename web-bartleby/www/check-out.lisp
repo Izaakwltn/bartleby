@@ -14,10 +14,10 @@
      (appointments-check-out)))
 
 (defmethod checkable-appointment ((appointment bartleby::appointment))
-  (let* ((form-id (format nil "~a-~a" "appointment-checkout" (mito:object-id appointment)))
-         (form-uri (format nil "/~a" form-id))
-         (handler-name (read-from-string form-id)))
-    (progn (checkout-handler handler-name form-uri) ;(progn (hunchentoot:define-easy-handler (form-id :uri "/appointment-check-out") (appointment-id atte;ndance makeup notes)
+  (let ((form-id (format nil "appointment-checkout-~a" (mito:object-id appointment)))
+	(form-uri (format nil "/appointment-checkout-~a" (mito:object-id appointment))))
+    (let ((handler-name (read-from-string form-id)))
+      (progn (checkout-handler handler-name form-uri) ;(progn (hunchentoot:define-easy-handler (form-id :uri "/appointment-check-out") (appointment-id atte;ndance makeup notes)
   ;(bartleby::check-out (bartleby::appointment-id-search (parse-integer appointment-id)) attendance (parse-integer makeup) notes)
   ;(appointments-check-out))
     (spinneret:with-html
@@ -53,7 +53,7 @@
                                       :else
                                         :do (:option :value i (format nil "~a" i)))))
 			 (:td (:input :type "text" :id "notes" :name "notes" :form form-id))
-			 (:td (:button :type "submit" :class "btn btn-default" "Check Out"))))))))
+			 (:td (:button :type "submit" :class "btn btn-default" "Check Out")))))))))
 
 (hunchentoot:define-easy-handler (appointments-check-out :uri "/appointments-check-out") ()
   (with-page (:title "Check out Appointments")
