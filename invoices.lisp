@@ -57,11 +57,15 @@
 			  
 (defun default-invoice-filename (object month year)
   "Generates a filename for a given invoice."
-  (concatenate 'string "invoice"
-               (write-to-string (mito:object-id object))
-               (write-to-string (month-name month))
-               "/"
-               (write-to-string year)))
+  (format nil "invoice-~a-~a-~a.pdf"
+          (if (string-equal (type-of object) "CLIENT")
+              (format nil "~a-~a" (client-first-name object)
+                      (client-last-name object))
+              (format nil "~a-~a" (employee-first-name object)
+                                  (employee-last-name object)))
+          ;(mito:object-id object))
+               (month-name month)
+               year))
                
 ;;; Adding and removing invoices
 
@@ -92,8 +96,8 @@
   "Returns all apppointments for an employee in a given month."
   (loop :for r :in (all-receipts)
 	:if (and (equal (appointment-employee-id r) (mito:object-id employee))
-		 (equal month (m (date-o (appointment-timestamp r))))
-		 (equal year (y (date-o (appointment-timestamp r)))))
+		 (equal month (m (date-o (timestamp-from-sql (write-to-string (appointment-timestamp r))))))
+		 (equal year (y (date-o (timestamp-from-sql (write-to-string (appointment-timestamp r)))))))
 	  :collect r :into rcpts
 	:finally (return rcpts)))
 
@@ -101,8 +105,10 @@
   "Returns all appointments for a client in a given month"
   (loop :for r :in (all-receipts)
 	:if (and (equal (appointment-client-id r) (mito:object-id client))
-		 (equal month (m (date-o (appointment-timestamp r))))
-		 (equal year (y (date-o (appointment-timestamp r)))))
+		 (equal month (m (date-o (write-to-string
+                                          (timestamp-from-sql (appointment-timestamp r))))))
+                 (equal year (y (date-o (write-to-string
+                                         (timestamp-from-sql (appointment-timestamp r)))))))
 	  :collect r :into rcpts
 	:finally (return rcpts)))                            ;;;;;;later add room method
 
@@ -270,8 +276,15 @@
    ; (pdf:write-document "test-invoice.pdf")))
 
 (defmethod default-title ((invoice invoice))
-  (let ((o (find-invoice-object invoice)))
-    (concatenate 'string o (invoice-month invoice) "/" (invoice-year invoice))))
+  (let* ((o (find-invoice-object (invoice-obj-type invoice)
+                                 (invoice-obj-id   invoice)))
+         (name (cond ((string-equal (invoice-obj-type invoice) "client")
+                      (format nil "~a ~a" (client-first-name o)
+                              (client-last-name o)))
+                     ((string-equal (invoice-obj-type invoice) "employee")
+                      (format nil "~a ~a" (employee-first-name o)
+                                          (employee-last-name o))))))
+    (format nil "~a, ~a ~a" name (month-name (invoice-month invoice))  (invoice-year invoice))))
 
 (defmacro invoice-template ((&key invoice) &body body)
   `(pdf:with-document ()
@@ -317,16 +330,19 @@
 (defmethod make-banner (invoice-layout title)
   (pdf:draw-centered-text (/ (width invoice-layout) 2)
                           (margin-top invoice-layout)
-                          "INVOICE"
+                          title
                           (pdf:get-font "Helvetica")
                           (inch-pt .2)))
   
 ;;; then populate with items
+(defgeneric invoice-item ((receipt receipt) layout) ;maybe now rename receipt "checked-receipts"
+  
 
 (defmethod pdf-invoice ((invoice invoice))
-  (pdf:with-document ()
-    (pdf:with-page ()
-      (pdf:with-outline-level ("Invoice" (pdf:register-page-reference))
+  (let ((layout (default-invoice-layout)))
+    (pdf:with-document ()
+      (pdf:with-page ()
+        (pdf:with-outline-level ((default-title invoice) (pdf:register-page-reference))
         ;(let ((helvetica (pdf:get-font "Helvetica")))
-          (make-banner (default-invoice-layout) "Turtles")))
-    (pdf:write-document "test-invoice.pdf")))
+          (make-banner layout (default-title invoice))))
+    (pdf:write-document (invoice-filename invoice)))))

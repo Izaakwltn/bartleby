@@ -27,9 +27,10 @@
 		    (duration    appointment-duration)
 		    (notes       appointment-notes)
                     (attendance  receipt-attendance)
+                    (makeup      receipt-makeup)
       	            (final-notes receipt-final-notes))
 	obj
-     (format stream "Receipt #~a~%~a~%~a~%~a~%~a~%~a~%~a~%~a~%~a"
+     (format stream "Receipt #~a~%~a~%~a~%~a~%~a~%~a~%~a~%Makeup+/-:~a~%Attendance:~a~%~a"
 	     (mito:object-id obj)
 	     timestamp
 	     (room-id-search room-id)
@@ -37,6 +38,7 @@
              (employee-id-search employee-id)
              duration
 	     notes
+             makeup
 	     attendance
 	     final-notes))))
 
@@ -90,11 +92,14 @@
 
 (defun all-receipts ()
   (loop :with receipts := nil
+        :with rc := (receipt-count)
 
 	:for i :upfrom 1
-	:if (equal (length receipts) (receipt-count))
-	  :do (return receipts)
-	:else :do (setq receipts (cons (mito:find-dao 'receipt :id i) receipts))))
+        :do (setq receipts (if (null (receipt-id-search i))
+                               receipts
+                               (cons (receipt-id-search i) receipts)))
+        :when (equal (length receipts) rc)
+          :do (return receipts)))
 
 
 
