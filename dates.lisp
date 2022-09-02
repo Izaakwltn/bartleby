@@ -374,8 +374,8 @@
   (let ((m (m date))
         (y (y date)))
     (let ((m-days (month-days m y)))
-      (make-instance 'month :month-num m
-                            :month-name (month-name m)
+      (make-instance 'month :num m
+                            :name (month-name m)
                             :year y
                             :days (loop :for i :from 1 :to m-days
 	                                :collect (date m i y))))))

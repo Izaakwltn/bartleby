@@ -202,7 +202,6 @@
   (add-appointment
    (make-appointment 0 0 (mito:object-id meeting-room) timestamp duration "Unavailable")))
 
-
 ;;; Appointment conflict calculations:
 
 (defun overlap-p (appointment1 appointment2)

@@ -335,7 +335,7 @@
                           (inch-pt .2)))
   
 ;;; then populate with items
-(defgeneric invoice-item ((receipt receipt) layout) ;maybe now rename receipt "checked-receipts"
+;(defgeneric invoice-item ((receipt receipt) layout) ;maybe now rename receipt "checked-receipts"
   
 
 (defmethod pdf-invoice ((invoice invoice))
