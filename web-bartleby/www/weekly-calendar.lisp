@@ -2,7 +2,8 @@
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :web-bartleby) ; weekly calendar should be limited by availability?
+
 
 (defmethod week-day-pairing ((week bartleby::week))
   (spinneret:with-html
@@ -66,3 +67,4 @@
             (:th "time")
             (week-day-pairing w)))
           (time-it w))))))
+

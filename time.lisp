@@ -24,6 +24,17 @@
 		  minutes)
 	      (if (and (< hour 24) (>= hour 12)) "pm" "am")))))
 
+(defgeneric pretty-print (object))
+
+(defmethod pretty-print ((set-time set-time))
+  (let ((h (hour set-time))
+        (m (minutes set-time)))
+    (format nil "~a:~a ~a"
+            (if (> h 12) (- h 12) h)
+	    (if (equal 1 (length (write-to-string m)))
+                (format nil "0~a" m)
+		m)
+	      (if (and (< h 24) (>= h 12)) "pm" "am"))))
 
 (defun set-time (hour minutes)
   (make-instance 'set-time :hour hour

@@ -41,6 +41,17 @@
 		(concatenate 'string "0" parsed-day)
 		parsed-day))))
 
+(defmethod pretty-print ((date date))
+  (let ((m (m date))
+        (d (d date))
+        (y (y date)))
+    (format nil "~a, ~a ~a~a, ~a"
+	      (second (assoc (day-of-week (date m d y)) days-of-week))
+	      (month-name m)
+	      d
+	      (number-suffix d)
+	      y)))
+
 (defun date (m d y)
   (make-instance 'date :m m
 		       :d d

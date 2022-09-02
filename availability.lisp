@@ -166,13 +166,17 @@
 	:finally (return matches)))
 
 (defmethod appointments ((date date))
-  (loop :for i :from 1 to (appointment-count)
-	:if (equal-date date
+  (loop :with matches := nil
+
+        :for i :from 1 to (appointment-count)
+	:if (mito:find-dao 'appointment :id i)
+            :do (if (equal-date date
                         (date-o
                          (timestamp-from-sql
                           (write-to-string
                            (appointment-timestamp (mito:find-dao 'appointment :id i))))))
-	  :collect (mito:find-dao 'appointment :id i) :into matches
+                    (setq matches (cons (appointment-id-search i) matches)))
+	  ;:collect (mito:find-dao 'appointment :id i) :into matches
 	:finally (return matches)))
 
 (defmethod appointments ((week week))

@@ -14,8 +14,9 @@
                            ")")
               " ")))
    
-(hunchentoot:define-easy-handler (monthly-calendar :uri "/monthly-calendar") (&optional select-date)
-  (with-page (:title "Monthly Calendar")
+(hunchentoot:define-easy-handler (monthly-calendar :uri "/monthly-calendar") (&optional date)
+  (let ((select-date (if date date (bartleby::today))))
+    (with-page (:title "Monthly Calendar")
     (:h1 "Monthly Calendar")
     (cl-bootstrap:bs-table
       (:thead
@@ -30,9 +31,7 @@
       (:tbody
        (spinneret:with-html
          (loop :for w :in (bartleby::gather-weeks (bartleby::month
-                                                   (if select-date
-                                                       select-date
-                                                       (bartleby::today))))
+                                                   select-date))
                                   :do (:tr (loop :for d :in (bartleby::days w)
-                                                 :do (:td (monthly-calendar-day d))))))))))
+                                                 :do (:td (monthly-calendar-day d)))))))))))
 

@@ -3,6 +3,14 @@
 ;;;; Copyright Izaak Walton (c) 2022
 
 (in-package :web-bartleby)
+                                        ; daily calendar should show a list of appointments
+                                        ; in chronological order
+                                        ; rather than some sort of time grid
+
+                                        ; appointment boxes that let you click for more information,
+                                        ; maybe with links to view the client or employee or room
+                                        ;
+
 
 (hunchentoot:define-easy-handler (daily-calendar :uri "/daily-calendar") (date)
   (let ((select-date (if date date (bartleby::today))))
