@@ -20,7 +20,7 @@
       (format stream "~a ~a" date-o time-o))))
 
 (defun two-digits (numstring)
-  "Formats a number string to have 2 digits"
+  "Ensures that a number string has 2 digits"
   (cond ((equal (length numstring) 2)
 	 numstring)
 	((equal (length numstring) 1)

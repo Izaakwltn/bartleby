@@ -110,7 +110,7 @@
 			      (cons (client-id-search i) clients)))
 	:when (equal (length clients) cc)
 	  :do (return clients)))
-				
+;;; I may need to go back to this more convoluted method, when objects are deleted				
 ;(defun client-first-name-search (first-name)
  ; (loop :for i :from 1 :to (client-count)
   ;      :if (string-equal (client-first-name (mito:find-dao 'client :id i))

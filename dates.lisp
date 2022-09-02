@@ -42,6 +42,7 @@
 		parsed-day))))
 
 (defmethod pretty-print ((date date))
+  "Prints a date in 'Day, Month day, year' form." 
   (let ((m (m date))
         (d (d date))
         (y (y date)))
@@ -116,14 +117,6 @@
 	((> (d date1) (d date2)) date1)
 	((> (d date2) (d date1)) date2)
 	(t date1)))
-
-;(defun equal-date (date1 date2)
- ; "Determines whether two dates are equal."
-  ;(if (and (equal (m date1) (m date2))
-;	   (equal (d date1) (d date2))
-;	   (equal (y date1) (y date2)))
-;	 t
-;	 nil))
 
 (defun month-days (month year)
   "Given a month and a year, returns the number of days in that month."

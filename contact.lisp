@@ -56,7 +56,7 @@
 	obj
       (format stream "~a@~a" username domain))))
 
-(defun parse-email (email-string)
+(defun parse-email (email-string) ; redo with lexer
   "Parses an email address and splits username from domain."
   (loop :with switch := nil ;username, then domain
 	:with u := ""

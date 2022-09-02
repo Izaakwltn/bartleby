@@ -4,12 +4,15 @@
 
 (in-package :bartleby)
 
-;;; SQL compatibility:
+;;; Formatting objects
 
 (defgeneric sql-print (object)
   (:documentation "Prints an sql compatible form of the object."))
 
-;;;Changing object attributes
+(defgeneric pretty-print (object)
+  (:documentation "Prints an object for easy formatting."))
+
+;;; Changing object attributes
 
 (defgeneric change-first-name (object first-name)
   (:documentation "Change the first name of the object"))

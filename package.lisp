@@ -10,6 +10,9 @@
   
   ;;; system-generics.lisp
   (:export #:sql-print
+           #:pretty-print
+
+           ;;; altering sql objects
 	   #:change-first-name
 	   #:change-last-name
 	   #:change-id
@@ -23,7 +26,7 @@
 	   #:change-name
 	   #:change-date
 	   #:change-time
-	   #:change-date-time)
+	   #:change-timestamp)
 
   ;;; time.lisp
   (:export #:set-time ; class and function
@@ -44,6 +47,7 @@
 	   #:add-days
 	   #:sub-days
 	   #:next-year
+           #:month-name
 	   #:day-of-week
 	   #:day-of-week-name
 	   #:number-suffix
@@ -59,15 +63,19 @@
 	   #:month ;class and method
 	   #:this-month
 	   #:last-month
-	   #:next-month)
+	   #:next-month
+           #:gather-weeks)
 
   ;;; timestamps.lisp
-  (:export #:timestamp ; class and method
+  (:export #:timestamp ; class and function
+           #:parse-timestamp
+           #:timestamp-from-sql
            #:current-timestamp
            #:moment
            #:change-date
            #:change-time
            #:later-timestamp-p
+           #:later-timestamp
            #:future-p
            #:previous-day)
   
