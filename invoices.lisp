@@ -242,15 +242,15 @@
 ;;;;
 ;;;;------------------------------------------------------------------------
 
-(defmethod pdf-invoice ((invoice invoice))
-  (pdf:with-document ()
-    (pdf:with-page ()
-      (pdf:with-outline-level ("Invoice" (pdf:register-page-reference))
-        (let ((helvetica (pdf:get-font "Helvetica")))
-          (pdf:in-text-mode
-            (pdf:set-font helvetica 36.0)
-            (pdf:draw-text "Test Invoice")))))
-    (pdf:write-document "test-invoice.pdf")))
+;(defmethod pdf-invoice ((invoice invoice))
+ ; (pdf:with-document ()
+  ;  (pdf:with-page ()
+  ;    (pdf:with-outline-level ("Invoice" (pdf:register-page-reference))
+   ;     (let ((helvetica (pdf:get-font "Helvetica")))
+    ;      (pdf:in-text-mode
+     ;       (pdf:set-font helvetica 36.0)
+      ;      (pdf:draw-text "Test Invoice")))))
+   ; (pdf:write-document "test-invoice.pdf")))
 
 ;(defun test-invoice-pdf ()
  ; (let ((width 8.5)
@@ -309,40 +309,124 @@
                   :accessor width)
    (height        :initarg :height
                   :accessor height)
+   (margin-left   :initarg :margin-left
+		  :accessor margin-left)
+   (margin-right  :initarg :margin-right
+		  :accessor margin-right)
    (margin-top    :initarg :margin-top
                   :accessor margin-top)
    (margin-bottom :initarg :margin-bottom
                   :accessor margin-bottom)))
 
-(defun invoice-layout (width height margin-top margin-bottom)
+(defun invoice-layout (width height margin-left margin-right margin-top margin-bottom)
   (make-instance 'invoice-layout :width width
                                  :height height
+				 :margin-left margin-left
+				 :margin-right margin-right
                                  :margin-top margin-top
                                  :margin-bottom margin-bottom))
 
-(defun default-invoice-layout ()
-  (invoice-layout (inch-pt 8.5)
+(defvar default-invoice-layout (invoice-layout (inch-pt 8.5)
                   (inch-pt 11)
+		  (inch-pt .5)
+		  (inch-pt 8)
                   (inch-pt 10)
                   (inch-pt 1)))
 
 ;;; make title/ banner
-(defmethod make-banner (invoice-layout title)
-  (pdf:draw-centered-text (/ (width invoice-layout) 2)
-                          (margin-top invoice-layout)
-                          title
-                          (pdf:get-font "Helvetica")
-                          (inch-pt .2)))
+(defmethod dotted-line ((layout invoice-layout)) ;generalize for use with any y value
+   (pdf:draw-right-text (margin-left layout)
+			(- (margin-top layout) 70)
+			(format nil "~{~a~}" (loop :for i :from 1 :to (/ (- (margin-right layout)
+									     (margin-left layout))
+									  4)
+						    :collect (format nil "-")))
+			 (pdf:get-font "Helvetica")
+			 12))
+;(defmethod make-banner (invoice-layout title)
+(defmethod make-banner ((invoice invoice) layout)
+  (let ((o (find-invoice-object (invoice-obj-type invoice)
+				(invoice-obj-id invoice))))
+    (progn (pdf:draw-right-text (margin-left layout)
+			 (margin-top layout)
+			 (pretty-print o)
+			 (pdf:get-font "Helvetica")
+			 30)
+	   (pdf:draw-left-text (margin-right layout)
+			       (margin-top layout)
+			       (format nil "~a, ~a"
+				       (month-name (invoice-month invoice))
+				       (invoice-year invoice))
+			       (pdf:get-font "Helvetica")
+			       30)
+    (pdf:draw-right-text (margin-left layout)
+			 (- (margin-top layout) 15)
+			 (employee-address o)
+			 (pdf:get-font "Helvetica")
+			 12)
+    (pdf:draw-right-text (margin-left layout)
+			 (- (margin-top layout) 30)
+			 (employee-email o)
+			 (pdf:get-font "Helvetica")
+			 12)
+    (pdf:draw-right-text (margin-left layout)
+		         (- (margin-top layout) 45)
+			 (pretty-print (make-phone-number (employee-phone o)))
+			 (pdf:get-font "Helvetica")
+			 12)
+    (dotted-line layout))))
+		     
+;(defmethod make-banner (invoice-layout title)
+ ; (pdf:draw-centered-text (/ (width invoice-layout) 2)
+  ;                        (margin-top invoice-layout)
+   ;                       title
+    ;                      (pdf:get-font "Helvetica")
+     ;                     (inch-pt .2)))
   
 ;;; then populate with items
-;(defgeneric invoice-item ((receipt receipt) layout) ;maybe now rename receipt "checked-receipts"
-  
+(defgeneric invoice-item (object line-number layout) ;maybe now rename receipt "checked-receipts"
+  (:documentation "Generates an invoice item for the object."))
+
+(defmethod line-number-pt ((invoice-layout invoice-layout) line-number)
+  (- (margin-top invoice-layout) (+ 70 (* line-number 15)))) ;(margin-bottom invoice-layout)))
+
+(defmethod pretty-print ((receipt receipt))
+  "Formats a receipt for invoices (Maybe also for web."
+  (format nil "~a, ~a ~a, ~a minutes, ~a, Makeup+/-: ~a"
+	  (pretty-print (client-id-search (appointment-client-id receipt)))
+	  (pretty-print (date-o (timestamp-from-sql (write-to-string (appointment-timestamp receipt)))))
+	  (pretty-print (time-o (timestamp-from-sql (write-to-string (appointment-timestamp receipt)))))
+	  ;(pretty-print (appointment-employee-id receipt))
+	  ;(pretty-print (client-id-search (appointment-client-id receipt)))
+	  (appointment-duration receipt)
+	  (receipt-attendance receipt)
+	  (receipt-makeup receipt)))
+	  
+
+(defmethod invoice-item ((receipt receipt) line-number layout)
+  "Generates an invoice item, including all relevant information."
+  (progn (pdf:draw-right-text (margin-left layout)
+		      (line-number-pt layout line-number)
+		      (pretty-print receipt)
+		      (pdf:get-font "Helvetica")
+		      12)
+	 (dotted-line layout)))
+		      
 
 (defmethod pdf-invoice ((invoice invoice))
-  (let ((layout (default-invoice-layout)))
+  (let ((layout default-invoice-layout))
     (pdf:with-document ()
       (pdf:with-page ()
         (pdf:with-outline-level ((default-title invoice) (pdf:register-page-reference))
         ;(let ((helvetica (pdf:get-font "Helvetica")))
-          (make-banner layout (default-title invoice))))
+          (make-banner invoice layout)
+	  (loop :with line-number := 1
+		:with month-receipts := (month-receipts (find-invoice-object (invoice-obj-type invoice)
+								(invoice-obj-id invoice))
+					   (invoice-month invoice)
+					   (invoice-year invoice))
+		
+		:for i :in month-receipts
+		:do (progn (invoice-item i line-number layout)
+		           (setq line-number (1+ line-number))))))
     (pdf:write-document (invoice-filename invoice)))))

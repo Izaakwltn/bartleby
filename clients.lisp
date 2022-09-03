@@ -30,6 +30,8 @@
 	      "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Credit Minutes:~%Notes: ~a~%"
 	      first-name last-name phone email address  notes))))
 
+(defmethod pretty-print ((client client))
+  (format nil "~a ~a" (client-first-name client) (client-last-name client)))
 (defun make-client (first-name last-name phone email address notes)
   (make-instance 'client :first-name first-name
                          :last-name  last-name

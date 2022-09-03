@@ -31,6 +31,12 @@
 	       (middle phone-number)
 	       (end phone-number)))
 
+(defmethod pretty-print ((phone-number phone-number))
+  (format nil "+~a(~a)~a-~a" (country phone-number)
+	  (area phone-number)
+	  (middle phone-number)
+	  (end phone-number)))
+
 (defun make-phone-number (number-string)
   "Stores a string phone number as an object including country and area codes"
   (let ((l (length number-string)))

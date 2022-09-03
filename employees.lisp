@@ -31,6 +31,10 @@
       (format stream "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Rate: $~a/hr~%Notes: ~a"
 	      first-name last-name phone email address hourly-rate notes))))
 
+
+(defmethod pretty-print ((employee employee))
+  (format nil "~a ~a" (employee-first-name employee) (employee-last-name employee)))
+
 (defun make-employee (first-name last-name phone email address hourly-rate notes)
   (make-instance 'employee :first-name  first-name
          		   :last-name   last-name
