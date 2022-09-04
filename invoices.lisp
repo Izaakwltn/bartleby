@@ -388,7 +388,7 @@
   (:documentation "Generates an invoice item for the object."))
 
 (defmethod line-number-pt ((invoice-layout invoice-layout) line-number)
-  (- (margin-top invoice-layout) (+ 70 (* line-number 15)))) ;(margin-bottom invoice-layout)))
+  (- (margin-top invoice-layout) (+ 70 (* line-number 20)))) ;(margin-bottom invoice-layout)))
 
 (defmethod pretty-print ((receipt receipt))
   "Formats a receipt for invoices (Maybe also for web."
@@ -405,13 +405,34 @@
 
 (defmethod invoice-item ((receipt receipt) line-number layout)
   "Generates an invoice item, including all relevant information."
-  (progn (pdf:draw-right-text (margin-left layout)
+  (pdf:draw-right-text (margin-left layout)
 		      (line-number-pt layout line-number)
 		      (pretty-print receipt)
 		      (pdf:get-font "Helvetica")
-		      12)
-	 (dotted-line layout)))
-		      
+		      12))
+
+(defmethod print-invoice-total ((invoice invoice) layout))
+
+;(defmethod client-makeup-data ((client client) month)
+ ; "Returns a list of start, end, and change values for a client"
+;(defmethod makeup-table ((invoice invoice) layout)
+ ; "Makes a makeup-table for client makeups"
+  ;(let* ((minute-change
+   ;        (reduce #'+
+    ;               (mapcar #'receipt-makeup
+     ;                      (mapcar #'appointment-client-id (month-receipts
+      ;                      (find-invoice-object (invoice-obj-type invoice)
+      ;                                           (invoice-obj-id invoice)))))))
+    ;(format nil "~a" minute-change)))
+
+;;; To find start value:
+;;; add up all of the makeup changes for all receipts in the invoice
+;;; subtract from the client's current makeup value
+
+;;; to find end value:
+;;; current client makeup-minutes
+
+
 
 (defmethod pdf-invoice ((invoice invoice))
   (let ((layout default-invoice-layout))
@@ -419,14 +440,25 @@
       (pdf:with-page ()
         (pdf:with-outline-level ((default-title invoice) (pdf:register-page-reference))
         ;(let ((helvetica (pdf:get-font "Helvetica")))
-          (make-banner invoice layout)
+          (progn (make-banner invoice layout)
 	  (loop :with line-number := 1
-		:with month-receipts := (month-receipts (find-invoice-object (invoice-obj-type invoice)
-								(invoice-obj-id invoice))
-					   (invoice-month invoice)
-					   (invoice-year invoice))
+		:with month-receipts := (sort
+                                         (month-receipts
+                                          (find-invoice-object
+                                           (invoice-obj-type invoice)
+					   (invoice-obj-id invoice))
+					  (invoice-month invoice)
+					  (invoice-year invoice))
+                                         #'(lambda (r1 r2)
+                                             (later-timestamp-p
+                                              (timestamp-from-sql
+                                               (write-to-string
+                                                (appointment-timestamp r2)))
+                                             (timestamp-from-sql
+                                              (write-to-string
+                                               (appointment-timestamp r1))))))
 		
 		:for i :in month-receipts
 		:do (progn (invoice-item i line-number layout)
-		           (setq line-number (1+ line-number))))))
+		           (setq line-number (1+ line-number)))))))
     (pdf:write-document (invoice-filename invoice)))))
