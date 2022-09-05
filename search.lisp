@@ -1,4 +1,4 @@
-;;;; search.lisp
+x;;;; search.lisp
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
@@ -20,13 +20,13 @@
 (alexa:define-string-lexer search-lexer
   "A Lexer for bartleby search queries."
   (;(:hyphen-word "[A-Za-z]\\-[A-Za-z]")
-   (:phone "[0-9][0-9]*|[0-9][0-9][0-9\-[0-9][0-9")
+   (:phone "[0-9][0-9]*|[0-9][0-9][0-9]\-[0-9][0-9][0-9][0-9]")
    (:word "[A-Za-z][A-Za-z]*")
    (:email "[A-Za-z0-9][A-Za-z0-9]*@[A-Za-z][A-Za-z]*\.[A-Za-z][A-Za-z]*")
-   (:space " "))
+   (:space "\s\S"))
   ;("{{HYPHEN-WORD}}" (return (tok :hyphen-word (princ-to-string $@))))
   ("{{WORD}}"        (return (tok :word (princ-to-string $@))))
-  ("{{NUM}}"         (return (tok :number (princ-to-string $@))))
+  ("{{PHONE}}"         (return (tok :phone (princ-to-string $@))))
   ("{{EMAIL}}"       (return (tok :email (princ-to-string $@))))
   ("{{SPACE}}" nil))
 

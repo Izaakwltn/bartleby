@@ -22,6 +22,7 @@
 	       (:file "clients")
 	       (:file "rooms")
 	       (:file "employees")
+               (:file "services")
 	       (:file "appointments")
 	       (:file "availability") 
 	       (:file "receipts")

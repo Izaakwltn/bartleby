@@ -10,6 +10,7 @@
   ((num  :col-type (:int))
    (name :col-type (:varchar 64))
    (capacity  :col-type (:int))
+   (services  :col-type (:varchar 64))
    (notes     :col-type (:varchar 128)))
   (:conc-name room-))
 
@@ -20,18 +21,21 @@
     (with-accessors ((room-num room-num)
 		     (room-name room-name)
 		     (room-capacity room-capacity)
+                     (room-services room-services)
 		     (room-notes room-notes))
 	obj
-      (format stream "~%Room ~a, ~a~%Capacity: ~a~%Notes: ~a~%"
+      (format stream "~%Room ~a, ~a~%Capacity: ~a~%Services: ~a~%Notes: ~a~%"
 	      room-num
 	      room-name
 	      room-capacity
+              room-services
 	      room-notes))))
 
 (defun make-room (num name capacity notes)
   (make-instance 'meeting-room :num       num
 		               :name      name
 			       :capacity  capacity
+                               :services  service-chunk
 		               :notes     notes))
 
 ;;; Adding and removing rooms
@@ -62,6 +66,10 @@
 (defmethod change-capacity ((meeting-room meeting-room) new-capacity)
   (setf (slot-value meeting-room 'capacity) new-capacity)
   (mito:save-dao meeting-room))
+
+(defmethod add-services ((meeting-room meeting-room) new-services)
+  (setf (slot-value meeting-room 'services) (concatenate 'string (room-services meeting-room)
+                                                     (absorb-services new-services))))
 
 (defmethod change-notes((meeting-room meeting-room) new-notes)
   (setf (slot-value meeting-room 'notes) new-notes)
@@ -94,4 +102,6 @@
   (find-if #'(lambda (r)
 	       (string-equal name (room-name r)))
 	   (all-rooms)))
+
+
 	       

@@ -13,6 +13,7 @@
    (email       :col-type (or (:varchar 64) :null))
    (address     :col-type (or (:varchar 100) :null))
    (hourly-rate :col-type (:int))
+   (services    :col-type (:varchar 64))
    (notes       :col-type (or (:varchar 128) :null)))
   (:conc-name employee-))
 
@@ -26,22 +27,24 @@
 		     (email employee-email)
 		     (address employee-address)
 		     (hourly-rate employee-hourly-rate)
+                     (services employee-services)
 		     (notes employee-notes))
 	obj
-      (format stream "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Rate: $~a/hr~%Notes: ~a"
-	      first-name last-name phone email address hourly-rate notes))))
+      (format stream "~%Name: ~a ~a~%Phone: ~a~%Email: ~a~%Address: ~a~%Rate: $~a/hr~%Services: ~a~%Notes: ~a"
+	      first-name last-name phone email address hourly-rate (return-services obj) notes))))
 
 
 (defmethod pretty-print ((employee employee))
   (format nil "~a ~a" (employee-first-name employee) (employee-last-name employee)))
 
-(defun make-employee (first-name last-name phone email address hourly-rate notes)
+(defun make-employee (first-name last-name phone email address hourly-rate notes &optional service-chunk)
   (make-instance 'employee :first-name  first-name
          		   :last-name   last-name
 			   :phone       phone
 			   :email       email
 			   :address     address
 			   :hourly-rate hourly-rate
+                           :services    service-chunk
 			   :notes       notes))
 
 ;;; Adding and removing employees
@@ -52,15 +55,20 @@
 
 (defvar *standard-hourly* 37)
 
-(defun new-employee (first-name last-name phone email notes &optional hourly-rate)
+(defun new-employee (first-name last-name phone email notes &optional hourly-rate service-list-string)
   "Makes a new employee with optional hourly-rate."
-  (mito:create-dao (make-employee first-name
-				  last-name
-		                  phone
-		                  email
-		                  (if hourly-rate
-		                      hourly-rate
-		                      *standard-hourly*))))
+  (add-employee (make-employee first-name
+                               last-name
+                               phone
+                               email
+                               ""
+                               (if hourly-rate
+		                   hourly-rate
+		                   *standard-hourly*)
+                               notes
+                               (if service-list-string
+                                   (absorb-services service-list-string)
+                                   ""))))
 
 (defmethod remove-employee ((employee employee))
   "Removes the employee from the Employee sql table"
@@ -97,6 +105,9 @@
   (setf (slot-value employee 'hourly-rate) hourly-rate)
   (mito:save-dao employee))
 
+(defmethod add-services ((employee employee) new-services)
+  (setf (slot-value employee 'services) (concatenate 'string (employee-services employee)
+                                                     (absorb-services new-services))))
 (defmethod change-notes ((employee employee) notes)
   (setf (slot-value employee 'notes) notes)
   (mito:save-dao employee))
