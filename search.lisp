@@ -6,6 +6,8 @@
 
 ;;; Search methods
 
+;;;; add phone number searching by xxx-xxx-xxxx, (xxx)-xxx-xxxx and xxxxxxxxxx
+
 ;;; one option- parse search input,
 ;;; if one of the words is "client" "employee" or "appointment" it will only search one of those categories
 
@@ -18,12 +20,14 @@
 (alexa:define-string-lexer search-lexer
   "A Lexer for bartleby search queries."
   (;(:hyphen-word "[A-Za-z]\\-[A-Za-z]")
-   (:num "[0-9][0-9]*")
+   (:phone "[0-9][0-9]*|[0-9][0-9][0-9\-[0-9][0-9")
    (:word "[A-Za-z][A-Za-z]*")
+   (:email "[A-Za-z0-9][A-Za-z0-9]*@[A-Za-z][A-Za-z]*\.[A-Za-z][A-Za-z]*")
    (:space " "))
   ;("{{HYPHEN-WORD}}" (return (tok :hyphen-word (princ-to-string $@))))
   ("{{WORD}}"        (return (tok :word (princ-to-string $@))))
   ("{{NUM}}"         (return (tok :number (princ-to-string $@))))
+  ("{{EMAIL}}"       (return (tok :email (princ-to-string $@))))
   ("{{SPACE}}" nil))
 
 (defun lex-query (query)
