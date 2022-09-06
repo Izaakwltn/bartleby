@@ -24,6 +24,7 @@
 	       (:file "employees")
                (:file "services")
 	       (:file "appointments")
+               (:file "makeups")
 	       (:file "availability") 
 	       (:file "receipts")
 	       (:file "check-out")

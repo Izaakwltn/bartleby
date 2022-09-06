@@ -80,4 +80,4 @@
 
 (defun generate-rooms (number-of-rooms)
   (loop :for i :from (+ 1 (room-count)) :to number-of-rooms
-	:do (add-room (make-room i (random-room *room-names*) (random 15) "test room"))))
+	:do (add-room (make-room i (random-room *room-names*) (random 15) "" "test room"))))

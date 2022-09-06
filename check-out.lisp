@@ -7,8 +7,12 @@
 ;;; Functions for Checking out Appointments
 
 (defmethod check-out ((appointment appointment) attendance makeup notes)
-  (add-receipt (make-receipt appointment attendance makeup notes))
-  (remove-appointment appointment))
+  (progn (add-receipt (make-receipt appointment attendance makeup notes))
+         (cond ((zerop makeup) nil)
+               ((< 0 makeup) (credit-appointment appointment))
+               ((> 0 makeup) (use-makeups (client-id-search (appointment-client-id appointment))
+                                          (- makeup))))
+  (remove-appointment appointment)))
 
 ;;;;in lieu of the proper web-service:
 

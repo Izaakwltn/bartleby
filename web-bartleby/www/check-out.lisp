@@ -4,68 +4,6 @@
 
 (in-package :web-bartleby)
 
-;;;;;;;;scratch work for checkout-handler
-;(defmacro ddt (func-name) `(defun ,(intern func-name) () (+ 2 4)))
-
-;(ddt "turtle")
-
-;(defun ddt-test ()
- ; (let ((s (concatenate 'string "S")))
-  ;  (ddt s)))
-
-;(defun make-function (func-name) (defvar (intern func-name) ))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(eval-when (:compile-toplevel :load-toplevel :execute)
- ; (defun handler-name (handler-string)
-  ;  (intern handler-string)))
-
-;(defmacro checkout-handler (lambda-list)
- ; (destructuring-bind (name &key uri
-  ;                                      ;(let ((handler form-id))
- ; (destructuring-bind
-  ;  `(hunchentoot:define-easy-handler (,(intern form-id) :uri ,form-uri) (appointment-id attendance makeup notes)
-   ;  (bartleby::check-out
-    ;  (bartleby::appointment-id-search (parse-integer appointment-id))
-     ; attendance
-  ;    (parse-integer makeup)
-   ;   notes)
-    ; (appointments-check-out))))))
-
-;(mito:deftable checkable-appointment (bartleby::appointment)
- ; ((form-id :col-type (:varchar 32)) ;type symbol
- ;  (form-uri :col-type (:varchar 32)))
- ; (:conc-name "checkable-"))
-
-;(mito:ensure-table-exists 'checkable-appointment)
-
-;(defmethod make-checkable-appointment ((appointment bartleby:appointment))
- ; (make-instance 'checkable-appointment
-  ;               :client-id   (bartleby::appointment-client-id appointment)
-   ;              :employee-id (bartleby::appointment-employee-id appointment)
-    ;             :room-id     (bartleby::appointment-room-id appointment)
-     ;            :timestamp   (bartleby::appointment-timestamp appointment)
-      ;           :duration    (bartleby::appointment-duration appointment)
-       ;          :notes       (bartleby::appointment-notes appointment)
-        ;         :form-id     (make-symbol
-         ;                      (concatenate 'string
-          ;                                  "appointment-checkout-"
-           ;                                 (write-to-string
-            ;                                 (mito:object-id appointment))))
-             ;    :form-uri    (concatenate 'string
-              ;                             "/appointment-checkout-"
-               ;                            (write-to-string
-                ;                            (mito:object-id appointment)))))
-
-;(defmethod add-checkable-appointment ((checkable-appointment checkable-appointment))
- ;(mito:insert-dao checkable-appointment))
-
-;(defmethod remove-checkable-appointment ((checkable-appointment checkable-appointment))
- ; (mito:delete-dao checkable-appointment))
-
-;(defmethod replace-checkable-appointment ((checkable-appointment checkable-appointment) new-checkable-appointment)
- ; (remove-checkable-appointment checkable-appointment)
-  ;(add-checkable-appointment checkable-appointment))
-
 (defmethod checkout-item ((appointment bartleby::appointment))
   (let ((form-id (concatenate 'string
                               "appointment-checkout-"
@@ -144,35 +82,3 @@
   ;(write (list appointment-id attendance makeups notes)))
   (bartleby::check-out (bartleby::appointment-id-search (parse-integer appointment-id)) attendance (parse-integer makeups) notes)
   (appointments-check-out))
-     ;(:hr)
-;     (spinneret:with-html (:select :name "employee" :form "new-appointment"
-;	     (loop :for e :in (bartleby:all-employees)
-;		   :do (:option :value (mito:object-id e)
-;				(format nil "~a ~a" (bartleby::employee-first-name e)
-;						    (bartleby::employee-last-name e))))))
- ;    (:hr)
-  ;   (spinneret:with-html (:select :name "room" :form "new-appointment"
-;	     (loop :for r :in (bartleby:all-rooms)
-;		   :do (:option :value (mito:object-id r)
-;				(format nil "~a ~a" (bartleby::room-num r)
-;					(bartleby::room-name r))))))
- ;    (:hr)
-  ;   (spinneret:with-html
-   ;    (:select :name "date" :form "new-appointment"
-;	 (loop :for i :from 0 :to 30
-;	       :do (:option :value (bartleby:add-days
-;				    (bartleby::date-o (bartleby::current-timestamp)) i)
-;			    (format nil "~a"
-;				    (bartleby:add-days (bartleby::date-o (bartleby::current-timestamp)) i))))))
- ;    (spinneret:with-html
-  ;     (:select :name "time" :form "new-appointment"
-;	 (loop :for i :in time-options
-;	       :do (:option :value i
-;			    (format nil "~a" i)))))
- ;    (:hr)
-  ;   (:hr)
-   ;  (:label :for "notes"
-;	     "Notes ")
- ;    (:input :type "text" :id "notes" :name "notes")
-;	          (cl-bootstrap:bs-form-checkbox "Check me out")
-;	     (:button :type "submit" :class "btn btn-default" "Submit"))))

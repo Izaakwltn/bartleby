@@ -31,15 +31,19 @@
      (:label :for "hourly-rate"
 	     "Hourly Rate ")
      (:input :type "text" :id "hourly-rate" :name "hourly-rate")
-     (:hr) 
+     (:hr)
+     (:label :for "services"
+             "Services- list separated by spaces")
+     (:input :type "text" :id "services" :name "services")
+     (:hr)
      (:label :for "notes"
 	     "Notes ")
      (:input :type "text" :id "notes" :name "notes")
-	          (cl-bootstrap:bs-form-checkbox "Check me out")
+	         ; (cl-bootstrap:bs-form-checkbox "Check me out")
 		  (:button :type "submit" :class "btn btn-default" "Submit"))))
 
 (hunchentoot:define-easy-handler (submit-new-employee :uri "/submit-new-employee")
-  (fname lname phone email address hourly-rate notes)
+  (fname lname phone email address hourly-rate services notes)
   (setf (hunchentoot:content-type*) "text/html")
-  (bartleby:add-employee (bartleby::make-employee fname lname phone email address (parse-integer hourly-rate) notes))
+  (bartleby:add-employee (bartleby::make-employee fname lname phone email address (parse-integer hourly-rate) (bartleby::absorb-services services) notes))
   (browse-employees))

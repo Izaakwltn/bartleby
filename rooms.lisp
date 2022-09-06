@@ -31,7 +31,7 @@
               room-services
 	      room-notes))))
 
-(defun make-room (num name capacity notes)
+(defun make-room (num name capacity service-chunk notes)
   (make-instance 'meeting-room :num       num
 		               :name      name
 			       :capacity  capacity
