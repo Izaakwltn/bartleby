@@ -17,18 +17,18 @@
 (defmethod print-object ((obj makeup-credit) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((client-id makeup-client-id)
-                     (duration  makeup-duration)
-                     (timestamp makeup-timestamp)
-                     (expiration makeup-expiration)
-                     (active     makeup-active))
+                     (duration  makeup-duration))
+                     ;(timestamp makeup-timestamp)
+                     ;(expiration makeup-expiration)
+                     ;(active     makeup-active))
         obj
       (format stream
-              "Active: ~a~%Client ~a~%~a Minutes~%Granted: ~a~%Expires: ~a"
-              (if active "Yes" "No")
+              "~a ~a";"Active: ~a~%Client ~a~%~a Minutes~%Granted: ~a~%Expires: ~a"
+              ;(if active "Yes" "No")
               (client-id-search client-id)
-              duration
-              timestamp
-              expiration))))
+              duration))))
+              ;(timestamp-from-sql (write-to-string timestamp))
+              ;(timestamp-from-sql (write-to-string expiration))))))
 
 (defun make-makeup (client-id duration sql-timestamp expiration &optional active-status)
   (make-instance 'makeup-credit :client-id  client-id
@@ -127,8 +127,9 @@
                                       
 (defun makeups-by-date ()
   (sort (all-makeups) #'(lambda (x y)
-                          (later-timestamp-p (timestamp-from-sql (write-to-string y))
-                                        (timestamp-from-sql (write-to-string x))))))
+                          (later-timestamp-p
+                           (timestamp-from-sql (write-to-string (makeup-timestamp y)))
+                           (timestamp-from-sql (write-to-string (makeup-timestamp x)))))))
 
 (defmethod makeups ((client client))
   (remove-if-not #'(lambda (i)
@@ -157,18 +158,32 @@
  ;       ((> amount-to-use (makeup-duration 
 
 (defmethod total-positive-minutes ((client client))
-  (reduce #'+ (remove-if-not #'(lambda (m)
-                                 (> (makeup-duration m) 0))
-                             (makeups client))))
+  (reduce #'+ (mapcar #'makeup-duration
+                      (remove-if-not #'(lambda (m)
+                                         (> (makeup-duration m) 0))
+                                     (makeups client)))))
 
 (defmethod total-negative-minutes ((client client))
-  (reduce #'+ (remove-if-not #'(lambda (m)
+  (reduce #'+ (mapcar #'makeup-duration (remove-if-not #'(lambda (m)
                                  (< (makeup-duration m) 0))
-                             (makeups client))))
+                             (makeups client)))))
                
 (defmethod total-makeup-minutes ((client client))
   (reduce #'+ (mapcar #'makeup-duration (makeups client)))) 
 
 
-(defmethod total-makeup-minutes-before ((client client) date)
-  "Returns total makeup minutes before arbitrary date") ; for calculating month-start and month-end makeup minutes
+(defmethod makeups-before ((client client) timestamp)
+  "Returns all makeups before arbitrary date"
+  (remove-if-not #'(lambda (m)
+                     (later-timestamp-p timestamp
+                                        (timestamp-from-sql
+                                         (write-to-string (makeup-timestamp m)))))
+                 (makeups client)))
+
+(defmethod past-makeups ((client client))
+  (makeups-before client (current-timestamp)))
+
+(defmethod makeup-minutes-before ((client client) timestamp)
+  (reduce #'+ (mapcar #'makeup-duration (makeups-before client timestamp))))
+                          
+                                        ; for calculating month-start and month-end makeup minutes

@@ -63,7 +63,6 @@
                       (client-last-name object))
               (format nil "~a-~a" (employee-first-name object)
                                   (employee-last-name object)))
-          ;(mito:object-id object))
                (month-name month)
                year))
                
@@ -94,12 +93,15 @@
 
 (defmethod month-receipts ((employee employee) month year)
   "Returns all apppointments for an employee in a given month."
-  (loop :for r :in (all-receipts)
+  (sort (loop :for r :in (all-receipts)
 	:if (and (equal (appointment-employee-id r) (mito:object-id employee))
 		 (equal month (m (date-o (timestamp-from-sql (write-to-string (appointment-timestamp r))))))
 		 (equal year (y (date-o (timestamp-from-sql (write-to-string (appointment-timestamp r)))))))
 	  :collect r :into rcpts
-	:finally (return rcpts)))
+              :finally (return rcpts))
+        #'(lambda (r1 r2)
+            (later-timestamp-p (timestamp-from-sql (write-to-string (appointment-timestamp r2)))
+                               (timestamp-from-sql (write-to-string (appointment-timestamp r1)))))))
 
 (defmethod month-receipts ((client client) month year)
   "Returns all appointments for a client in a given month"
@@ -112,13 +114,13 @@
 	  :collect r :into rcpts
 	:finally (return rcpts)))                            ;;;;;;later add room method
 
-(defun chronological-receipts (receipts)
-  "Sorts a list of receipts by oldest to newest."
-  (sort (copy-list receipts)
-	#'(lambda (receipt1 receipt2)
-	    (not (later-date (app-date (appointment receipt1))
-			(app-date (appointment receipt2)))))))
-
+;(defun chronological-receipts (receipts)
+ ; "Sorts a list of receipts by oldest to newest."
+  ;(sort receipts
+;	#'(lambda (receipt1 receipt2)
+ ;           (later-timestamp-p (not (later-date (app-date (appointment receipt1))
+;			(app-date (appointment receipt2)))))))
+;
 ;;;;------------------------------------------------------------------------
 ;;;;Figure out Makeup Table
 ;;;;------------------------------------------------------------------------
@@ -242,39 +244,6 @@
 ;;;;
 ;;;;------------------------------------------------------------------------
 
-;(defmethod pdf-invoice ((invoice invoice))
- ; (pdf:with-document ()
-  ;  (pdf:with-page ()
-  ;    (pdf:with-outline-level ("Invoice" (pdf:register-page-reference))
-   ;     (let ((helvetica (pdf:get-font "Helvetica")))
-    ;      (pdf:in-text-mode
-     ;       (pdf:set-font helvetica 36.0)
-      ;      (pdf:draw-text "Test Invoice")))))
-   ; (pdf:write-document "test-invoice.pdf")))
-
-;(defun test-invoice-pdf ()
- ; (let ((width 8.5)
-  ;      (height 11)
-   ;     (margin-top 1)
-    ;    (margin-bottom 1)
-       ; (span .02)
-     ;;   (helvetica (pdf:get-font "Helvetica")))
- ; (pdf:with-document ()
-  ;  (pdf:with-page ()
-   ;   (loop :for i :from 1 :to 12
-    ;        :do (pdf:rectangle 100 (+ margin-bottom (* i 5)) 1 1)))
- ;   (pdf:write-document "test-invoice.pdf"))))
-  ;    
-   ;   (pdf:with-outline-level ("Invoice" (pdf:register-page-reference))
-    ;      (pdf:in-text-mode
-     ;       (pdf:set-font helvetica 36.0)
-      ;      ;(pdf:move-text 100 800)
-       ;     (pdf:draw-text "Test Invoice"))
-        ;  (loop :with line := 1
-         ;       :for i :from 1 :to 70
-          ;      :do (pdf:draw-left-text 3 5 "Test" helvetica 12.0)))))
-   ; (pdf:write-document "test-invoice.pdf")))
-
 (defmethod default-title ((invoice invoice))
   (let* ((o (find-invoice-object (invoice-obj-type invoice)
                                  (invoice-obj-id   invoice)))
@@ -326,7 +295,7 @@
                                  :margin-top margin-top
                                  :margin-bottom margin-bottom))
 
-(defvar default-invoice-layout (invoice-layout (inch-pt 8.5)
+(defvar *default-invoice-layout* (invoice-layout (inch-pt 8.5)
                   (inch-pt 11)
 		  (inch-pt .5)
 		  (inch-pt 8)
@@ -411,9 +380,7 @@
 		      (pdf:get-font "Helvetica")
 		      12))
 
-(defmethod print-invoice-total ((invoice invoice) layout))
-
-;(defmethod client-makeup-data ((client client) month)
+                                        ;(defmethod client-makeup-data ((client client) month)
  ; "Returns a list of start, end, and change values for a client"
 ;(defmethod makeup-table ((invoice invoice) layout)
  ; "Makes a makeup-table for client makeups"
@@ -432,10 +399,88 @@
 ;;; to find end value:
 ;;; current client makeup-minutes
 
+;;; invoice totals
+
+(defmethod invoice-total-minutes ((invoice invoice))
+  (reduce #'+ (mapcar #'(lambda (r)
+                          (cond ((string-equal (receipt-attendance r) "\"ARRIVED\"")
+                                 (appointment-duration r))
+                                ((string-equal (receipt-attendance r) "\"NO-SHOW\"")
+                                 (/ (appointment-duration r) 2))
+                                ((string-equal (receipt-attendance r) "\"CANCELLED\"")
+                                 0)))
+                      (month-receipts (find-invoice-object (invoice-obj-type invoice)
+                                                           (invoice-obj-id invoice))
+                                      (invoice-month invoice)
+                                      (invoice-year invoice)))))
+
+(defmethod print-invoice-total ((invoice invoice) line-number layout)
+  (pdf:draw-right-text (margin-left layout)
+		      (line-number-pt layout line-number)
+		      (let ((itm (invoice-total-minutes invoice))
+                            (hr (employee-hourly-rate
+                                (find-invoice-object
+                                 (invoice-obj-type invoice)
+                                 (invoice-obj-id invoice)))))
+                        (format nil "Total Minutes (~a) * Hourly (~a) = $~a"
+                              itm
+                              hr
+                              (* hr (/ itm 60))))
+		      (pdf:get-font "Helvetica")
+		      12))
+
+(defmethod invoice-clients ((invoice invoice))
+  (mapcar #'client-id-search (loop :with client-ids := nil
+
+        :for r :in (month-receipts (find-invoice-object (invoice-obj-type invoice)
+                                                        (invoice-obj-id   invoice))
+                                   (invoice-month invoice)
+                                   (invoice-year invoice))
+        :do (setq client-ids (union (list (appointment-client-id r)) client-ids))
+        :finally (return client-ids))))
+
+(defmethod lines-from-the-bottom ((invoice-layout invoice-layout) line-number)
+  (+ (margin-bottom invoice-layout) (* line-number 40)))
+
+(defmethod makeup-table ((invoice invoice) layout)
+  (loop :with line-number := 1
+
+        :for c :in (invoice-clients invoice)
+        :do (progn
+              (pdf:draw-right-text
+               (margin-left layout)
+               (lines-from-the-bottom layout line-number)
+               (format nil "~a ~a: ~a -> ~a"
+                           (client-first-name c)
+                           (client-last-name c)
+                           (makeup-minutes-before c
+                                           (timestamp-from-sql
+                                            (write-to-string
+                                             (appointment-timestamp
+                                              (first
+                                               (month-receipts
+                                                (find-invoice-object (invoice-obj-type invoice)
+                                                                     (invoice-obj-id invoice))
+                                                (invoice-month invoice)
+                                                (invoice-year invoice)))))))
+                           (makeup-minutes-before c
+                                           (timestamp-from-sql
+                                            (write-to-string
+                                             (appointment-timestamp
+                                              (car (last
+                                              (month-receipts
+                                                (find-invoice-object (invoice-obj-type invoice)
+                                                                     (invoice-obj-id invoice))
+                                                (invoice-month invoice)
+                                                (invoice-year invoice)))))))))
+               (pdf:get-font "Helvetica")
+               12)
+                   (setq line-number (1+ line-number)))))
+                       
 
 
 (defmethod pdf-invoice ((invoice invoice))
-  (let ((layout default-invoice-layout))
+  (let ((layout *default-invoice-layout*))
     (pdf:with-document ()
       (pdf:with-page ()
         (pdf:with-outline-level ((default-title invoice) (pdf:register-page-reference))
@@ -460,5 +505,7 @@
 		
 		:for i :in month-receipts
 		:do (progn (invoice-item i line-number layout)
-		           (setq line-number (1+ line-number)))))))
+		           (setq line-number (1+ line-number)))
+                :finally (progn (print-invoice-total invoice (1+ line-number ) layout)
+                                (makeup-table invoice layout))))))
     (pdf:write-document (invoice-filename invoice)))))
