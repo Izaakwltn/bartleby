@@ -5,9 +5,11 @@
 (in-package :bartleby)
 
 (mito:deftable makeup-credit ()
-  ((client-id :col-type (:int))
-   (duration  :col-type (:int))
-   (timestamp :col-type (:timestamp)))
+  ((client-id  :col-type (:int))
+   (duration   :col-type (:int))
+   (timestamp  :col-type (:timestamp))
+   (expiration :col-type (:timestamp))
+   (active     :col-type (:boolean)))
   (:conc-name makeup-))
 
 (mito:ensure-table-exists 'makeup-credit)
@@ -16,25 +18,50 @@
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((client-id makeup-client-id)
                      (duration  makeup-duration)
-                     (timestamp makeup-timestamp))
+                     (timestamp makeup-timestamp)
+                     (expiration makeup-expiration)
+                     (active     makeup-active))
         obj
       (format stream
-              "client ~a ~a ~a"
+              "Active: ~a~%Client ~a~%~a Minutes~%Granted: ~a~%Expires: ~a"
+              (if active "Yes" "No")
               (client-id-search client-id)
               duration
-              timestamp))))
+              timestamp
+              expiration))))
 
-(defun make-makeup (client-id duration sql-timestamp)
-  (make-instance 'makeup-credit :client-id client-id
-                                :duration  duration
-                                :timestamp sql-timestamp))
+(defun make-makeup (client-id duration sql-timestamp expiration &optional active-status)
+  (make-instance 'makeup-credit :client-id  client-id
+                                :duration   duration
+                                :timestamp  sql-timestamp
+                                :expiration expiration
+                                :active     (if active-status
+                                                active-status
+                                                1)))
 
 (defmethod add-makeup ((makeup-credit makeup-credit))
   (mito:insert-dao makeup-credit))
 
-(defun new-makeup (client-id duration sql-timestamp)
-  (add-makeup (make-makeup client-id duration sql-timestamp)))
+(defvar *default-makeup-expiration* 180)
 
+(defun new-makeup (client-id duration sql-timestamp &optional expiration)
+  (add-makeup (make-makeup client-id
+                           duration
+                           sql-timestamp
+                           (if expiration
+                               expiration
+                               (sql-print
+                                (add-days
+                                 (timestamp-from-sql (write-to-string sql-timestamp))
+                                 *default-makeup-expiration*))))))
+
+(defmethod new-counter-makeup ((makeup-credit makeup-credit) amount-used)
+  (add-makeup (make-makeup (makeup-client-id makeup-credit)
+                           (- amount-used)
+                           (makeup-timestamp makeup-credit)
+                           (makeup-expiration makeup-credit)
+                           0)))
+              
 (defmethod remove-makeup ((makeup-credit makeup-credit))
   (mito:delete-dao makeup-credit))
 
@@ -47,8 +74,31 @@
               (appointment-duration  appointment)
               (appointment-timestamp appointment)))
 
+(defmethod passive-partial-makeup ((makeup-credit makeup-credit) amount-used)
+  (add-makeup (make-makeup (makeup-client-id makeup-credit)
+                           amount-used
+                           (makeup-timestamp makeup-credit)
+                           (makeup-expiration makeup-credit)
+                           0)))
+
+(defmethod active-partial-makeup ((makeup-credit makeup-credit) amount-used)
+  (add-makeup (make-makeup (makeup-client-id makeup-credit)
+                           (- (makeup-duration makeup-credit) amount-used)
+                           (makeup-timestamp makeup-credit)
+                           (makeup-expiration makeup-credit)
+                           1)))
+
 (defmethod partial-use ((makeup-credit makeup-credit) amount-used)
-  (setf (slot-value makeup-credit 'duration) (- (makeup-duration makeup-credit) amount-used))
+  "Splits a makeup-credit into active and passive pieces, generates counter-credit for passive piece"
+  (progn (new-counter-makeup makeup-credit amount-used)
+         (passive-partial-makeup makeup-credit amount-used)
+         (active-partial-makeup makeup-credit amount-used)
+         (remove-makeup makeup-credit)))
+  ;(setf (slot-value makeup-credit 'duration) (- (makeup-duration makeup-credit) amount-used))
+ ; (mito:save-dao makeup-credit))
+
+(defmethod deactivate-makeup ((makeup-credit makeup-credit))
+  (setf (slot-value makeup-credit 'active) 0)
   (mito:save-dao makeup-credit))
 
 (defun makeup-count ()
@@ -63,11 +113,18 @@
 
 	:for i :upfrom 1
 	:do (setq makeups (if (null (makeup-id-search i))
-			      makeups
+                              makeups
 			      (cons (makeup-id-search i) makeups)))
 	:when (equal (length makeups) mc)
 	  :do (return makeups)))
 
+(defun all-active-makeups ()
+  (remove-if-not #'(lambda (i)
+                     (makeup-active i))
+                 (all-makeups)))
+
+            ;(eq (makeup-active (makeup-id-search i))
+                                      
 (defun makeups-by-date ()
   (sort (all-makeups) #'(lambda (x y)
                           (later-timestamp-p (timestamp-from-sql (write-to-string y))
@@ -78,18 +135,37 @@
                      (eq (makeup-client-id i) (mito:object-id client)))
                  (makeups-by-date)))
 
+(defmethod active-makeups ((client client))
+  (remove-if-not #'(lambda (i)
+                     (makeup-active i))
+                 (makeups client)))
+
 (defmethod use-makeups ((client client) amount-used)
   (loop :with amount-to-use := amount-used
 
-        :for m :in (makeups client)
+        :for m :in (active-makeups client)
         :do (cond ((zerop amount-to-use)
-                   (return (total-makeup-minutes client)))
+                   (return (format nil "Total Makeup-minutes ~a" (total-makeup-minutes client))))
                   ((> amount-to-use (makeup-duration m))
                    (progn (setq amount-to-use (- amount-to-use (makeup-duration m)))
-                         (remove-makeup m)))
+                         (deactivate-makeup m)))
                   (t (progn (partial-use m amount-to-use)
                             (setq amount-to-use 0))))))
 
+;(defmethod use-makeups ((client client) amount-to-use)
+;;  (cond ((zerop amount-to-use) (total-makeup-minutes client))
+ ;       ((> amount-to-use (makeup-duration 
+
+(defmethod total-positive-minutes ((client client))
+  (reduce #'+ (remove-if-not #'(lambda (m)
+                                 (> (makeup-duration m) 0))
+                             (makeups client))))
+
+(defmethod total-negative-minutes ((client client))
+  (reduce #'+ (remove-if-not #'(lambda (m)
+                                 (< (makeup-duration m) 0))
+                             (makeups client))))
+               
 (defmethod total-makeup-minutes ((client client))
   (reduce #'+ (mapcar #'makeup-duration (makeups client)))) 
 

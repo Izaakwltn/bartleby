@@ -21,6 +21,7 @@
 					   (:file "new-appointment")
 					   (:file "new-employee")
 					   (:file "new-room")
+                                           (:file "view-client")
 					   (:file "browse-clients")
 					   (:file "browse-employees")
 					   (:file "browse-rooms")

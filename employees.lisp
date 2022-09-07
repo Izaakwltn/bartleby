@@ -44,7 +44,7 @@
 			   :email       email
 			   :address     address
 			   :hourly-rate hourly-rate
-                           :services    service-chunk
+                           :services    (if service-chunk service-chunk "")
 			   :notes       notes))
 
 ;;; Adding and removing employees

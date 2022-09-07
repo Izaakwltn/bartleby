@@ -105,6 +105,7 @@
 
 (defmethod next-week ((appointment appointment))
   (add-days appointment 7))
+
 (defmethod next-month ((appointment appointment))
   (copy-new-timestamp appointment (next-month (let ((at (appointment-timestamp appointment)))
 					       (if (typep at 'simple-base-string)
@@ -172,11 +173,23 @@
 	  :do (return appointments)))
         ;:else :do (setq appointments (cons (appointment-id-search i) appointments))))
 
-(defun all-future-appointments ()
+(defun future-appointments (appointment-list)
   "Returns all future appointments"
-  (loop :for i :in (all-appointments)
-        :if (future-p (timestamp-from-sql (write-to-string (appointment-timestamp i))))
-          :collect i))
+  (loop :for a :in (sort appointment-list #'(lambda (x y)
+                                              (later-timestamp-p
+                                               (timestamp-from-sql
+                                                (write-to-string (appointment-timestamp y)))
+                                               (timestamp-from-sql
+                                                (write-to-string (appointment-timestamp x))))))
+        :if (future-p (timestamp-from-sql (write-to-string (appointment-timestamp a))))
+          :collect a))
+
+(defun all-future-appointments ()
+  (future-appointments (all-appointments)))
+
+
+;(defgeneric future-appointments (object)
+ ; (:documentation "Finds all future appointments for an object"))
 
 (defun past-appointments (appointment-list)
   (loop :for i :in appointment-list

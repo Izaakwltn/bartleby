@@ -145,9 +145,9 @@
 
 (defmethod appointments ((client client))
   (let ((c (mito:object-id client)))
-    (loop :for i :from 1 :to (appointment-count)
-	  :if (equal c (appointment-client-id (mito:find-dao 'appointment :id i)))
-	    :collect (mito:find-dao 'appointment :id i) :into matches
+    (loop :for i :in (all-appointments)
+	  :if (equal c (appointment-client-id i))
+	    :collect i :into matches
 	  :finally (return matches))))
 
 (defmethod appointments ((employee employee))
