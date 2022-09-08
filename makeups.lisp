@@ -17,18 +17,17 @@
 (defmethod print-object ((obj makeup-credit) stream)
   (print-unreadable-object (obj stream :type t)
     (with-accessors ((client-id makeup-client-id)
-                     (duration  makeup-duration))
-                     ;(timestamp makeup-timestamp)
-                     ;(expiration makeup-expiration)
-                     ;(active     makeup-active))
+                     (duration  makeup-duration)
+                     (timestamp makeup-timestamp)
+                     (expiration makeup-expiration)
+                     (active     makeup-active))
         obj
-      (format stream
-              "~a ~a";"Active: ~a~%Client ~a~%~a Minutes~%Granted: ~a~%Expires: ~a"
-              ;(if active "Yes" "No")
+      (format stream "~%~a~%~a~%~a minutes~%Granted:~%~a~%Expires:~%~a~%~%"
+              (if active "PASSIVE" "ACTIVE")
               (client-id-search client-id)
-              duration))))
-              ;(timestamp-from-sql (write-to-string timestamp))
-              ;(timestamp-from-sql (write-to-string expiration))))))
+              duration
+              (timestamp-from-sql (write-to-string timestamp))
+              (timestamp-from-sql (write-to-string expiration))))))
 
 (defun make-makeup (client-id duration sql-timestamp expiration &optional active-status)
   (make-instance 'makeup-credit :client-id  client-id

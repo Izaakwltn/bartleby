@@ -425,7 +425,7 @@
                         (format nil "Total Minutes (~a) * Hourly (~a) = $~a"
                               itm
                               hr
-                              (* hr (/ itm 60))))
+                              (float (* hr (/ itm 60)))))
 		      (pdf:get-font "Helvetica")
 		      12))
 
@@ -454,25 +454,18 @@
                            (client-first-name c)
                            (client-last-name c)
                            (makeup-minutes-before c
-                                           (timestamp-from-sql
-                                            (write-to-string
-                                             (appointment-timestamp
-                                              (first
-                                               (month-receipts
-                                                (find-invoice-object (invoice-obj-type invoice)
-                                                                     (invoice-obj-id invoice))
-                                                (invoice-month invoice)
-                                                (invoice-year invoice)))))))
+                                           (timestamp (date (invoice-month invoice)
+                                                              1
+                                                              (invoice-year invoice))
+                                                        (set-time 1 0)))
+
                            (makeup-minutes-before c
-                                           (timestamp-from-sql
-                                            (write-to-string
-                                             (appointment-timestamp
-                                              (car (last
-                                              (month-receipts
-                                                (find-invoice-object (invoice-obj-type invoice)
-                                                                     (invoice-obj-id invoice))
-                                                (invoice-month invoice)
-                                                (invoice-year invoice)))))))))
+                                                  (timestamp (date (invoice-month invoice)
+                                                                   (month-days (invoice-month invoice)
+                                                                               (invoice-year invoice))
+                                                                   (invoice-year invoice))
+                                                             (set-time 11 0))))
+
                (pdf:get-font "Helvetica")
                12)
                    (setq line-number (1+ line-number)))))
