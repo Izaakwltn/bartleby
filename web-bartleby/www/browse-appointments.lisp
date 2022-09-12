@@ -10,9 +10,10 @@
     (cl-bootstrap:bs-table
       (:thead
        (:tr
-	(:th "Client") (:th "Employee") (:th "timestamp") (:th "Edit")))
+	(:th "Client") (:th "Employee") (:th "Time/Date") (:th "Duration") (:th "Edit")))
       (:tbody
-       (spinneret:with-html (loop :for a :in (bartleby::all-appointments)
+       (spinneret:with-html (loop :for a :in (bartleby::chronological-appointments (bartleby::all-future-appointments))
+						   
 				  :do (:tr (:td (format nil "~a ~a"
 							(bartleby::client-first-name
 							 (bartleby::client-id-search (bartleby::appointment-client-id a)))
@@ -23,7 +24,13 @@
 								      (bartleby::appointment-employee-id a)))
 					       (bartleby::employee-last-name (bartleby::employee-id-search
 							       (bartleby::appointment-employee-id a)))))
-		      (:td (format nil "~a" (write-to-string (bartleby::appointment-timestamp a))))
+					   (:td (let ((ts (bartleby::timestamp-from-sql
+							   (write-to-string
+							    (bartleby::appointment-timestamp a)))))
+						  (format nil "~a ~a"
+							  (bartleby::pretty-print (bartleby::date-o ts))
+                                                          (bartleby::pretty-print (bartleby::time-o ts)))))
+					   (:td (format nil "~a" (bartleby::appointment-duration a)))
 		      (:td (:a :href (concatenate 'string "/edit-appointment" (write-to-string
 									  (mito:object-id a)))
 			       "edit")))))))))

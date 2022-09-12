@@ -120,7 +120,7 @@
     ;      :collect (mito:find-dao 'client :id i) :into matches
      ;   :finally (return matches)))
 (defun client-first-name-search (first-name)
-  (find-if #'(lambda (c)
+  (remove-if-not #'(lambda (c)
 	       (string-equal first-name (client-first-name c)))
 	   (all-clients)))
 
@@ -132,7 +132,7 @@
      ;   :finally (return matches)))
 
 (defun client-last-name-search (last-name)
-  (find-if #'(lambda (c)
+  (remove-if-not #'(lambda (c)
 	       (string-equal last-name (client-last-name c)))
 	   (all-clients)))
 ;;; Client Credits

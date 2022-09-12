@@ -25,6 +25,7 @@
 					   (:file "browse-clients")
 					   (:file "browse-employees")
 					   (:file "browse-rooms")
+					   (:file "browse-appointments")
                                            (:file "daily-calendar")
 					   (:file "weekly-calendar")
                                            (:file "monthly-calendar")

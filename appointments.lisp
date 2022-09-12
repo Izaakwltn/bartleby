@@ -184,6 +184,15 @@
         :if (future-p (timestamp-from-sql (write-to-string (appointment-timestamp a))))
           :collect a))
 
+(defun chronological-appointments (appointment-list)
+  (sort appointment-list #'(lambda (x y)
+			     (later-timestamp-p
+			      (timestamp-from-sql
+			       (write-to-string (appointment-timestamp y)))
+                              (timestamp-from-sql
+                               (write-to-string (appointment-timestamp x)))))))
+
+  
 (defun all-future-appointments ()
   (future-appointments (all-appointments)))
 

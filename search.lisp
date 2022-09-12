@@ -23,12 +23,12 @@ x;;;; search.lisp
    (:phone "[0-9][0-9]*|[0-9][0-9][0-9]\-[0-9][0-9][0-9][0-9]")
    (:word "[A-Za-z][A-Za-z]*")
    (:email "[A-Za-z0-9][A-Za-z0-9]*@[A-Za-z][A-Za-z]*\.[A-Za-z][A-Za-z]*")
-   (:space "\s\S"))
+   (:space " "))
   ;("{{HYPHEN-WORD}}" (return (tok :hyphen-word (princ-to-string $@))))
   ("{{WORD}}"        (return (tok :word (princ-to-string $@))))
   ("{{PHONE}}"         (return (tok :phone (princ-to-string $@))))
   ("{{EMAIL}}"       (return (tok :email (princ-to-string $@))))
-  ("{{SPACE}}" nil))
+  ("{{SPACE}}" nil));(return (tok :space))))
 
 (defun lex-query (query)
   "Breaks down a formula string into tokens."
@@ -40,9 +40,34 @@ x;;;; search.lisp
 					; Add services, make service enumeration for searching ease
 
 (defun word-search (word)
-  (union (client-first-name-search word)
-	 (client-last-name-search word)
+  (union (union (client-first-name-search word) ;;;; client first-name or last-name search need to return lists
+	        (client-last-name-search word))
+	 (service-name-search word)))
 
+(defun phone-search (phone-string)
+  (union (loop :for c :in (all-clients)
+	       :if (string-equal phone-string (client-phone c))
+		 :collect c)
+	 (loop :for e :in (all-employees)
+	       :if (string-equal phone-string (employee-phone e))
+		 :collect e)))
+
+(defun email-search (email-string)
+  (union (loop :for c :in (all-clients)
+	       :if (string-equal email-string (client-email c))
+		 :collect c)
+	 (loop :for e :in (all-employees)
+	       :if (string-equal email-string (employee-email e))
+		 :collect e)))
+
+(defun bart-search (query-string)
+  (remove-duplicates (loop :for i :in (lex-query query-string)
+	:collect (cond ((eq (car i) ':phone)
+		        (phone-search (cdr i)))
+		       ((eq (car i) ':email)
+		        (email-search (cdr i)))
+		       ((eq (car i) ':word)
+			(word-search (cdr i)))))))
 					;	 (employee-first-name-search word) ;this function doesn't exist
 					;	 (employee-last-name-search word)  ;add this function
 	 
