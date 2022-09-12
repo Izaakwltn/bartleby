@@ -4,7 +4,7 @@
 
 (in-package :web-bartleby)
 
-(defvar time-options (loop :with time-incr := (bartleby::set-time 1 0)
+(defvar time-options (loop :with time-incr := (bartleby::set-time 1 00)
 
                            :for i :from 1 :to 96
                            :collect (list i time-incr)
