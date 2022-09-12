@@ -79,20 +79,20 @@
  ;                          :do (setq date-incr (bartleby::add-days date-incr 1))))
 ;			   
 ;
-(setq time-options (loop :for i :from 1 :to 24
-			 :collect (loop :for j :from 0 :to 59
-				     :if (zerop (mod i 15))
-				       :collect (bartleby::set-time i j) :into time-options
-				     :finally (return time-options))))
+;(setq time-options (loop :for i :from 1 :to 24
+;			 :collect (loop :for j :from 0 :to 59
+;				     :if (zerop (mod i 15))
+;				       :collect (bartleby::set-time i j) :into time-options
+;				     :finally (return time-options))))
 
-(hunchentoot:define-easy-handler (submit-new-employee :uri "/submit-new-appointment")
+(hunchentoot:define-easy-handler (submit-new-appointment :uri "/submit-new-appointment")
     (client-id employee-id room-id date time duration notes recurring)
   (let ((a (bartleby::make-appointment
             (parse-integer client-id)
             (parse-integer employee-id)
             (parse-integer room-id)
-            (bartleby::timestamp (second (assoc date date-options))
-                                 (second (assoc time time-options)))
+            (bartleby::timestamp (second (assoc (parse-integer date) date-options))
+                                 (second (assoc (parse-integer time) time-options)))
             (parse-integer duration)
             notes)))
     (if recurring

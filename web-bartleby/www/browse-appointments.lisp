@@ -15,16 +15,13 @@
        (spinneret:with-html (loop :for a :in (bartleby::all-appointments)
 				  :do (:tr (:td (format nil "~a ~a"
 							(bartleby::client-first-name
-							 (mito:find-dao 'bartleby::client
-									(bartleby::appointment-client-id a)))
+							 (bartleby::client-id-search (bartleby::appointment-client-id a)))
 							(bartleby::client-last-name
-						         (mito:find-dao 'bartleby::client
-									(bartleby::appointment-client-id a)))))
-		      (:td (format nil "~a ~a" (bartleby::employee-first-name
-						(mito:find-dao 'bartleby::employee
-							       (bartleby::appointment-employee-id a)))
-					       (bartleby::employee-last-name
-						(mito:find-dao 'bartleby::employee
+						         (bartleby::client-id-search (bartleby::appointment-client-id a)))))
+					   (:td (format nil "~a ~a" (bartleby::employee-first-name
+								     (bartleby::employee-id-search
+								      (bartleby::appointment-employee-id a)))
+					       (bartleby::employee-last-name (bartleby::employee-id-search
 							       (bartleby::appointment-employee-id a)))))
 		      (:td (format nil "~a" (write-to-string (bartleby::appointment-timestamp a))))
 		      (:td (:a :href (concatenate 'string "/edit-appointment" (write-to-string
