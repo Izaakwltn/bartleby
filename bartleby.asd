@@ -13,7 +13,7 @@
                (:file "sql")
 	       (:file "system-generics")
 	       ;(:file "sort")
-	       (:file "search")
+	       ;(:file "search")
 	       (:file "time")
 	       (:file "dates")
 	       (:file "timestamps")

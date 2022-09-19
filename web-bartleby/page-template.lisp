@@ -39,8 +39,8 @@
 	  (:a :href "/appointments-check-out" "Check Out")
 	  (cl-bootstrap:bs-navbar-form ()
 		    (:div
-			(:div :class "form-group"
-			    (:input :type "text" :class "form-control" :placeholder "Search"))
+			(:div :class "form-group" :action "/search"
+			    (:input :type "text" :class "form-control" :id "query" :name "query" :placeholder "Search"))
 			(:button :type "submit" :class "btn btn-default" "Submit")))))
       (cl-bootstrap:bs-container ()
         (cl-bootstrap:bs-row

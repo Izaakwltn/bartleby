@@ -40,9 +40,9 @@ x;;;; search.lisp
 					; Add services, make service enumeration for searching ease
 
 (defun word-search (word)
-  (union (union (client-first-name-search word) ;;;; client first-name or last-name search need to return lists
+  (remove-duplicates (union (union (client-first-name-search word) ;;;; client first-name or last-name search need to return lists
 	        (client-last-name-search word))
-	 (service-name-search word)))
+	 (service-name-search word))))
 
 (defun phone-search (phone-string)
   (union (loop :for c :in (all-clients)
@@ -60,16 +60,20 @@ x;;;; search.lisp
 	       :if (string-equal email-string (employee-email e))
 		 :collect e)))
 
-(defun bart-search (query-string)
-  (remove-duplicates (loop :for i :in (lex-query query-string)
-	:collect (cond ((eq (car i) ':phone)
-		        (phone-search (cdr i)))
-		       ((eq (car i) ':email)
-		        (email-search (cdr i)))
-		       ((eq (car i) ':word)
-			(word-search (cdr i)))))))
-					;	 (employee-first-name-search word) ;this function doesn't exist
-					;	 (employee-last-name-search word)  ;add this function
+(defun bart-search (query-string)   ;;;make function for removing duplicates (maybe just id manipulation)
+  (loop :with result-list := nil
+
+	:for i :in (lex-query query-string)
+	:do (setq result-list
+		  (union result-list (cond ((eq (car i) ':phone)
+		                            (phone-search (cdr i)))
+		                           ((eq (car i) ':email)
+		                            (email-search (cdr i)))
+		                           ((eq (car i) ':word)
+			                    (word-search (cdr i))))))
+	:finally (return result-list)))
+
+				      
 	 
 ;(defun id-search (id)
 ;  (cond ((client-id-search id)
