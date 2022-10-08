@@ -28,22 +28,27 @@
 	(t nil)))
 
 (defmethod sql-print ((obj timestamp))
-  (let ((string-year (write-to-string
-		      (y (date-o obj))))
-	(string-month (write-to-string
-		       (m (date-o obj))))
-        (string-day (write-to-string
-		     (d (date-o obj))))
-        (string-hour (write-to-string
-		      (hour (time-o obj))))
-        (string-minute (write-to-string
-			(minutes (time-o obj)))))
-    (format nil "~a-~a-~a ~a:~a:00"
+  (let (;(ts (add-time obj (- *tz-offset-minutes*)))
+         (string-year (write-to-string
+	               (y (date-o obj))))
+	 (string-month (write-to-string
+                        (m (date-o obj))))
+         (string-day (write-to-string
+		      (d (date-o obj))))
+         (string-hour (write-to-string
+ 		       (hour (time-o obj))))
+         (string-minute (write-to-string
+			 (minutes (time-o obj)))))
+    (format nil "~a-~a-~a ~a:~a:00~a~a" ; +_ 02
 	    string-year
 	    (two-digits string-month)
 	    (two-digits string-day)
 	    (two-digits string-hour)
-	    (two-digits string-minute))))
+	    (two-digits string-minute)
+            (if (>= *tz-offset* 0)
+               "+"
+                "-")
+            (two-digits (write-to-string (abs *tz-offset*))))))
 
 ;;;;parse with a lexer instead of
 (alexa:define-string-lexer timestamp-parser
@@ -67,6 +72,10 @@
                      (first parsed))
                (set-time (nth 3 parsed)
                          (nth 4 parsed)))))
+
+(defun timestamp-from-sql-with-offset (t-string)
+  (add-time (timestamp-from-sql t-string) *tz-offset-minutes*))
+
 (defun timestamp (date time)
   (make-instance 'timestamp :date-o date
 		            :time-o time))

@@ -87,3 +87,13 @@
 	((and (later-time-p newtime earlytime)
 	      (later-time-p latetime newtime))
 	 t)))
+
+
+(defvar tz local-time:*default-timezone*)
+
+(defvar *tz-offset* (/ (nth 9
+                         (multiple-value-list
+                          (local-time:decode-timestamp (local-time:now))))
+                       3600))
+
+(defvar *tz-offset-minutes* (* *tz-offset* 60))

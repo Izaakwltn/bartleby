@@ -10,7 +10,7 @@
   ((client-id    :col-type (:int))
    (employee-id  :col-type (:int))
    (room-id      :col-type (:int))
-   (timestamp    :col-type (:timestamp))
+   (timestamp    :col-type (:timestamptz))
    (duration     :col-type (:int))
    (notes        :col-type (or (:varchar 128) :null)))
   (:conc-name appointment-))
@@ -28,7 +28,7 @@
 	obj
       (format stream
 	      "~%~%~a~%~%Room: ~a~%Client:~%~a~%Employee:~%~a~%Duration: ~a~%Notes: ~a~%"
-	      timestamp
+	      (timestamp-from-sql (write-to-string timestamp))
 	      (room-id-search room-id)
 	      (client-id-search client-id)
               (employee-id-search employee-id)
@@ -97,6 +97,9 @@
 (defmethod add-days ((appointment appointment) days)
   (copy-new-timestamp appointment (add-days (timestamp-from-sql (appointment-timestamp appointment)) days)))
 
+(defmethod add-time ((appointment appointment) minutes)
+  (copy-new-timestamp appointment (add-time (timestamp-from-sql (appointment-timestamp appointment)) minutes)))
+
 (defmethod next-day ((appointment appointment))
   (copy-new-timestamp appointment (next-day (appointment-timestamp appointment))))
 
@@ -134,8 +137,8 @@
 (defmethod weekly ((appointment appointment) &optional (cut-off 52))
   (loop :with a := appointment
 	  :for i :from 1 :to cut-off
-	  :do (progn (add-appointment (next-week a))
-		     (setq a (next-week a)))))
+	  :do (add-appointment a)
+	  :do (setq a (next-week a))))
 
 (defmethod monthly ((appointment appointment) &optional (cut-off 12))
   (loop :with a := appointment
