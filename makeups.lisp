@@ -23,7 +23,7 @@
                      (active     makeup-active))
         obj
       (format stream "~%~a~%~a~%~a minutes~%Granted:~%~a~%Expires:~%~a~%~%"
-              (if active "PASSIVE" "ACTIVE")
+              (if active "ACTIVE" "PASSIVE")
               (client-id-search client-id)
               duration
               (timestamp-from-sql (write-to-string timestamp))
@@ -52,7 +52,9 @@
                                (sql-print
                                 (add-days
                                  (timestamp-from-sql (write-to-string sql-timestamp))
-                                 *default-makeup-expiration*))))))
+                                 *default-makeup-expiration*)))
+			   1)))
+			   
 
 (defmethod new-counter-makeup ((makeup-credit makeup-credit) amount-used)
   (add-makeup (make-makeup (makeup-client-id makeup-credit)
