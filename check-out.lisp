@@ -11,7 +11,7 @@
          (cond ((zerop makeup) nil)
                ((< 0 makeup) (credit-appointment appointment))
                ((> 0 makeup) (use-makeups (client-id-search (appointment-client-id appointment))
-                                          (- makeup))))
+                                          (- makeup) (appointment-timestamp appointment))))
   (remove-appointment appointment)))
 
 ;;;;in lieu of the proper web-service:

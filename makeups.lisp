@@ -56,10 +56,10 @@
 			   1)))
 			   
 
-(defmethod new-counter-makeup ((makeup-credit makeup-credit) amount-used)
+(defmethod new-counter-makeup ((makeup-credit makeup-credit) amount-used timestamp)
   (add-makeup (make-makeup (makeup-client-id makeup-credit)
                            (- amount-used)
-                           (makeup-timestamp makeup-credit)
+                           timestamp
                            (makeup-expiration makeup-credit)
                            0)))
               
@@ -89,9 +89,9 @@
                            (makeup-expiration makeup-credit)
                            1)))
 
-(defmethod partial-use ((makeup-credit makeup-credit) amount-used)
+(defmethod partial-use ((makeup-credit makeup-credit) amount-used timestamp)
   "Splits a makeup-credit into active and passive pieces, generates counter-credit for passive piece"
-  (progn (new-counter-makeup makeup-credit amount-used)
+  (progn (new-counter-makeup makeup-credit amount-used timestamp)
          (passive-partial-makeup makeup-credit amount-used)
          (active-partial-makeup makeup-credit amount-used)
          (remove-makeup makeup-credit)))
@@ -142,7 +142,7 @@
                      (makeup-active i))
                  (makeups client)))
 
-(defmethod use-makeups ((client client) amount-used)
+(defmethod use-makeups ((client client) amount-used timestamp)
   (loop :with amount-to-use := amount-used
 
         :for m :in (active-makeups client)
@@ -151,7 +151,7 @@
                   ((> amount-to-use (makeup-duration m))
                    (progn (setq amount-to-use (- amount-to-use (makeup-duration m)))
                          (deactivate-makeup m)))
-                  (t (progn (partial-use m amount-to-use)
+                  (t (progn (partial-use m amount-to-use timestamp)
                             (setq amount-to-use 0))))))
 
 ;(defmethod use-makeups ((client client) amount-to-use)
