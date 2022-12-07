@@ -1,6 +1,6 @@
-;;;; web-bartleby/package.lisp
+;;;; webbartleby/package.lisp
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(defpackage #:web-bartleby
+(defpackage #:webbartleby
   (:use #:cl))

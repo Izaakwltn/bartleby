@@ -1,8 +1,8 @@
-;;;; web-bartleby/new-appointment.lisp
+;;;; webbartleby/new-appointment.lisp
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
 
 (defvar time-options (loop :with time-incr := (bartleby::set-time 1 00)
 

@@ -9,12 +9,12 @@
 (defvar *first-names*
   (uiop:read-file-lines
    (asdf:system-relative-pathname
-    "bartleby" "test-populations/first-names.txt")))
+    "bartleby" "src/test-populations/first-names.txt")))
 
 (defvar *last-names*
   (uiop:read-file-lines
    (asdf:system-relative-pathname
-    "bartleby" "test-populations/last-names.txt")))
+    "bartleby" "src/test-populations/last-names.txt")))
 
 (defun random-first ()
   (nth (random 199) *first-names*))

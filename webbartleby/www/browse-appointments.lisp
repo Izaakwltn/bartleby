@@ -2,7 +2,7 @@
 ;;;;
 ;;;; Copyright Izaak Walton (C) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
 
 (hunchentoot:define-easy-handler (browse-appointments :uri "/browse-appointments") ()
   (with-page (:title "All Appointments")

@@ -1,8 +1,8 @@
-;;;; web-bartleby/new-client.lisp
+;;;; webbartleby/new-client.lisp
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
 
 (hunchentoot:define-easy-handler (new-client-form :uri "/new-client") ()
   (with-page (:title "New Client")

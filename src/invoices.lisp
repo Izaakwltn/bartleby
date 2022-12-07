@@ -361,7 +361,7 @@
 
 (defmethod pretty-print ((receipt receipt))
   "Formats a receipt for invoices (Maybe also for web."
-  (format nil "~a, ~a ~a, ~a minutes, ~a, Makeup+/-: ~a"
+  (format nil "~a, ~a ~a, ~a minutes, ~a, ~a"
 	  (pretty-print (client-id-search (appointment-client-id receipt)))
 	  (pretty-print (date-o (timestamp-from-sql (write-to-string (appointment-timestamp receipt)))))
 	  (pretty-print (time-o (timestamp-from-sql (write-to-string (appointment-timestamp receipt)))))
@@ -369,7 +369,12 @@
 	  ;(pretty-print (client-id-search (appointment-client-id receipt)))
 	  (appointment-duration receipt)
 	  (receipt-attendance receipt)
-	  (receipt-makeup receipt)))
+	  (let ((rm (receipt-makeup receipt)))
+            (cond ((zerop rm) "")
+                  ((> rm 0)
+                   (format nil "M/U added: ~a" rm))
+                  ((< rm 0)
+                   (format nil "M/U used: ~a" (- rm)))))))
 	  
 
 (defmethod invoice-item ((receipt receipt) line-number layout)

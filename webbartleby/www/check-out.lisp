@@ -2,7 +2,7 @@
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
 
 (defmethod checkout-item ((appointment bartleby::appointment))
   (let ((form-id (concatenate 'string

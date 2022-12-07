@@ -2,7 +2,7 @@
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
                                         ; daily calendar should show a list of appointments
                                         ; in chronological order
                                         ; rather than some sort of time grid

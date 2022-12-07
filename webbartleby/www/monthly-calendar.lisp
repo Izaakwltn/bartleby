@@ -2,7 +2,7 @@
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
 
 (defmethod monthly-calendar-day ((date bartleby::date))
   (format nil "~a   ~a"

@@ -1,8 +1,8 @@
-;;;; web-bartleby/page-template.lisp
+;;;; webbartleby/page-template.lisp
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
 
 (setf (cl-bootstrap::html-mode) :html5)
 

@@ -2,7 +2,7 @@
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
 
 (hunchentoot:define-easy-handler (view-client :uri "/view-client") (client-id)
   (let ((client (bartleby::client-id-search (parse-integer client-id))))

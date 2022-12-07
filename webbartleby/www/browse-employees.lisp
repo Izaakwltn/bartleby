@@ -2,7 +2,7 @@
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
 
 
 (hunchentoot:define-easy-handler (browse-employees :uri "/browse-employees") ()

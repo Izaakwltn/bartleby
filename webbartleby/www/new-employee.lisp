@@ -1,8 +1,8 @@
-;;;; web-bartleby/new-employee.lisp
+;;;; webbartleby/new-employee.lisp
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
-(in-package :web-bartleby)
+(in-package :webbartleby)
 
 (hunchentoot:define-easy-handler (new-employee-form :uri "/new-employee") ()
   (with-page (:title "New Employee")
