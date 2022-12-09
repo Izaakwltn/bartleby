@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+        webbartleby:
+        image: bartleby
+        ports:
+        - "4242:4242"
+        netw
+        bartleby-db:
+        image: postgres:10.5
+        restart: always
+        environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=johannsebastianbach
+        logging:
+                options:
+                        max-size: 10m
+                        max-file: "3"
+        ports:
+        - '5438:5432'
+        expose:
+        - '5438'

@@ -3,4 +3,6 @@
 ;;;; Copyright Izaak Walton (c) 2022
 
 (defpackage #:webbartleby
-  (:use #:cl))
+  (:use #:cl)
+
+  (:export #:launch))

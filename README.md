@@ -1,7 +1,7 @@
 # Bartleby
 ###     the Scheduler
 
-A scheduling system for reluctant schedulers, written in Common Lisp
+A simple scheduling system for reluctant schedulers, written in Common Lisp
 
 ### Getting Set Up
 Before running the first time, set up a postgresql database with a login, and add the login information to #'bartleby-connect in sql.lisp. 
@@ -15,4 +15,13 @@ If you want to give it a try but don't have your own data to use, clients, emplo
 
 ## Web GUI
 
-Package :WEB-BARTLEBY provides a web-gui application for handling Bartleby operations. To start a local copy, run (web-bartleby::launch) from the repl and go to 127.0.0.1:4242 in your browser.
+Package :WEB-BARTLEBY provides a web-gui application for handling Bartleby operations. To start in localhost: 
+(ql:quickload :webbartleby)
+(webbartleby:launch)
+
+This should start the webbartleby server and open your browser to 127.0.0.1:4242. 
+
+## Running with Docker (pre-beta)
+
+Currently, to load with docker, first run ```make``` in the directory, then run ```docker build -t bartleby .```, and finally ```docker run -d -i -p 4242:4242 bartleby```
+If you go to your browser, bartleby should be running at 127.0.0.1:4242, though it will just show the landing page, I'll be connecting it to a separate postgres container next.

@@ -1,12 +1,9 @@
-FROM ubuntu:latest
+FROM clfoundation/sbcl:2.2.2
 
-RUN apt-get update && apt-get install -y make wget sbcl
+ARG QUICKLISP_DIST_VERSION=2022-02-20
+ARG QUICKLISP_ADD_TO_INIT_FILE=true
 
-RUN cd /tmp && \
-    wget https://beta.quicklisp.org/quicklisp.lisp && \
-    sbcl --load quicklisp.lisp --quit --eval '(quicklisp-quickstart:install)'
-
-WORKDIR /root/quicklisp/local-projects/bartleby
+WORKDIR /bartleby
 
 # Copy necessary bartleby files:
 COPY /webbartleby .
@@ -14,12 +11,13 @@ COPY /src .
 COPY webbartleby.asd .
 COPY bartleby.asd .
 COPY /invoices .
-COPY load.lisp .
-COPY Makefile .
-
-RUN make
+RUN true
+COPY launch-webbartleby .
+RUN true
 
 EXPOSE 4242
+
+EXPOSE 5432
 
 ENTRYPOINT ["./launch-webbartleby"]
 
