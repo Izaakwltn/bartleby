@@ -1,25 +1,31 @@
-# Bartleby
-###     the Scheduler
+# Bartleby (the Scheduler)
 
 A simple scheduling system for reluctant schedulers, written in Common Lisp
 
-### Getting Set Up
-Before running the first time, set up a postgresql database with a login, and add the login information to #'bartleby-connect in sql.lisp. 
+## Running in the REPL
 
+### Getting Set Up
+Before running the first time, set up a postgresql database with a login, and add the login information to ```#'bartleby-connect``` in sql.lisp. 
+
+Then, in the repl, run ```(ql:quickload :bartleby)```.
 The database connection should automatically start up on quickload, but it might be necessary to run (bartleby-connect) if you start getting mito errors.
 
 Note: Currently using SBCL and postgresql, hasn't been tested with other Lisp implementations or sqls.
 
+
+
 ### Testing
-If you want to give it a try but don't have your own data to use, clients, employees, and rooms can be generated before starting the interface by using (generate-clients n), (generate-employees n), or (generate-rooms n), respectively. 
+If you want to give it a try but don't have your own data to use, clients, employees, and rooms can be generated before starting the interface by using ```(generate-clients n)```, ```(generate-employees n)```, or ```(generate-rooms n)```, respectively. 
 
 ## Web GUI
 
-Package :WEB-BARTLEBY provides a web-gui application for handling Bartleby operations. To start in localhost: 
-(ql:quickload :webbartleby)
-(webbartleby:launch)
+Package ```:WEB-BARTLEBY``` provides a web-gui application for handling Bartleby operations. To start from the REPL: 
+```(ql:quickload :webbartleby)```
+```(webbartleby:launch)```
 
-This should start the webbartleby server and open your browser to 127.0.0.1:4242. 
+This should start the webbartleby server and open your browser to 127.0.0.1:4242.
+
+You will need to follow the database steps above for full usability.
 
 ## Running with Docker (pre-beta)
 
