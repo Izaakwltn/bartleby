@@ -5,14 +5,23 @@
 (in-package :webbartleby)
 
 (defmethod monthly-calendar-day ((date bartleby::date))
-  (format nil "~a   ~a"
-          (bartleby::d date)
-          (if (bartleby::appointments date)
-              (concatenate 'string
-                           "("
-                           (write-to-string (length (bartleby::appointments date)))
-                           ")")
-              " ")))
+  (let ((form-id (concatenate 'string
+                              "day-"
+                              (write-to-string date))))
+    (spinneret:with-html
+      (:form :id form-id :action "/daily-calendar"
+           (:input :type "hidden" :form form-id :id "date" :name "date" :value (bartleby::sql-print date))
+           (:button :type "submit" :form form-id
+                    (format nil "~a   ~a"
+                            (bartleby::d date)
+                            (if (bartleby::appointments date)
+                                (concatenate 'string
+                                             "("
+                                             (write-to-string
+                                              (length (bartleby::appointments date)))
+                                             ")")
+                                " ")))))))
+           
    
 (hunchentoot:define-easy-handler (monthly-calendar :uri "/monthly-calendar") (&optional date)
   (let ((select-date (if date date (bartleby::today))))

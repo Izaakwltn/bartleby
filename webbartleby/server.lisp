@@ -9,7 +9,8 @@
                  :port 4242
                  :document-root (asdf:system-relative-pathname "bartleby" "webbartleby/www/")))
 
-;taken from https://github.com/eudoxia0/trivial-open-browser, thank you
+;;; Launching in the browser:
+;;; adopted from https://github.com/eudoxia0/trivial-open-browser, thank you
 (defparameter +format-string+
   #+(or win32 mswindows windows)
   "explorer ~S"
