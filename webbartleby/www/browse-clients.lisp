@@ -6,7 +6,11 @@
 
 ;;;
 
-(defmethod browsable-client ((client bartleby::client))
+(defgeneric browsable (object)
+  (:documentation "Returns a browsable html list item for a given object"))
+
+
+(defmethod browsable ((client bartleby::client))
   (let ((form-id (concatenate 'string
                               "view-"
                               (write-to-string
@@ -32,7 +36,7 @@
       (:tbody
        (spinneret:with-html
          (loop :for c :in (bartleby::all-clients)
-               :do (browsable-client c)))))))
+               :do (browsable c)))))))
 
 
                ;:do (:tr (:td (:form :id "view-client" :action "/view-client"

@@ -4,7 +4,7 @@
 
 (in-package :webbartleby)
 
-(defmethod browsable-appointment ((appointment bartleby::appointment))
+(defmethod browsable ((appointment bartleby::appointment))
   (spinneret:with-html
     (:tr (:td (format nil "~a ~a"
                       (bartleby::client-first-name
@@ -38,7 +38,7 @@
 	(:th "Client") (:th "Employee") (:th "Time/Date") (:th "Duration") (:th "Edit")))
       (:tbody
        (loop :for a :in (bartleby::chronological-appointments (bartleby::all-future-appointments))
-             :do (browsable-appointment a))))))
+             :do (browsable a))))))
       ; (spinneret:with-html (loop :for a :in (bartleby::chronological-appointments (bartleby::all-future-appointments))
 ;						   
 ;				  :do (:tr (:td (format nil "~a ~a"

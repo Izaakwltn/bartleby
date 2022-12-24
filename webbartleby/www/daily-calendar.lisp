@@ -22,7 +22,7 @@
 	  (:th select-date)))
 	(:tbody (spinneret:with-html
 		  (loop :for a :in (bartleby::appointments select-date)
-			:do (browsable-appointment a))))))))
+			:do (browsable a))))))))
 
 (defgeneric available-timeslots (object)
   (:documentation "Provides all available timeslots for the object"))

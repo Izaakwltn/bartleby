@@ -4,7 +4,7 @@
 
 (in-package :webbartleby)
 
-(defmethod browsable-employee ((employee bartleby::employee))
+(defmethod browsable ((employee bartleby::employee))
   (let ((form-id (concatenate 'string
                               "view-"
                               (write-to-string
@@ -27,7 +27,7 @@
 	(:th "Name") (:th "Phone") (:th "Email") (:th "Edit")))
       (:tbody
        (loop :for e :in (bartleby::all-employees)
-             :do (browsable-employee e))))))
+             :do (browsable e))))))
        ;(spinneret:with-html (loop :for e :in (bartleby::all-employees)
 	;     :do (:tr (:td (format nil "~a ~a" (bartleby::employee-first-name e)
 	;			   (bartleby::employee-last-name e)))
