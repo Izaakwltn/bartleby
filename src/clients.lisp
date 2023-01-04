@@ -32,6 +32,8 @@
 
 (defmethod pretty-print ((client client))
   (format nil "~a ~a" (client-first-name client) (client-last-name client)))
+
+
 (defun make-client (first-name last-name phone email address notes)
   (make-instance 'client :first-name first-name
                          :last-name  last-name
@@ -112,65 +114,13 @@
 			      (cons (client-id-search i) clients)))
 	:when (equal (length clients) cc)
 	  :do (return clients)))
-;;; I may need to go back to this more convoluted method, when objects are deleted				
-;(defun client-first-name-search (first-name)
- ; (loop :for i :from 1 :to (client-count)
-  ;      :if (string-equal (client-first-name (mito:find-dao 'client :id i))
-   ;                       first-name)
-    ;      :collect (mito:find-dao 'client :id i) :into matches
-     ;   :finally (return matches)))
+
 (defun client-first-name-search (first-name)
   (remove-if-not #'(lambda (c)
 	       (string-equal first-name (client-first-name c)))
 	   (all-clients)))
 
-;(defun client-last-name-search (last-name)
- ; (loop :for i :from 1 :to (client-count)
-  ;      :if (string-equal (client-last-name (mito:find-dao 'client :id i))
-   ;                       last-name)
-    ;      :collect (mito:find-dao 'client :id i) :into matches
-     ;   :finally (return matches)))
-
 (defun client-last-name-search (last-name)
   (remove-if-not #'(lambda (c)
 	       (string-equal last-name (client-last-name c)))
 	   (all-clients)))
-;;; Client Credits
-
-;(defun credit-count ()
- ; (mito:count-dao 'credit))
-
-;(defmethod total-credit-minutes ((client client))
- ; (loop :for i :from 1 :to (credit-count)
-;	:if (string-equal (client-id client)
- ;;                         (client-id (credit-client (mito:find-dao 'credit :id i))))
-   ;       :sum (credit-minutes (mito:find-dao 'credit :id i)) :into total-minutes
-    ;    :finally (return total-minutes)))
-
-
-;(defmethod add-credit ((client client) date-added minutes &optional expiration-days)
- ; (make-credit date-added
-;	       client
- ;              nil
-;	       minutes
-;	       (if expiration-days
-;		   expiration-days
-;		   nil)))
-
-
-
-;(defmethod change-credits    ((client client) credits)
- ; "Changes the credit minutes of a client"
-  ;(replace-client client (make-client (id client)
-;				      (first-name client)
-;				      (last-name client)
-;				      (phone     client)
-;				      (email     client)
-;				      (credits client)
-;				      (notes     client))))
-;;
-;(defmethod add-credits ((client client) new-credits)
- ; (change-credits client (+ (credit-minutes client) new-credits)))
-;
-;(defmethod use-credits ((client client) used-credits)
- ; (change-credits client (- (credit-minutes client) used-credits)))

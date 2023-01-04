@@ -104,4 +104,8 @@
 	   (all-rooms)))
 
 
+(defun room-num-search (n)
+  (find-if #'(lambda (r)
+	       (equal n (room-num r)))
+	   (all-rooms)))
 	       
