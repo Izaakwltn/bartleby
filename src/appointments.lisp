@@ -199,7 +199,6 @@
 (defun all-future-appointments ()
   (future-appointments (all-appointments)))
 
-
 ;(defgeneric future-appointments (object)
  ; (:documentation "Finds all future appointments for an object"))
 
@@ -212,20 +211,3 @@
   "Returns all past appointments"
   (past-appointments (all-appointments)))
 
-;(defgeneric appointments (object)
- ; (:documentation "Returns all appointments associated with an object."))
-
-;(defmethod appointments ((client client))
- ; (let ((c (mito:object-id client)))
-  ;  (loop :for i :from 1 :to (appointment-count)
-;	  :if (equal c (mito:object-id (mito:find-dao 'appointment :id i)))
-;	    :collect (mito:find-dao 'appointment :id i) :into matches
-;	  :finally (return matches))))
-
-;(defmethod appointments ((employee employee))
- ; (let ((c (mito:object-id employee employee)))
-  ;  (loop :for i :from 1 :to (appointment-count)
-;	  :if (equal c (mito:object-id (mito:find-dao 'appointment :id i)))
-;	    :collect (mito:find-dao 'appointment :id i) :into matches
-;	  :finally (return matches))))
-		     
