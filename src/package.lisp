@@ -6,7 +6,8 @@
   (:use #:cl)
 
   ;;; sql.lisp
-  (:export #:bartleby-connect)
+  (:export #:connect-postgres)
+  ;(:export #:bartleby-connect)
   
   ;;; system-generics.lisp
   (:export #:sql-print
@@ -35,10 +36,16 @@
 	   #:later-time-p
 	   #:later-time
 	   #:equal-time
-	   #:time-conflict-p)
+	   #:time-conflict-p
+           #:tz ;timezone
+           #:*tz-offset*
+           #:*tz-offset-minutes*)
   
   ;;; dates.lisp
-  (:export #:date ;class and function
+  (:export #:calendar-month ; type
+           #:calendar-year ; type
+           #:valid-day-of-week ; type
+   #:date ;class and function
 	   #:date-from-sql
 	   #:later-date-p
 	   #:later-date

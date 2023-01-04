@@ -36,12 +36,16 @@
               (cl-bootstrap:bs-nav-li (:href "/daily-calendar") "Daily")
               (:li (:a :href "/weekly-calendar" "Weekly"))
 	    (:li (:a :href "/monthly-calendar" "Monthly")))
-	  (:a :href "/appointments-check-out" "Check Out")
-	  (cl-bootstrap:bs-navbar-form ()
-		    (:div
-			(:div :class "form-group" :action "/search"
-			    (:input :type "text" :class "form-control" :id "query" :name "query" :placeholder "Search"))
-			(:button :type "submit" :class "btn btn-default" "Submit")))))
+          (cl-bootstrap:bs-nav-li (:href "/appointments-check-out") "Check Out")
+              (:form :id "query" :action "/search-results"
+                 (:input :type "search" :id "query" :name "query" :placeholder "Search")
+                 (:button "Submit"))))
+
+                                        ;(cl-bootstrap:bs-navbar-form ()
+	;	    (:div
+	;		(:div :class "form-group" :action "/search-results"
+	;		    (:input :type "text" :class "form-control" :id "query" :name "query" :placeholder "Search"))
+	;		(:button :type "submit" :form "query" :class "btn btn-default" "Submit")))))
       (cl-bootstrap:bs-container ()
         (cl-bootstrap:bs-row
           (cl-bootstrap:bs-col-md ()

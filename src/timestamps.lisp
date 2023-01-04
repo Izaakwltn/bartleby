@@ -7,10 +7,10 @@
 ;;; Timestamps
 
 (defclass timestamp ()
-  ((date-o :initarg :date-o
+  ((date-o :initarg :date-o ; if I just make #'make-date, date-o can be less stupid
 	   :accessor date-o)
    (time-o :initarg :time-o
-	   :accessor time-o)))
+	   :accessor time-o))) ; maybe add timezone
 
 (defmethod print-object ((obj timestamp) stream)
   (print-unreadable-object (obj stream :type t)
@@ -19,6 +19,7 @@
 	obj
       (format stream "~a ~a" date-o time-o))))
 
+(declaim (ftype (function (string) (or t null)) two-digits))
 (defun two-digits (numstring)
   "Ensures that a number string has 2 digits"
   (cond ((equal (length numstring) 2)
@@ -67,30 +68,32 @@
 (defun timestamp-from-sql (t-string)
   (let ((parsed (mapcar #'parse-integer
                         (parse-timestamp t-string))))
-    (timestamp (date (second parsed)
+    (make-timestamp (date (second parsed)
                      (third parsed)
                      (first parsed))
-               (set-time (nth 3 parsed)
+               (make-time (nth 3 parsed)
                          (nth 4 parsed)))))
 
 (defun timestamp-from-sql-with-offset (t-string)
   (add-time (timestamp-from-sql t-string) *tz-offset-minutes*))
 
-(defun timestamp (date time)
+(declaim (ftype (function (date set-time) timestamp) make-timestamp)) 
+(defun make-timestamp (date time) ;move above printing functions maybe
   (make-instance 'timestamp :date-o date
 		            :time-o time))
 
 (defun current-timestamp ()
   "Shows the current Date/time"
-  (timestamp (today) (current-time)))
+  (make-timestamp (today) (current-time)))
 
+(declaim (ftype (function (calendar-month integer calendar-year clock-hour clock-minutes) timestamp)))
 (defun moment (m d yyyy hour minutes)
   "Simple input for a date and time."
-  (timestamp (date m d yyyy) (set-time hour minutes)))
+  (make-timestamp (date m d yyyy) (make-time hour minutes)))
 
 (defmethod add-days ((timestamp timestamp) days)
   "Adds a specified number of dates to the given date-time"
-  (timestamp (add-days (date-o timestamp) days) (time-o timestamp)))
+  (make-timestamp (add-days (date-o timestamp) days) (time-o timestamp)))
 
 (defmethod add-time ((timestamp timestamp) minutes)
   "Adds minutes to a date-time"
@@ -99,11 +102,11 @@
     (cond ((zerop minutes) timestamp)
  	  ((and (equal (minutes ct) 59)
 	        (equal (hour ct) 23))
-	   (add-time (timestamp (add-days cd 1) (add-time ct 1))
+	   (add-time (make-timestamp (add-days cd 1) (add-time ct 1))
 		     (- minutes 1)))
 	  ((equal (minutes ct) 59)
-	   (add-time (timestamp cd (add-time ct 1)) (- minutes 1)))
-	  (t (add-time (timestamp cd (add-time ct 1)) (- minutes 1))))))
+	   (add-time (make-timestamp cd (add-time ct 1)) (- minutes 1)))
+	  (t (add-time (make-timestamp cd (add-time ct 1)) (- minutes 1))))))
 
 (defmethod day-of-week ((timestamp timestamp))
   (day-of-week (date-o timestamp)))
@@ -114,14 +117,14 @@
 ;;; Altering timestamps
 
 (defmethod change-date ((timestamp timestamp) new-date)
-  (timestamp new-date
+  (make-timestamp new-date
 	     (time-o timestamp)))
 
 (defmethod change-time ((timestamp timestamp) new-time)
-  (timestamp (date-o timestamp)
+  (make-timestamp (date-o timestamp)
 	     new-time))
 
-(defvar *midnight* (set-time 24 0))
+(defvar *midnight* (make-time 24 0))
 
 ;;; Checking status relative to current timestamp
 
@@ -151,18 +154,15 @@
 
 (defun future-p (timestamp)
   "Determines whether a timestamp is in the future"
-  (if (later-timestamp-p timestamp (current-timestamp))
-      t
-      nil))
-
+  (later-timestamp-p timestamp (current-timestamp)))
 ;;; Relative timestamps
 
 (defmethod next-day ((timestamp timestamp))
-  (timestamp (add-days timestamp 1)
+  (make-timestamp (add-days timestamp 1)
              (time-o timestamp)))
 
 (defmethod previous-day ((timestamp timestamp))
-  (timestamp (sub-days timestamp 1)
+  (make-timestamp (sub-days timestamp 1)
              (time-o timestamp)))
 
 (defmethod last-week ((timestamp timestamp))
@@ -172,4 +172,4 @@
   (week (add-days (date-o timestamp) 7)))
 
 (defmethod next-year ((timestamp timestamp))
-  (timestamp (next-year (date-o timestamp)) (time-o timestamp)))
+  (make-timestamp (next-year (date-o timestamp)) (time-o timestamp)))

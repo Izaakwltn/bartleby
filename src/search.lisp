@@ -1,4 +1,4 @@
-x;;;; search.lisp
+;;;; search.lisp
 ;;;;
 ;;;; Copyright Izaak Walton (c) 2022
 
@@ -28,7 +28,7 @@ x;;;; search.lisp
   ("{{WORD}}"        (return (tok :word (princ-to-string $@))))
   ("{{PHONE}}"         (return (tok :phone (princ-to-string $@))))
   ("{{EMAIL}}"       (return (tok :email (princ-to-string $@))))
-  ("{{SPACE}}" nil));(return (tok :space))))
+  ("{{SPACE}}" nil))
 
 (defun lex-query (query)
   "Breaks down a formula string into tokens."
@@ -40,9 +40,12 @@ x;;;; search.lisp
 					; Add services, make service enumeration for searching ease
 
 (defun word-search (word)
-  (remove-duplicates (union (union (client-first-name-search word) ;;;; client first-name or last-name search need to return lists
-	        (client-last-name-search word))
-	 (service-name-search word))))
+  "Searches clients and employees for a given word"
+  (append (client-first-name-search word)
+          (client-last-name-search word)
+          (employee-first-name-search word)
+          (employee-last-name-search word)))
+
 
 (defun phone-search (phone-string)
   (union (loop :for c :in (all-clients)
@@ -60,17 +63,21 @@ x;;;; search.lisp
 	       :if (string-equal email-string (employee-email e))
 		 :collect e)))
 
-(defun bart-search (query-string)   ;;;make function for removing duplicates (maybe just id manipulation)
+(defun bart-search (query-string)
   (loop :with result-list := nil
 
 	:for i :in (lex-query query-string)
-	:do (setq result-list
-		  (union result-list (cond ((eq (car i) ':phone)
+	:do (setq result-list (remove-duplicates (append result-list (cond ((eq (car i) ':phone)
 		                            (phone-search (cdr i)))
 		                           ((eq (car i) ':email)
 		                            (email-search (cdr i)))
 		                           ((eq (car i) ':word)
-			                    (word-search (cdr i))))))
+			                    (word-search (cdr i)))))
+                         :test #'(lambda (x y)
+                                   (and (equal (type-of x)
+                                              (type-of y))
+                                        (equal (mito:object-id x)
+                                               (mito:object-id y))))))
 	:finally (return result-list)))
 
 				      
@@ -114,9 +121,9 @@ x;;;; search.lisp
 ;	  :collect c :into results
 ;	:finally (return results)))
 
-(defun date-search (date-string)
-  "Searches for a date input as mm/dd/yyyy") ;also make functions for converting Dates to dates
+;(defun date-search (date-string)
+ ; "Searches for a date input as mm/dd/yyyy") ;also make functions for converting Dates to dates
 
-(defun system-search ()
-  "Searches through clients, employees, and relevant appointments.")
+;(defun system-search ()
+ ; "Searches through clients, employees, and relevant appointments.")
 ;;;;return clients top, employees next, then appointments

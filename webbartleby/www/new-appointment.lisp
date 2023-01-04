@@ -4,7 +4,7 @@
 
 (in-package :webbartleby)
 
-(defvar time-options (loop :with time-incr := (bartleby::set-time 1 00)
+(defvar time-options (loop :with time-incr := (bartleby::make-time 1 00)
 
                            :for i :from 1 :to 96
                            :collect (list i time-incr)
@@ -91,8 +91,8 @@
             (parse-integer client-id)
             (parse-integer employee-id)
             (parse-integer room-id)
-            (bartleby::timestamp (second (assoc (parse-integer date) date-options))
-                                 (second (assoc (parse-integer time) time-options)))
+            (bartleby::make-timestamp (second (assoc (parse-integer date) date-options))
+                                      (second (assoc (parse-integer time) time-options)))
             (parse-integer duration)
             notes)))
     (if recurring

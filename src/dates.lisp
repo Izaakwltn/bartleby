@@ -4,6 +4,21 @@
 
 (in-package :bartleby)
 
+;;; Defining month/day/year types - actually check for day later
+
+(defun calendar-month-p (n)
+  (and (> n 0) (<= n 12)))
+
+(deftype calendar-month ()
+  `(satisfies calendar-month-p))
+
+(defun calendar-year-p (n)
+  (and (>= n 1900) (<= n 3000))) ; I think this is reasonable
+
+(deftype calendar-year ()
+  `(satisfies calendar-year-p))
+    
+
 ;;; Date Class
 
 (defclass date ()
@@ -53,11 +68,15 @@
 	      (number-suffix d)
 	      y)))
 
+(declaim (ftype (function (calendar-month integer calendar-year) date) date))
 (defun date (m d y)
+  "Generates a date object from a month, day, and year"
+  (assert (<= d (month-days m y)))
   (make-instance 'date :m m
 		       :d d
 		       :y y))
 
+(declaim (ftype (function (string) date) date-from-sql))
 (defun date-from-sql (sql-date)
   "Creates a bartleby:date object from an sql-date string."
   (loop :with yyyy := ""
@@ -89,16 +108,20 @@
 	     
 ;;; Date Functions
 
+(declaim (ftype (function (date date) (or t null)) equal-date))
 (defun equal-date (date1 date2)
   "Determines whether two dates are equal."
-  (if (and (equal (m date1) (m date2))
-	   (equal (d date1) (d date2))
-	   (equal (y date1) (y date2)))
-	 t
-	 nil))
+  (check-type date1 date)
+  (check-type date2 date)
+  (and (equal (m date1) (m date2))
+       (equal (d date1) (d date2))
+       (equal (y date1) (y date2))))
 
+(declaim (ftype (function (date date) (or t null)) later-date-p))
 (defun later-date-p (date1 date2)
   "Returns t if date1 is later than date2."
+  (check-type date1 date)
+  (check-type date2 date)
   (cond ((equal-date date1 date2) nil)
         ((> (y date1) (y date2)) t)
 	((> (y date2) (y date1)) nil)
@@ -108,8 +131,11 @@
 	((> (d date2) (d date1)) nil)
 	(t t)))
 
+(declaim (ftype (function (date date) date) later-date))
 (defun later-date (date1 date2)
   "Compares two dates, returns the later date."
+  (check-type date1 date)
+  (check-type date2 date)
   (cond ((> (y date1) (y date2)) date1)
 	((> (y date2) (y date1)) date2)
 	((> (m date1) (m date2)) date1)
@@ -118,8 +144,12 @@
 	((> (d date2) (d date1)) date2)
 	(t date1)))
 
+
+(declaim (ftype (function (calendar-month calendar-year) integer) month-days))
 (defun month-days (month year)
   "Given a month and a year, returns the number of days in that month."
+  (check-type month calendar-month)
+  (check-type year calendar-year)
   (second (assoc month (if (leap-year-p year)
 			   leap-year-numbers
 			   common-year-numbers))))
@@ -157,6 +187,7 @@
   (:documentation "Returns a date one year later"))
 
 (defmethod next-year ((date date))
+  "Returns the same date one year in advance"
   (if (and (equal (m date) 2)
 	   (equal (d date) 29))
       (date 3 1 (+ (y date) 1))
@@ -203,18 +234,31 @@
 		      (11 "November")
 		      (12 "December")))
 
+(declaim (ftype (function (calendar-month) string) month-name))
 (defun month-name (n-month)
   "Returns the name for a given month number"
+  (check-type n-month calendar-month)
   (second (assoc n-month month-names)))
 
-(defun day-cycle (day-value change)
+(defun valid-day-of-week-p (n)
+  (<= n 6))
+
+(deftype valid-day-of-week ()
+  `(satisfies valid-day-of-week-p))
+
+(declaim (ftype (function (valid-day-of-week integer) valid-day-of-week) day-cycle))
+(defun day-cycle (day-value change) ; there may be a modular approach but this works for now
   "Cycles through days of the week as designated."
+  (check-type day-value valid-day-of-week)
+  (check-type change integer)
   (cond ((zerop change) day-value)
 	((equal day-value 6) (day-cycle 0 (- change 1)))
 	(t (day-cycle (+ day-value 1) (- change 1)))))
 
+(declaim (ftype (function (calendar-year) (or t null)) leap-year-p))
 (defun leap-year-p (year)
   "Determines whether a given year is a leap year"
+  (check-type year calendar-year)
   (cond ((not (zerop (mod year 4))) nil)
 	((not (zerop (mod year 100))) t)
 	((not (zerop (mod year 400))) nil)
@@ -231,8 +275,12 @@
 		 sum (second (nth i month-list)))))
        (d date))))
 
+(declaim (ftype (function (calendar-year valid-day-of-week calendar-year) list) each-first-of-january))
 (defun each-first-of-january (start-year start-day-of-week end-year)
   "Start from an arbitrary monday january 1st, go up to a specified year, store a list of (year day-of-week)"
+  (check-type start-year calendar-year)
+  (check-type end-year calendar-year)
+  (check-type start-day-of-week valid-day-of-week)
   (loop :with day-of-week := start-day-of-week
 	:for year :from start-year :to end-year
 	:collect (list year day-of-week) :into firsts
@@ -266,6 +314,7 @@
   "Returns the name of the day of the week of a date."
   (second (assoc (day-of-week date) days-of-week)))
 
+(declaim (ftype (function (integer) string) number-suffix))
 (defun number-suffix (n)
   "Given a number, returns the English suffix (st, nd, th)."
   (let ((s (write-to-string n)))

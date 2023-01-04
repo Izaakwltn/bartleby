@@ -133,12 +133,12 @@
 	  :do (return employees)))
 
 (defun employee-first-name-search (first-name)
-  (find-if #'(lambda (e)
+  (remove-if-not #'(lambda (e)
 	       (string-equal first-name (employee-first-name e)))
 	   (all-employees)))
 
 (defun employee-last-name-search (last-name)
-  (find-if #'(lambda (e)
+  (remove-if-not #'(lambda (e)
 	       (string-equal last-name (employee-last-name e)))
 	   (all-employees)))
 			      

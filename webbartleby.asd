@@ -25,6 +25,8 @@
 					   (:file "new-employee")
 					   (:file "new-room")
                                            (:file "view-client")
+                                           (:file "view-employee")
+                                           (:file "view-room")
 					   (:file "browse-clients")
 					   (:file "browse-employees")
 					   (:file "browse-rooms")
@@ -32,4 +34,5 @@
                                            (:file "daily-calendar")
 					   (:file "weekly-calendar")
                                            (:file "monthly-calendar")
-					   (:file "check-out"))))))) ;add edit and view functions
+					   (:file "check-out")
+                                           (:file "search")))))))
