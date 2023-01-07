@@ -19,7 +19,9 @@ If you want to give it a try but don't have your own data to use, clients, emplo
 
 ## Web GUI
 
-Package ```:WEBBARTLEBY``` provides a web-gui application for handling many Bartleby operations. 
+Package ```:WEBBARTLEBY``` provides a web-gui application for handling many Bartleby operations:
+
+!["Bartleby Web GUI Screenshot"](screenshots/webbartleby-screenshot.png "Bartleby Web GUI")
 
 To start from the REPL: 
 
