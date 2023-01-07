@@ -31,7 +31,13 @@ To start from the REPL:
 
 This should start the webbartleby server and open your browser to 127.0.0.1:4242.
 
-You will need to follow the database steps above for full usability.
+Example Screens:
+
+!["Bartleby Monthly Calendar"](screenshots/monthly-calendar.png "Bartleby Monthly Calendar")
+
+!["Browsing Rooms on Bartleby"](screenshots/browsing.png "Browsing Rooms on Bartleby")
+
+You will need to follow the database steps listed above for full usability.
 
 ## Running with Docker (pre-beta)
 
