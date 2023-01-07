@@ -35,6 +35,8 @@ Example Screens:
 
 !["Bartleby Monthly Calendar"](screenshots/monthly-calendar.png "Bartleby Monthly Calendar")
 
+Browse rooms (or clients, employees, or appointments)
+
 !["Browsing Rooms on Bartleby"](screenshots/browsing.png "Browsing Rooms on Bartleby")
 
 You will need to follow the database steps listed above for full usability.
