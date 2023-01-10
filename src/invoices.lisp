@@ -459,17 +459,17 @@
                            (client-first-name c)
                            (client-last-name c)
                            (makeup-minutes-before c
-                                           (timestamp (date (invoice-month invoice)
+                                           (make-timestamp (date (invoice-month invoice)
                                                               1
                                                               (invoice-year invoice))
-                                                        (set-time 1 0)))
+                                                        (make-time 1 0)))
 
                            (makeup-minutes-before c
-                                                  (timestamp (date (invoice-month invoice)
+                                                  (make-timestamp (date (invoice-month invoice)
                                                                    (month-days (invoice-month invoice)
                                                                                (invoice-year invoice))
                                                                    (invoice-year invoice))
-                                                             (set-time 11 0))))
+                                                             (make-time 11 0))))
 
                (pdf:get-font "Helvetica")
                12)
