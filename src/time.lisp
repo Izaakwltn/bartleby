@@ -120,6 +120,23 @@
 	      (later-time-p latetime newtime))
 	 t)))
 
+;;; Timezones (headache)
+
+;;; the more functional approach would be to just have (current-timezone)
+
+(defun current-timezone ()
+  local-time:*default-timezone*)
+
+(defun current-timezone-offset ()
+  (/ (nth 9
+                         (multiple-value-list
+                          (local-time:decode-timestamp (local-time:now))))
+                       3600))
+
+(defun current-timezone-offset-minutes ()
+  (* (current-timezone-offset) 60))
+
+;;; probably don't need this but leaving it for now
 
 (defvar tz local-time:*default-timezone*)
 
@@ -129,3 +146,12 @@
                        3600))
 
 (defvar *tz-offset-minutes* (* *tz-offset* 60))
+
+(defun refresh-timezone ()
+  "Resets timezone information."
+  (setq tz local-time:*default-timezone*)
+  (setq *tz-offset* (/ (nth 9
+                         (multiple-value-list
+                          (local-time:decode-timestamp (local-time:now))))
+                       3600))
+  (setq *tz-offset-minutes* (* *tz-offset* 60)))

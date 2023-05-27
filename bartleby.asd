@@ -7,7 +7,7 @@
   :author "Izaak Walton <izaakw@protonmail.com>"
   :license "GNU General Purpose License"
   :description "Scheduling System"
-  :depends-on ("local-time" "mito" "alexa" "cl-pdf")
+  :depends-on (:local-time :mito :alexa :cl-pdf :coalton)
   :serial t
   :components ((:module "src"
                 :serial t

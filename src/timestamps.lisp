@@ -51,7 +51,7 @@
                 "-")
             (two-digits (write-to-string (abs *tz-offset*))))))
 
-;;;;parse with a lexer instead of
+;;;; 
 (alexa:define-string-lexer timestamp-parser
   ((:noise "[^0-9]")
    (:num "[0-9][0-9]*"))
@@ -60,12 +60,14 @@
   ("{{NUM}}" (return (princ-to-string $@))))
 
 (defun parse-timestamp (t-string)
+  "Breaks a timestamp into number values."
   (loop :with lexer := (timestamp-parser t-string)
         :for tok := (funcall lexer)
         :while tok
         :collect tok))
 
 (defun timestamp-from-sql (t-string)
+  "Takes a sql timestamp, returns a bartleby timestamp."
   (let ((parsed (mapcar #'parse-integer
                         (parse-timestamp t-string))))
     (make-timestamp (date (second parsed)
@@ -75,10 +77,10 @@
                          (nth 4 parsed)))))
 
 (defun timestamp-from-sql-with-offset (t-string)
-  (add-time (timestamp-from-sql t-string) *tz-offset-minutes*))
+  (add-time (timestamp-from-sql t-string) (current-timezone-offset-minutes)))
 
 (declaim (ftype (function (date set-time) timestamp) make-timestamp)) 
-(defun make-timestamp (date time) ;move above printing functions maybe
+(defun make-timestamp (date time) ;should timestamp include timezone?
   (make-instance 'timestamp :date-o date
 		            :time-o time))
 

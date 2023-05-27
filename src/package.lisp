@@ -37,15 +37,17 @@
 	   #:later-time
 	   #:equal-time
 	   #:time-conflict-p
-           #:tz ;timezone
+
+           ;; timezones
+           #:current-timezone
+           #:current-timezone-offset
+           #:current-timezone-offset-minutes
+           #:tz ; global variables
            #:*tz-offset*
            #:*tz-offset-minutes*)
   
   ;;; dates.lisp
-  (:export #:calendar-month ; type
-           #:calendar-year ; type
-           #:valid-day-of-week ; type
-   #:date ;class and function
+  (:export #:date ;class and function
 	   #:date-from-sql
 	   #:later-date-p
 	   #:later-date
