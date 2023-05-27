@@ -29,7 +29,7 @@
 
   (declare add-time (Clock-time -> Integer -> Clock-time))
   (define (add-time time minutes)
-    (if (coalton-library/math/arith:zero? minutes)
+    (if (arith:zero? minutes)
         time
         (match time
           ((Clock-time 24 59)

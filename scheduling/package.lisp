@@ -7,4 +7,6 @@
    #:coalton
    #:coalton-prelude)
   (:local-nicknames
-   (#:sql #:bartleby-sql)))
+   (#:sql #:bartleby-sql)
+   (#:list #:coalton-library/list)
+   (#:arith #:coalton-library/math)))

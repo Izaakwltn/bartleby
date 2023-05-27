@@ -3,7 +3,9 @@
 ;;;; Copyright Izaak Walton (C) 2022-2023
 
 (defpackage #:bartleby-sql
-  (:use #:mito))
+  (:use
+   #:cl
+   #:mito))
 
 (in-package #:bartleby-sql)
 
