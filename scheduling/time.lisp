@@ -5,45 +5,59 @@
 (in-package #:bartleby-scheduling)
 
 (coalton-toplevel
-  (repr :native clock-time)
-  (define-type Clock-time
-    (Clock-time UFix UFix))
-
-  ;(declare make-time (Clock-hour -> Clock-minutes -> Clock-time))
-  #+ignore(define (make-time hour minutes)
-    (if (not (and (and (>= minutes 0) (< minutes 60))
-                  (and (>= hour 0) (< hour 24))))
-        (error "Invalid hour:minutes ~a:~a")
-        (Clock-time 10 30)))
-
-  (define (valid-hour n)
-    (and (> n 0)
-         (<= n 24)))
-
-  (define (valid-minutes n)
-    (and (>= n 0)
-         (< n 60)))
   
-  (declare extract (Clock-time -> (Tuple UFix UFix)))
-  (define (extract clock-time)
-    (match clock-time
-      ((Clock-time hour minutes) (Tuple hour minutes))))
-      ;(_ (error "improper clock-time"))))
+  #+ignore (repr :native clock-time) ; probably unecessary
+  (define-type Clock-time
+    (Clock-time Integer Integer))
 
-  #+ignore
-  (declare add-time (Clock-time -> UFix -> Clock-time))
 
+  (define-instance (Eq Clock-time)
+    (define (== a b)
+      (== (match a
+            ((Clock-time h m) (make-list h m)))
+          (match b
+            ((Clock-time h m) (make-list h m))))))
+
+  (define-instance (Ord Clock-time)
+    (define (<=> a b)
+      (let (Clock-time h1 m1) = a)
+      (let (Clock-time h2 m2) = b)
+      (match (<=> h1 h2)
+        ((LT) LT)
+        ((GT) GT)
+        ((EQ) (<=> m1 m2)))))
+
+  (declare add-time (Clock-time -> Integer -> Clock-time))
   (define (add-time time minutes)
-    (let t = (extract time))
-    (cond
-      ((coalton-library/math/arith:zero? minutes) time)
-      ((and (== (fst t) 24)
-            (== (snd t) 59))
-       (add-time (Clock-time 1 0) (1- minutes)))
-      ((== (snd t) 59)
-       (add-time (Clock-time (1+ (fst t)) 0) (1- minutes)))
-      (True (add-time (Clock-time (fst t) (1+ (snd t))) (1- minutes)))))
+    (if (coalton-library/math/arith:zero? minutes)
+        time
+        (match time
+          ((Clock-time 24 59)
+           (add-time (Clock-time 1 0) (1- minutes)))
+          ((Clock-time h 59)
+           (add-time (Clock-time (1+ h) 0) (1- minutes)))
+          ((Clock-time h m)
+           (add-time (Clock-time h (1+ m)) (1- minutes))))))
 
+  ;;;
+  ;;; Handling Local Time and Timezones
+  ;;;
 
-  )
+  (define (current-time)
+    "Returns the current local time."
+    (Clock-time
+     (lisp Integer () (local-time:timestamp-hour (local-time:now)))
+     (lisp Integer () (local-time:timestamp-minute (local-time:now)))))
+  
+  (define (current-timezone)
+    (Lisp (List String) ()
+      (cl:multiple-value-list local-time:*default-timezone*)))
+
+  (define (current-timezone-offset)
+    (Lisp Integer ()
+      (cl:/ (cl:nth 9 (cl:multiple-value-list (local-time:decode-timestamp (local-time:now))))
+            3600)))
+
+  (define (current-timezone-offset-minutes)
+    (* (current-timezone-offset) 60)))
 
