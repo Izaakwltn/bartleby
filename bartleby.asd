@@ -1,6 +1,6 @@
 ;;;; bartleby.asd
 ;;;;
-;;;; Copyright Izaak Walton (c) 2022
+;;;; Copyright Izaak Walton (c) 2022-2023
 
 (asdf:defsystem #:bartleby
   :version "0.0.1"
